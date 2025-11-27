@@ -8,6 +8,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
+
+   npx expo install react-native-vector-icons
+   
    ```
 
 2. Start the app
