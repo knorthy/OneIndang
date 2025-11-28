@@ -14,20 +14,25 @@ import { hp, wp } from '../../helpers/common';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Feather from "react-native-vector-icons/Feather";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"; // Added for graduation cap
 
 export default function HomeScreen() {
   const services = [
     { title: "Services", icon: <Ionicons name="apps" size={38} color="#D32F2F" /> },
     { title: "Citizen Guide", icon: <MaterialIcons name="menu-book" size={38} color="#D32F2F" /> },
-    { title: "E-Services", icon: <Ionicons name="globe-outline" size={38} color="#D32F2F" /> },
+    { 
+      title: "Students", 
+      icon: <MaterialCommunityIcons name="school" size={40} color="#D32F2F" /> // Great student icon
+      // Alternative icons you can use:
+      // icon: <Ionicons name="school" size={38} color="#D32F2F" />
+      // icon: <FontAwesome name="graduation-cap" size={38} color="#D32F2F" />
+    },
     { title: "Emergency", icon: <Ionicons name="warning" size={38} color="#D32F2F" /> },
-    { title: "Utilities", icon: <Ionicons name="flash" size={38} color="#D32F2F" /> },
     { title: "Transport", icon: <MaterialIcons name="directions-bus" size={38} color="#D32F2F" /> },
     { title: "Business", icon: <FontAwesome name="building" size={36} color="#D32F2F" /> },
-    { title: "View More", icon: <Feather name="chevron-up" size={40} color="#D32F2F" /> },
   ];
 
+  // ... rest of your component remains exactly the same
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8FAFF" }}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
