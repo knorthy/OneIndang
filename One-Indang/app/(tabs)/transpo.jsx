@@ -9,6 +9,7 @@ import {
   StyleSheet,
   StatusBar,
   Animated,
+  Alert,
 } from 'react-native';
 import { hp, wp } from '../../helpers/common';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -45,8 +46,7 @@ export default function App() {
 
   useEffect(() => {
     const now = new Date();
-    const phTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Manila"}));
-    const hour = phTime.getHours();
+    const hour = now.getHours();
     let greeting = 'Good Morning';
     if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
     else if (hour >= 17) greeting = 'Good Evening';
@@ -68,7 +68,7 @@ export default function App() {
   };
 
   const calculateFare = () => {
-    let rate = 12; // default
+    let rate = 12; 
     if (selectedTransport === 'Tricycle') rate = 10;
     else if (selectedTransport === 'Bus') rate = 12;
     else if (selectedTransport === 'Jeep') rate = 8;
@@ -77,6 +77,49 @@ export default function App() {
       const calculated = parseFloat(distance) * rate;
       setFare(calculated.toFixed(2));
     }
+  };
+
+  const handleDirection = () => {
+    // Handle directions for personal car
+    if (startingPoint && destination) {
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(startingPoint)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+      // In a real app, you might use Linking.openURL(url) or a maps library
+      console.log('Opening directions:', url);
+      // For now, show an alert
+      Alert.alert(
+        'Directions',
+        `Getting directions from ${startingPoint} to ${destination}`,
+        [{ text: 'OK' }]
+      );
+    } else {
+      Alert.alert(
+        'Missing Information',
+        'Please enter both starting point and destination for directions',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const handleRecommendationPress = (item) => {
+    // Handle recommendation item press
+    console.log('Selected recommendation:', item);
+    // In a real app, you might navigate to a details screen
+    Alert.alert(
+      'Recommendation Selected',
+      `Selected: ${item.title} - ${item.distance}`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleSearchSubmit = () => {
+    // Handle search submission
+    console.log('Search submitted');
+    // In a real app, you might perform a search
+    Alert.alert(
+      'Search',
+      'Search functionality coming soon!',
+      [{ text: 'OK' }]
+    );
   };
 
   return (
@@ -102,8 +145,10 @@ export default function App() {
             <Icon name="search" size={18} color="#D32F2F" style={{marginRight: 10}} />
             <TextInput
               placeholder="Discover places"
-              placeholderTextColor="#BBDEFB"
+              placeholderTextColor="#666"
               style={styles.searchInput}
+              onSubmitEditing={handleSearchSubmit}
+              returnKeyType="search"
             />
           </View>
         </View>
@@ -168,7 +213,7 @@ export default function App() {
             </View>
 
             <View style={styles.distanceRow}>
-              <TouchableOpacity style={styles.calculateBtn} onPress={calculateFare}>
+              <TouchableOpacity style={styles.calculateBtn} onPress={selectedTransport === 'Personal Car' ? handleDirection : calculateFare}>
                 <Text style={styles.calculateBtnText}>{selectedTransport === 'Personal Car' ? 'Direction' : 'Calculate'}</Text>
               </TouchableOpacity>
             </View>
@@ -192,7 +237,7 @@ export default function App() {
           {showAllRecommendations ? (
             <ScrollView style={styles.fullRecommendationsContainer} showsVerticalScrollIndicator={false}>
               {recommendations.map((item) => (
-                <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => console.log('Selected', item)}>
+                <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => handleRecommendationPress(item)}>
                   <View style={styles.fullCardImageContainer}>
                     <View style={styles.cardImagePlaceholder}>
                       <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
@@ -401,7 +446,7 @@ const styles = StyleSheet.create({
   },
   cardDistance: {
     fontSize: 13,
-    color: '#BBDEFB',
+    color: '#666',
   },
   recommendationsContainer: {
     paddingHorizontal: wp(5),
@@ -448,7 +493,7 @@ const styles = StyleSheet.create({
   },
   fullCardDistance: {
     fontSize: hp(1.6),
-    color: '#BBDEFB',
+    color: '#666',
   },
   row: {
     flexDirection: 'row',
