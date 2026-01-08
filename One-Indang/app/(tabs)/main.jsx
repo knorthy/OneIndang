@@ -36,7 +36,7 @@ export default function HomeScreen() {
     {
       title: "Students",
       icon: <MaterialCommunityIcons name="school" size={40} color="#D32F2F" />,
-      route: "/students", // This will navigate to StudentsScreen
+      route: "/studmain", 
     },
     {
       title: "Emergency",

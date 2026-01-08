@@ -16,15 +16,14 @@ import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Importing your helpers
+
 import { hp, wp } from '../../helpers/common'; 
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
-  // --- STATE MANAGEMENT ---
-  const [currentStep, setCurrentStep] = useState(1); // 1 = Form, 2 = OTP
+  const [currentStep, setCurrentStep] = useState(1); 
 
-  // FORM STATE
+ 
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -33,7 +32,7 @@ const AccountSetupScreen = () => {
 
   // OTP STATE
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
-  const [timerCount, setTimer] = useState(60); // CHANGED: Set to 60 seconds (1 minute)
+  const [timerCount, setTimer] = useState(60); 
   const inputRefs = useRef([]); 
 
   // ERROR STATE
@@ -64,7 +63,7 @@ const AccountSetupScreen = () => {
     });
   }, [password]);
 
-  // Timer Countdown (Only runs when in Step 2)
+
   useEffect(() => {
     let interval;
     if (currentStep === 2 && timerCount > 0) {
@@ -76,7 +75,6 @@ const AccountSetupScreen = () => {
   }, [currentStep, timerCount]);
 
 
-  // --- HANDLERS: STEP 1 (FORM) ---
 
   const handlePhoneChange = (text) => {
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -103,11 +101,11 @@ const AccountSetupScreen = () => {
 
     if (valid) {
       setCurrentStep(2);
-      setTimer(60); // Reset timer when entering step 2
+      setTimer(60);
     }
   };
 
-  // --- HANDLERS: STEP 2 (OTP) ---
+
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -129,9 +127,9 @@ const AccountSetupScreen = () => {
     }
   };
 
-  // New Resend Handler
+
   const handleResendCode = () => {
-    setTimer(60); // Reset back to 1 minute
+    setTimer(60);
     Alert.alert("Code Resent", "A new verification code has been sent to your number.");
     // Add your actual API resend call here
   };
@@ -146,7 +144,6 @@ const AccountSetupScreen = () => {
 
   const isFullCode = otpCode.every((digit) => digit !== '');
 
-  // --- RENDER ---
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar style="dark" />
@@ -287,7 +284,7 @@ const AccountSetupScreen = () => {
                           ))}
                         </View>
 
-                        {/* TIMER LOGIC: SHOW TEXT OR CLICKABLE BUTTON */}
+                
                         <View style={styles.timerContainer}>
                             {timerCount > 0 ? (
                                 <Text style={styles.timerText}>
@@ -346,7 +343,6 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
 
-  // Header & Progress
   header: {
     marginTop: hp(3), 
     marginBottom: hp(1),
@@ -367,7 +363,6 @@ const styles = StyleSheet.create({
     marginRight: wp(2),
   },
 
-  // Main Scroll Area
   keyboardContainer: {
     flex: 1,
   },
@@ -376,7 +371,6 @@ const styles = StyleSheet.create({
     paddingBottom: hp(15), 
   },
   
-  // Text Styles
   title: {
     fontSize: hp(3), 
     fontWeight: '800',
@@ -391,7 +385,6 @@ const styles = StyleSheet.create({
     marginBottom: hp(4),
   },
 
-  // Form Styles
   formContainer: {
     gap: hp(3),
   },
@@ -466,7 +459,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
 
-  // Password Criteria
   criteriaContainer: {
     marginTop: hp(1),
   },
@@ -484,7 +476,6 @@ const styles = StyleSheet.create({
     color: '#388E3C',
   },
 
-  // --- OTP Specific Styles ---
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -504,7 +495,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   
-  // Timer & Resend Styles (UPDATED)
   timerContainer: {
     marginBottom: hp(5),
   },
@@ -514,12 +504,11 @@ const styles = StyleSheet.create({
   },
   resendLinkText: {
     fontSize: hp(1.9),
-    color: '#D32F2F', // Brand Red
+    color: '#D32F2F',
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
 
-  // Footer Button
   footerContainer: {
     position: 'absolute',
     bottom: hp(4),
