@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   TouchableOpacity,
@@ -9,7 +8,8 @@ import {
   StatusBar,
   StyleSheet,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { hp, wp } from "../../helpers/common";
 
 // Icons
@@ -19,47 +19,48 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function HomeScreen() {
-  const navigation = useNavigation();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const services = [
     {
       title: "Services",
       icon: <Ionicons name="apps" size={38} color="#D32F2F" />,
-      route: "Services",
+      route: "/services",
     },
     {
       title: "Citizen Guide",
       icon: <MaterialIcons name="menu-book" size={38} color="#D32F2F" />,
-      route: "CitizenGuide",
+      route: "/citizen",
     },
     {
       title: "Students",
       icon: <MaterialCommunityIcons name="school" size={40} color="#D32F2F" />,
-      route: "Students", // This will navigate to StudentsScreen
+      route: "/students", // This will navigate to StudentsScreen
     },
     {
       title: "Emergency",
       icon: <Ionicons name="warning" size={38} color="#D32F2F" />,
-      route: "Emergency",
+      route: "/emergency",
     },
     {
       title: "Transport",
       icon: <MaterialIcons name="directions-bus" size={38} color="#D32F2F" />,
-      route: "transpo",
+      route: "/transpo",
     },
     {
       title: "Business",
       icon: <FontAwesome name="building" size={36} color="#D32F2F" />,
-      route: "Business",
+      route: "/business",
     },
   ];
 
   const handleServicePress = (route) => {
-    navigation.navigate(route);
+    router.push(route);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
 
       {/* Map Header */}
@@ -83,7 +84,7 @@ export default function HomeScreen() {
 
           <Text style={styles.mainTitle}>One Indang ahuy</Text>
 
-          <TouchableOpacity style={styles.createAccountButton}>
+          <TouchableOpacity style={styles.createAccountButton} onPress={() => router.push('/signup')}>
             <Text style={styles.createAccountText}>Create your account</Text>
             <Ionicons name="arrow-forward" size={20} color="#D32F2F" style={styles.arrowIcon} />
           </TouchableOpacity>
@@ -121,7 +122,7 @@ export default function HomeScreen() {
 
         <View style={{ height: hp(10) }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFF",
   },
   mapHeader: {
-    height: hp(35),
+    height: hp(33),
   },
   mapBackground: {
     flex: 1,
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     flexDirection: "row",
     paddingHorizontal: wp(5),
-    paddingTop: hp(6),
+    paddingTop: hp(4.5),
     alignItems: "center",
   },
   searchInput: {
