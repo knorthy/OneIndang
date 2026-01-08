@@ -1,18 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-
-// ... (keep your other imports)
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false, // ✅ This ensures NO default headers on any tab
-        tabBarActiveTintColor: '#D32F2F', // Brand Red
-        tabBarInactiveTintColor: 'gray',
+        headerShown: false, // ✅ CRITICAL: This hides "<- services"
+        tabBarActiveTintColor: '#D32F2F',
+        tabBarStyle: { height: 60, paddingBottom: 10, paddingTop: 5 },
       }}
     >
-      {/* Home Tab */}
       <Tabs.Screen
         name="main"
         options={{
@@ -20,8 +17,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
         }}
       />
-
-      {/* ✅ NEW: Services Tab */}
       <Tabs.Screen
         name="services"
         options={{
@@ -29,8 +24,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="grid" size={24} color={color} />,
         }}
       />
-
-      {/* Citizen Guide Tab (Existing) */}
       <Tabs.Screen
         name="citizen"
         options={{
@@ -38,8 +31,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} />,
         }}
       />
-
-      {/* Emergency Tab (Existing) */}
       <Tabs.Screen
         name="emergency"
         options={{
@@ -47,10 +38,8 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="warning" size={24} color={color} />,
         }}
       />
-      
-      {/* Account Tab (Placeholder) */}
       <Tabs.Screen
-        name="account" 
+        name="account"
         options={{
           title: 'Account',
           tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,

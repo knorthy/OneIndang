@@ -4,12 +4,11 @@ export default function ServicesLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // ✅ This hides the default "<- (services)" header
-        animation: 'slide_from_right',
+        headerShown: false, // ✅ CRITICAL: This hides "<- detail" and "<- guide"
       }}
     >
-      <Stack.Screen name="detail" />
-      <Stack.Screen name="guide" />
+      <Stack.Screen name="detail" options={{ headerShown: false }} />
+      <Stack.Screen name="guide" options={{ headerShown: false }} />
     </Stack>
   );
 }

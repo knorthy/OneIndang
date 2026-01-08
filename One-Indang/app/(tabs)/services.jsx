@@ -1,16 +1,17 @@
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { router, Stack } from 'expo-router';
-import {
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+import React, { useState } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  ScrollView, 
+  TextInput, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  StatusBar,
+  Platform
 } from 'react-native';
+import { router, Stack } from 'expo-router'; 
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
 
 // --- THEME COLORS ---
@@ -20,18 +21,17 @@ const COLORS = {
   background: '#ffffff',
   text: '#003087',
   textGray: '#666666',
-  lightRedBg: '#FFEBEE', // Very light red for icon backgrounds
-  lightBlueBg: '#E3F2FD', // Very light blue for icon backgrounds
+  lightRedBg: '#FFEBEE', 
+  lightBlueBg: '#E3F2FD', 
 };
 
-// --- 1. E-SERVICES ---
+// --- DATA CONSTANTS ---
 const E_SERVICES = [
   { id: 1, title: 'Business Permit', icon: 'briefcase-outline', color: COLORS.secondary },
   { id: 2, title: 'Real Property Tax', icon: 'home-city-outline', color: COLORS.primary },
   { id: 3, title: 'Local Civil Registry', icon: 'file-document-outline', color: COLORS.secondary },
 ];
 
-// --- 2. FEATURED SERVICES ---
 const FEATURED_SERVICES = [
   { id: 'livelihood', title: 'Livelihood Training & Loan Assistance', icon: 'toolbox', library: 'MaterialCommunityIcons', color: COLORS.secondary },
   { id: 'medical_cert', title: 'Medical Certificate', icon: 'stethoscope', library: 'MaterialCommunityIcons', color: COLORS.primary },
@@ -41,7 +41,6 @@ const FEATURED_SERVICES = [
   { id: 'summer_job', title: 'Summer Employment', icon: 'school', library: 'MaterialCommunityIcons', color: COLORS.primary },
 ];
 
-// --- 3. POPULAR SERVICES ---
 const POPULAR_SERVICES = [
   { 
     id: 'facilities', 
@@ -80,7 +79,6 @@ const POPULAR_SERVICES = [
   },
 ];
 
-// --- 4. GUIDE CATEGORIES ---
 const SERVICE_GUIDES = [
   { id: 'health', title: 'Health and Nutrition' },
   { id: 'social', title: 'Social Services' },
@@ -96,7 +94,27 @@ const SERVICE_GUIDES = [
 ];
 
 export default function ServicesScreen() {
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // --- FILTER LOGIC ---
+  const filteredPopular = POPULAR_SERVICES.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredEServices = E_SERVICES.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredFeatured = FEATURED_SERVICES.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredGuides = SERVICE_GUIDES.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Helper to render icons dynamically
   const renderIcon = (lib, name, size, color) => {
     const iconSize = hp(3.5); 
     if (lib === 'MaterialIcons') return <Ionicons name={name} size={size || iconSize} color={color} />;
@@ -106,7 +124,7 @@ export default function ServicesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
+      {/* Note: We removed Stack.Screen here because _layout handles it now */}
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
       {/* Header */}
@@ -120,6 +138,7 @@ export default function ServicesScreen() {
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Search Bar */}
         <View style={styles.searchContainer}>
@@ -128,94 +147,132 @@ export default function ServicesScreen() {
             style={styles.searchInput} 
             placeholder="Search..." 
             placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
           />
-        </View>
-
-        {/* 1. Popular Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Popular Services</Text>
-          <Text style={styles.sectionSubtitle}>Avail municipal services in just a few taps.</Text>
-
-          {POPULAR_SERVICES.map((service) => (
-            <TouchableOpacity 
-              key={service.id} 
-              style={styles.card}
-              onPress={() => router.push({
-                pathname: '/(services)/detail',
-                params: { id: service.id }
-              })}
-            >
-              <View style={[styles.cardIconBox, { backgroundColor: service.color === COLORS.primary ? COLORS.lightBlueBg : COLORS.lightRedBg }]}>
-                <MaterialCommunityIcons name={service.icon} size={hp(3)} color={service.color} />
-              </View>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardTitle}>{service.title}</Text>
-                <Text style={styles.cardSubtitle}>{service.subtitle}</Text>
-              </View>
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+               <Ionicons name="close-circle" size={hp(2.5)} color="#999" />
             </TouchableOpacity>
-          ))}
+          )}
         </View>
 
-        {/* 2. e-Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>e-Services</Text>
-          <Text style={styles.sectionSubtitle}>
-            Login to the Online Services portal.
-          </Text>
-          <View style={styles.eServicesGrid}>
-            {E_SERVICES.map((item) => (
-              <TouchableOpacity key={item.id} style={styles.eServiceItem}>
-                <View style={[styles.iconBox, { backgroundColor: item.color === COLORS.primary ? COLORS.lightBlueBg : COLORS.lightRedBg }]}>
-                  <MaterialCommunityIcons name={item.icon} size={hp(3.5)} color={item.color} />
-                </View>
-                <Text style={styles.gridLabel}>{item.title}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+        {/* 1. Popular Services (Hide if no matches) */}
+        {filteredPopular.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Popular Services</Text>
+            {searchQuery === '' && (
+              <Text style={styles.sectionSubtitle}>Avail municipal services in just a few taps.</Text>
+            )}
 
-        {/* 3. Featured Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Featured Services</Text>
-          <Text style={styles.sectionSubtitle}>Quick guides and forms for essential services.</Text>
-          
-          <View style={styles.featuredGrid}>
-            {FEATURED_SERVICES.map((item) => (
+            {filteredPopular.map((service) => (
               <TouchableOpacity 
-                key={item.id} 
-                style={styles.featuredCard}
-                onPress={() => router.push({ pathname: '/(services)/detail', params: { id: item.id } })}
-              >
-                 <View style={styles.featuredIconContainer}>
-                    {renderIcon(item.library, item.icon, hp(3.5), item.color)}
-                 </View>
-                 <Text style={styles.featuredTitle}>{item.title}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* 4. Guide to All Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Guide to All Services</Text>
-          <Text style={styles.sectionSubtitle}>Requirements and procedures for availing City Services.</Text>
-          
-          <View style={styles.listContainer}>
-            {SERVICE_GUIDES.map((guide) => (
-              <TouchableOpacity 
-                key={guide.id} 
-                style={styles.listItem}
+                key={service.id} 
+                style={styles.card}
                 onPress={() => router.push({
-                  pathname: '/(services)/guide',
-                  params: { categoryId: guide.id }
+                  pathname: '/(services)/detail',
+                  params: { id: service.id }
                 })}
               >
-                <Text style={styles.listItemText}>{guide.title}</Text>
-                <Ionicons name="chevron-forward" size={hp(2.5)} color={COLORS.textGray} />
+                <View style={[styles.cardIconBox, { backgroundColor: service.color === COLORS.primary ? COLORS.lightBlueBg : COLORS.lightRedBg }]}>
+                  <MaterialCommunityIcons name={service.icon} size={hp(3)} color={service.color} />
+                </View>
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{service.title}</Text>
+                  <Text style={styles.cardSubtitle}>{service.subtitle}</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        )}
+
+        {/* 2. e-Services (Hide if no matches) */}
+        {filteredEServices.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>e-Services</Text>
+            {searchQuery === '' && (
+              <Text style={styles.sectionSubtitle}>Login to the Online Services portal.</Text>
+            )}
+            <View style={styles.eServicesGrid}>
+              {filteredEServices.map((item) => (
+                <TouchableOpacity key={item.id} style={styles.eServiceItem}>
+                  <View style={[styles.iconBox, { backgroundColor: item.color === COLORS.primary ? COLORS.lightBlueBg : COLORS.lightRedBg }]}>
+                    <MaterialCommunityIcons name={item.icon} size={hp(3.5)} color={item.color} />
+                  </View>
+                  <Text style={styles.gridLabel}>{item.title}</Text>
+                </TouchableOpacity>
+              ))}
+              {/* Spacer views to keep grid alignment if filtering leaves gaps (optional, but good for flex) */}
+              {filteredEServices.length === 1 && <View style={{width: wp(28)}} />} 
+              {filteredEServices.length === 1 && <View style={{width: wp(28)}} />} 
+            </View>
+          </View>
+        )}
+
+        {/* 3. Featured Services (Hide if no matches) */}
+        {filteredFeatured.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Featured Services</Text>
+            {searchQuery === '' && (
+              <Text style={styles.sectionSubtitle}>Quick guides and forms for essential services.</Text>
+            )}
+            
+            <View style={styles.featuredGrid}>
+              {filteredFeatured.map((item) => (
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={styles.featuredCard}
+                  onPress={() => router.push({ pathname: '/(services)/detail', params: { id: item.id } })}
+                >
+                   <View style={styles.featuredIconContainer}>
+                      {renderIcon(item.library, item.icon, hp(3.5), item.color)}
+                   </View>
+                   <Text style={styles.featuredTitle}>{item.title}</Text>
+                </TouchableOpacity>
+              ))}
+              {/* Keep grid aligned if only 1 item matches */}
+              {filteredFeatured.length % 2 !== 0 && <View style={styles.featuredCardHidden} />}
+            </View>
+          </View>
+        )}
+
+        {/* 4. Guide to All Services (Hide if no matches) */}
+        {filteredGuides.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Guide to All Services</Text>
+            {searchQuery === '' && (
+              <Text style={styles.sectionSubtitle}>Requirements and procedures for availing City Services.</Text>
+            )}
+            
+            <View style={styles.listContainer}>
+              {filteredGuides.map((guide) => (
+                <TouchableOpacity 
+                  key={guide.id} 
+                  style={styles.listItem}
+                  onPress={() => router.push({
+                    pathname: '/(services)/guide',
+                    params: { categoryId: guide.id }
+                  })}
+                >
+                  <Text style={styles.listItemText}>{guide.title}</Text>
+                  <Ionicons name="chevron-forward" size={hp(2.5)} color={COLORS.textGray} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* No Results Found State */}
+        {searchQuery.length > 0 && 
+         filteredPopular.length === 0 && 
+         filteredEServices.length === 0 && 
+         filteredFeatured.length === 0 && 
+         filteredGuides.length === 0 && (
+          <View style={{ alignItems: 'center', marginTop: hp(5) }}>
+            <Ionicons name="search-outline" size={hp(8)} color="#ddd" />
+            <Text style={{ color: '#999', marginTop: 10 }}>No services found matching "{searchQuery}"</Text>
+          </View>
+        )}
 
         <View style={{ height: hp(10) }} />
       </ScrollView>
@@ -244,7 +301,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: hp(3.5),
     fontWeight: 'bold',
-    color: COLORS.primary, // Blue Title
+    color: COLORS.primary,
   },
   notificationBtn: {
     padding: wp(2),
@@ -282,7 +339,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: hp(2.2),
     fontWeight: '700',
-    color: COLORS.primary, // Blue Section Titles
+    color: COLORS.primary,
     marginBottom: hp(0.5),
   },
   sectionSubtitle: {
@@ -293,11 +350,13 @@ const styles = StyleSheet.create({
   },
   eServicesGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', // Ensures items spread out
+    flexWrap: 'wrap', // Allows wrapping if we search and match weird numbers
   },
   eServiceItem: {
     width: wp(28),
     alignItems: 'center',
+    marginBottom: hp(2), // Added margin in case of wrapping
   },
   iconBox: {
     width: hp(8),
@@ -330,6 +389,10 @@ const styles = StyleSheet.create({
     marginBottom: hp(1.5),
     minHeight: hp(16),
     justifyContent: 'space-between',
+  },
+  featuredCardHidden: {
+    width: wp(43), // Invisible spacer to keep alignment
+    height: 0,
   },
   featuredIconContainer: {
     alignSelf: 'flex-start',

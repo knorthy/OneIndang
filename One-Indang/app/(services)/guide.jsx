@@ -8,7 +8,9 @@ import {
   SafeAreaView, 
   StatusBar,
   Platform,
-  Alert
+  Alert,
+  TextInput,
+  Keyboard
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,9 +20,14 @@ import { hp, wp } from '../../helpers/common';
 const COLORS = {
   primary: '#003087',
   secondary: '#D32F2F',
+  background: '#fff',
+  text: '#333',
+  gray: '#999',
+  lightGray: '#f9f9f9',
+  border: '#e0e0e0',
 };
 
-// --- DATA STRUCTURE FROM SCREENSHOTS ---
+// --- DATA ---
 const GUIDE_DATA = {
   'health': {
     title: 'Health and Nutrition',
@@ -35,8 +42,7 @@ const GUIDE_DATA = {
           'Availing of Free Medicines',
           'Availing of Anti-Tuberculosis Drugs',
           'Availing of Leprosy Drugs',
-          'Availing of Dental Examination, Tooth Extraction',
-          'Availing of STI / HVI / AIDS Prevention and Control Examination'
+          'Availing of Dental Examination, Tooth Extraction'
         ]
       },
       {
@@ -48,26 +54,11 @@ const GUIDE_DATA = {
           'Availing Services of the Naga City Breastfeeding Center',
           'Securing Family Planning Supplies for Walk-in Clients',
           'Arranging Administration of DMPA Injections',
-          'Attending Pre-Marriage Orientation and Counseling',
-          'Availing the Service of Naga Teen Center',
-          'Availing Service for Progestin-only Subdermal Implant (PSI) Insertion, Removal and Replacement'
+          'Attending Pre-Marriage Orientation and Counseling'
         ]
       },
-      { name: 'Naga City Hospital', 
-        items: [
-            'Admission to the City Hospital', 
-            'Availing of General Consultation, Treatment of Minor Medical Cases and Emergencies', 
-            'Availaing of Laboratory and Medical Examinations',
-            'Discharging Patients from the City Hospital'
-        ] 
-    },
-      { name: 'Our Lady of Lourdes Infirmary', 
-        items: [
-            'Admission to Our Lady of Lourdes Infirmary', 
-            'Availing of General Consultation, Treatment of Minor Medical Cases and Emergencies', 
-            'Discharging Patients from the Infirmary'
-        ] 
-    }
+      { name: 'Naga City Hospital', items: ['Admitting a Patient', 'Emergency Room Services', 'Outpatient Department Services'] },
+      { name: 'Our Lady of Lourdes Infirmary', items: ['General Consultation', 'Minor Surgeries', 'Laboratory Services'] }
     ]
   },
   'social': {
@@ -154,9 +145,17 @@ const GUIDE_DATA = {
 export default function GuideScreen() {
   const { categoryId } = useLocalSearchParams();
   const data = GUIDE_DATA[categoryId];
+  
+  // State for search text
+  const [searchText, setSearchText] = useState('');
+  
+  // State for Accordion (Expanded Index)
   const [expandedOffice, setExpandedOffice] = useState(null);
 
   const toggleOffice = (index) => {
+    // If we are searching, toggling shouldn't really close items because we want to see results
+    if (searchText.length > 0) return; 
+    
     if (expandedOffice === index) {
       setExpandedOffice(null);
     } else {
@@ -165,19 +164,53 @@ export default function GuideScreen() {
   };
 
   const openPdf = (itemName) => {
-    Alert.alert(
-      "Opening Document",
-      `Downloading sample.pdf for "${itemName}"...`,
-      [{ text: "OK" }]
-    );
+    Alert.alert("Opening Document", `Downloading sample.pdf for "${itemName}"...`, [{ text: "OK" }]);
   };
+
+  // --- ROBUST FILTERING FUNCTION ---
+  const getFilteredOffices = () => {
+    if (!data) return [];
+    
+    // If search is empty, return original list
+    if (searchText.trim() === '') {
+      return data.offices;
+    }
+
+    const lowerText = searchText.toLowerCase();
+
+    // Use reduce to build a NEW array containing only matching offices/items
+    return data.offices.reduce((acc, office) => {
+      // 1. Check if the OFFICE NAME matches
+      const officeNameMatches = office.name.toLowerCase().includes(lowerText);
+
+      // 2. Check if any ITEMS match
+      const matchingItems = office.items.filter(item => 
+        item.toLowerCase().includes(lowerText)
+      );
+
+      // LOGIC:
+      // If Office Name matches, show the office and ALL its items (user wants the whole office)
+      // If Office Name doesn't match, but Items DO match, show the office with ONLY the matching items
+      
+      if (officeNameMatches) {
+        acc.push(office);
+      } else if (matchingItems.length > 0) {
+        acc.push({ ...office, items: matchingItems });
+      }
+
+      return acc;
+    }, []);
+  };
+
+  // Calculate filtered list
+  const filteredOffices = getFilteredOffices();
 
   if (!data) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
            <TouchableOpacity onPress={() => router.back()}><Ionicons name="arrow-back" size={24} /></TouchableOpacity>
-           <Text>Category not found</Text>
+           <Text style={{marginLeft: 10}}>Category not found</Text>
         </View>
       </SafeAreaView>
     );
@@ -190,7 +223,7 @@ export default function GuideScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={hp(3.5)} color="#1a1a1a" />
+          <Ionicons name="chevron-back" size={hp(3.5)} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={2}>{data.title}</Text>
         <View style={{ width: wp(8) }} /> 
@@ -199,47 +232,85 @@ export default function GuideScreen() {
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
-        {data.offices.map((office, index) => {
-          const isExpanded = expandedOffice === index;
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={hp(2.5)} color={COLORS.gray} style={styles.searchIcon} />
+          <TextInput 
+            style={styles.searchInput} 
+            placeholder="Search Services..." 
+            placeholderTextColor={COLORS.gray}
+            value={searchText}
+            onChangeText={setSearchText}
+            autoCorrect={false}
+          />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={() => { setSearchText(''); Keyboard.dismiss(); }}>
+               <Ionicons name="close-circle" size={hp(2.5)} color={COLORS.gray} />
+            </TouchableOpacity>
+          )}
+        </View>
 
-          return (
-            <View key={index} style={styles.officeContainer}>
-              {/* Accordion Header */}
-              <TouchableOpacity 
-                style={[styles.officeHeader, isExpanded && styles.officeHeaderExpanded]} 
-                onPress={() => toggleOffice(index)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.officeTitle}>{office.name}</Text>
-                <Ionicons 
-                  name={isExpanded ? "remove" : "add"} 
-                  size={hp(3)} 
-                  color="#333" 
-                />
-              </TouchableOpacity>
+        {/* Results List */}
+        {filteredOffices.length > 0 ? (
+          filteredOffices.map((office, index) => {
+            // Force expand if searching, otherwise use manual state
+            const isExpanded = searchText.length > 0 ? true : expandedOffice === index;
+            // Use name as key because index changes when filtering
+            const uniqueKey = office.name; 
 
-              {/* Accordion Content */}
-              {isExpanded && (
-                <View style={styles.itemsContainer}>
-                  {office.items.map((item, i) => (
-                    <TouchableOpacity 
-                      key={i} 
-                      style={styles.itemRow}
-                      onPress={() => openPdf(item)}
-                    >
-                      <View style={styles.pdfIcon}>
-                        <MaterialCommunityIcons name="file-pdf-box" size={hp(3)} color={COLORS.secondary} />
-                      </View>
-                      <Text style={styles.itemText}>{item}</Text>
-                      <Ionicons name="arrow-forward-outline" size={hp(2)} color="#999" style={{marginLeft: 'auto'}}/>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          );
-        })}
+            return (
+              <View key={uniqueKey} style={styles.officeContainer}>
+                {/* Accordion Header */}
+                <TouchableOpacity 
+                  style={[styles.officeHeader, isExpanded && styles.officeHeaderExpanded]} 
+                  onPress={() => toggleOffice(index)}
+                  activeOpacity={0.7}
+                  // Optional: Disable collapsing while searching to prevent confusion
+                  disabled={searchText.length > 0} 
+                >
+                  <Text style={styles.officeTitle}>{office.name}</Text>
+                  
+                  {/* Hide +/- icon while searching to indicate it's auto-expanded */}
+                  {searchText.length === 0 && (
+                    <Ionicons 
+                      name={isExpanded ? "remove" : "add"} 
+                      size={hp(3)} 
+                      color={COLORS.text} 
+                    />
+                  )}
+                </TouchableOpacity>
+
+                {/* Accordion Content */}
+                {isExpanded && (
+                  <View style={styles.itemsContainer}>
+                    {office.items.map((item, i) => (
+                      <TouchableOpacity 
+                        key={i} 
+                        style={styles.itemRow}
+                        onPress={() => openPdf(item)}
+                      >
+                        <View style={styles.pdfIcon}>
+                          <MaterialCommunityIcons name="file-pdf-box" size={hp(3)} color={COLORS.secondary} />
+                        </View>
+                        <Text style={styles.itemText}>{item}</Text>
+                        <Ionicons name="arrow-forward-outline" size={hp(2)} color={COLORS.gray} style={{marginLeft: 'auto'}} />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+            );
+          })
+        ) : (
+          /* Empty State */
+          <View style={styles.emptyState}>
+            <Ionicons name="search-outline" size={hp(6)} color="#eee" />
+            <Text style={styles.emptyText}>No results found for "{searchText}"</Text>
+          </View>
+        )}
+
         <View style={{height: hp(5)}} />
       </ScrollView>
     </SafeAreaView>
@@ -264,7 +335,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: hp(2.2),
     fontWeight: 'bold',
-    color: COLORS.primary, // Brand Blue
+    color: COLORS.primary,
     flex: 1,
     textAlign: 'center',
     marginHorizontal: wp(2),
@@ -272,9 +343,34 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: wp(5),
   },
+  // Search Bar
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: wp(4),
+    height: hp(6.5),
+    marginBottom: hp(3),
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+  },
+  searchIcon: {
+    marginRight: wp(2),
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: hp(2),
+    color: COLORS.text,
+  },
+  // Accordion
   officeContainer: {
     marginBottom: hp(1.5),
-    backgroundColor: '#f9f9f9',
+    backgroundColor: COLORS.lightGray,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -283,7 +379,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: wp(5),
-    backgroundColor: '#f9f9f9',
+    backgroundColor: COLORS.lightGray,
   },
   officeHeaderExpanded: {
     borderBottomWidth: 1,
@@ -292,7 +388,7 @@ const styles = StyleSheet.create({
   officeTitle: {
     fontSize: hp(1.9),
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.text,
     width: '90%',
   },
   itemsContainer: {
@@ -311,8 +407,19 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: hp(1.8),
-    color: COLORS.primary, // Blue Link Color
+    color: COLORS.primary,
     flex: 1,
     lineHeight: hp(2.5),
+    marginRight: wp(2),
   },
+  // Empty State
+  emptyState: {
+    alignItems: 'center',
+    marginTop: hp(5),
+  },
+  emptyText: {
+    color: COLORS.gray,
+    marginTop: 10,
+    fontSize: hp(1.8),
+  }
 });
