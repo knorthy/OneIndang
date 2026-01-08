@@ -29,7 +29,7 @@ export default function App() {
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [startingPoint, setStartingPoint] = useState('');
-  const [destination, setDestination] = useState('Boni, F. Ortigas, Mandaluyong City, Metro');
+  const [destination, setDestination] = useState('');
   const [distance, setDistance] = useState('');
   const [fare, setFare] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -466,6 +466,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
+    position: 'relative',
   },
   calculatorRow: {
     flexDirection: 'row',
@@ -532,10 +533,10 @@ const styles = StyleSheet.create({
     color: '#003087',
   },
   calculateBtn: {
-    backgroundColor: '#003087',
-    borderRadius: 12,
+    backgroundColor: '#D32F2F',
+    borderRadius: 15,
     paddingHorizontal: wp(6),
-    height: hp(6),
+    height: hp(5.5),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -543,6 +544,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    position: 'absolute',
+    bottom: -35,
+    right: 0,
+    left: 170,
   },
   calculateBtnText: {
     color: 'white',
