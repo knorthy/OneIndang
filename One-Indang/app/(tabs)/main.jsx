@@ -45,7 +45,7 @@ export default function HomeScreen() {
     {
       title: "Transport",
       icon: <MaterialIcons name="directions-bus" size={38} color="#D32F2F" />,
-      route: "Transport",
+      route: "transpo",
     },
     {
       title: "Business",
