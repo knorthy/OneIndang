@@ -26,9 +26,7 @@ const HomeScreen = () => {
     { id: 4, name: 'Scholarship', icon: 'graduation-cap' },
   ];
 
-  // --- MASTER DATA: 10 Items per Category (Indang, Cavite) ---
   const allProperties = [
-    // --- HOUSES (10 Items) ---
     {
       id: 101,
       title: 'Sunrise Family Home',
@@ -130,7 +128,7 @@ const HomeScreen = () => {
       details: 'Scenic view, 2 BR'
     },
 
-    // --- BED SPACES (10 Items) ---
+    // BED SPACES
     {
       id: 201,
       title: 'Lola Fely\'s Dormitory',
@@ -232,7 +230,7 @@ const HomeScreen = () => {
       details: 'Male quarters'
     },
 
-    // --- APARTMENTS (10 Items) ---
+    //  APARTMENTS 
     {
       id: 301,
       title: 'Woodland Apartments',
@@ -334,7 +332,7 @@ const HomeScreen = () => {
       details: 'Studio w/ loft'
     },
 
-    // --- SCHOLARSHIPS (10 Items) ---
+    // SCHOLARSHIPS 
     {
       id: 401,
       title: 'CvSU Academic Scholarship',
@@ -437,19 +435,17 @@ const HomeScreen = () => {
     }
   ];
 
-  // --- FILTER LOGIC ---
-  // We filter the master list based on the active category and search text
+
   const filteredData = allProperties.filter(item => 
     item.type === activeCategory && 
     (item.title.toLowerCase().includes(searchText.toLowerCase()) || 
      item.location.toLowerCase().includes(searchText.toLowerCase()))
   );
 
-  // For "Nearby", we can just show the same list randomized or filtered differently.
-  // Here I'll just show the rest of the list or a slice to simulate a different view.
-  const nearbyData = filteredData.slice().reverse(); // Just reversing for variety in the UI
+  
+  const nearbyData = filteredData.slice().reverse(); 
 
-  // --- RENDER ITEMS ---
+  
 
   const renderCategory = ({ item }) => {
     const isActive = activeCategory === item.name;
