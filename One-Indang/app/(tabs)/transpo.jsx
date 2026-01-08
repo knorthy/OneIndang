@@ -14,13 +14,13 @@ import { hp, wp } from '../../helpers/common';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
-const TransportIcon = ({ name, icon }) => (
-  <View style={styles.transportItem}>
-    <View style={styles.transportIconContainer}>
-      <Icon name={icon} size={32} color="#D32F2F" />
+const TransportIcon = ({ name, icon, onPress, isSelected }) => (
+  <TouchableOpacity onPress={onPress} style={styles.transportItem}>
+    <View style={[styles.transportIconContainer, isSelected && styles.selectedTransportIcon]}>
+      <Icon name={icon} size={32} color={isSelected ? "#FFF" : "#D32F2F"} />
     </View>
     <Text style={styles.transportName}>{name}</Text>
-  </View>
+  </TouchableOpacity>
 );
 
 export default function App() {
@@ -32,6 +32,7 @@ export default function App() {
   const [destination, setDestination] = useState('');
   const [distance, setDistance] = useState('');
   const [fare, setFare] = useState(null);
+  const [selectedTransport, setSelectedTransport] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const recommendations = [
@@ -67,8 +68,11 @@ export default function App() {
   };
 
   const calculateFare = () => {
-    // Default rate since select transport was removed
-    const rate = 12; 
+    let rate = 12; // default
+    if (selectedTransport === 'Tricycle') rate = 10;
+    else if (selectedTransport === 'Bus') rate = 12;
+    else if (selectedTransport === 'Jeep') rate = 8;
+    else if (selectedTransport === 'Personal Car') rate = 15;
     if (distance) {
       const calculated = parseFloat(distance) * rate;
       setFare(calculated.toFixed(2));
@@ -90,9 +94,6 @@ export default function App() {
               <Text style={styles.timeGreeting}>{timeGreeting}</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="notifications" size={22} color="#D32F2F" />
-          </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
@@ -114,10 +115,10 @@ export default function App() {
           </View>
           <View style={styles.transportContainer}>
             <View style={styles.transportGrid}>
-              <TransportIcon name="Tricycle" icon="pedal-bike" />
-              <TransportIcon name="Bus" icon="directions-bus" />
-              <TransportIcon name="Jeep" icon="directions-car" />
-              <TransportIcon name="Personal Car" icon="drive-eta" />
+              <TransportIcon name="Tricycle" icon="pedal-bike" onPress={() => setSelectedTransport('Tricycle')} isSelected={selectedTransport === 'Tricycle'} />
+              <TransportIcon name="Bus" icon="directions-bus" onPress={() => setSelectedTransport('Bus')} isSelected={selectedTransport === 'Bus'} />
+              <TransportIcon name="Jeep" icon="directions-car" onPress={() => setSelectedTransport('Jeep')} isSelected={selectedTransport === 'Jeep'} />
+              <TransportIcon name="Personal Car" icon="drive-eta" onPress={() => setSelectedTransport('Personal Car')} isSelected={selectedTransport === 'Personal Car'} />
             </View>
           </View>
         </View>
@@ -168,7 +169,7 @@ export default function App() {
 
             <View style={styles.distanceRow}>
               <TouchableOpacity style={styles.calculateBtn} onPress={calculateFare}>
-                <Text style={styles.calculateBtnText}>Calculate</Text>
+                <Text style={styles.calculateBtnText}>{selectedTransport === 'Personal Car' ? 'Direction' : 'Calculate'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -275,12 +276,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#003087',
   },
-  notificationIcon: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   searchContainer: {
     flexDirection: 'row',
     paddingHorizontal: wp(5),
@@ -345,6 +340,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  selectedTransportIcon: {
+    backgroundColor: '#D32F2F',
   },
   transportName: {
     fontSize: 12,
@@ -461,7 +459,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(5),
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: wp(4),
+    padding: wp(5),
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -492,7 +490,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#008080', // Dark teal/blue from image
+    borderColor: '#DDD', 
     borderRadius: 12,
     paddingHorizontal: wp(3),
     height: hp(6),
