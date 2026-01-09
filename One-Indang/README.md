@@ -11,6 +11,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    npx expo install react-native-vector-icons
    
+   npx expo install react-native-reanimated
+
+   npm install react-native-google-places-autocomplete axios   
    ```
 
 2. Start the app

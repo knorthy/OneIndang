@@ -47,6 +47,7 @@ export default function TabLayout() {
         name="transpo"
         options={{
           title: 'Transpo',
+          tabBarStyle: { display: 'none' },
         }}
       />
     </Tabs>
