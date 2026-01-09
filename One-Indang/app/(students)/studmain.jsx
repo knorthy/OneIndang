@@ -25,38 +25,23 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const HomeScreen = () => {
 
   // --- STATE ---
-
   const [activeCategory, setActiveCategory] = useState('House');
-
   const [searchText, setSearchText] = useState('');
-
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-
-
   // --- BRAND COLORS ---
-
   const BRAND_BLUE = '#003087';
-
   const BRAND_RED = '#D32F2F';
 
-
-
   // --- DATA ---
-
   const categories = [
-
     { id: 1, name: 'House', icon: 'home' },
     { id: 2, name: 'Bed Space', icon: 'bed' },
     { id: 3, name: 'Apartment', icon: 'building' },
     { id: 4, name: 'Scholarship', icon: 'graduation-cap' },
-
   ];
 
-
-
   const allProperties = [
-
     // HOUSES 
     { id: 101, title: 'Sunrise Family Home', location: 'Poblacion 1, Indang', price: '15,000', rating: 4.7, type: 'House', image: 'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: '3 Bedroom, 2 Bath, Garage', beds: 3, baths: 2, sqft: '1,848' },
     { id: 102, title: 'Casa Verde Bungalow', location: 'Bancod, Indang', price: '12,500', rating: 4.5, type: 'House', image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: '2 Bedroom, Garden', beds: 2, baths: 1, sqft: '1,200' },
@@ -69,10 +54,7 @@ const HomeScreen = () => {
     { id: 109, title: 'Modern Minimalist', location: 'Poblacion 4, Indang', price: '16,500', rating: 4.7, type: 'House', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80', details: 'Newly renovated', beds: 2, baths: 1, sqft: '1,100' },
     { id: 110, title: 'Farm View House', location: 'Tambo Kulit, Indang', price: '9,500', rating: 4.5, type: 'House', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Scenic view', beds: 2, baths: 1, sqft: '950' },
 
-
-
     // BED SPACES 
-
     { id: 201, title: 'Lola Fely\'s Dormitory', location: 'Near CvSU Main', price: '1,500', rating: 4.8, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1469&q=80', details: 'Female only', beds: 1, baths: 1, sqft: 'N/A' },
     { id: 202, title: 'CvSU Student Lodge', location: 'Bancod, Indang', price: '1,800', rating: 4.2, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1596276020587-8044fe049813?ixlib=rb-4.0.3&auto=format&fit=crop&w=1478&q=80', details: 'Walking distance', beds: 1, baths: 2, sqft: 'N/A' },
     { id: 203, title: 'SHO Dormitory', location: 'Rough Road, Indang', price: '2,000', rating: 4.9, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Airconditioned', beds: 1, baths: 1, sqft: 'N/A' },
@@ -84,10 +66,7 @@ const HomeScreen = () => {
     { id: 209, title: 'Yellow Gate Boarding', location: 'Bancod, Indang', price: '1,300', rating: 4.1, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=1473&q=80', details: 'Budget friendly', beds: 1, baths: 2, sqft: 'N/A' },
     { id: 210, title: 'Cristian Jay Dorm', location: 'Near 7-11 Indang', price: '2,200', rating: 4.4, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Male quarters', beds: 1, baths: 2, sqft: 'N/A' },
 
-
-
     // APARTMENTS 
-
     { id: 301, title: 'Woodland Apartments', location: 'Rough Road, Indang', price: '5,500', rating: 4.5, type: 'Apartment', image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Studio Type', beds: 1, baths: 1, sqft: '500' },
     { id: 302, title: 'Poblacion Heights', location: 'Poblacion 4, Indang', price: '7,000', rating: 4.6, type: 'Apartment', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=1380&q=80', details: '1 BR, Balcony', beds: 1, baths: 1, sqft: '700' },
     { id: 303, title: 'CvSU Gate 2 Apts', location: 'Bancod, Indang', price: '4,500', rating: 4.3, type: 'Apartment', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Unfurnished', beds: 1, baths: 1, sqft: '400' },
@@ -99,10 +78,7 @@ const HomeScreen = () => {
     { id: 309, title: 'White House Units', location: 'Kaytapos, Indang', price: '4,000', rating: 4.2, type: 'Apartment', image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Water pump', beds: 1, baths: 1, sqft: '400' },
     { id: 310, title: 'East Wood Rental', location: 'Buna Cerca, Indang', price: '5,500', rating: 4.3, type: 'Apartment', image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Studio w/ loft', beds: 1, baths: 1, sqft: '500' },
 
-
-
     // SCHOLARSHIPS 
-
     { id: 401, title: 'CvSU Academic', location: 'Cavite State U', price: 'Full', rating: 5.0, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Dean\'s List', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 402, title: 'Provincial Schol', location: 'Provincial Gov', price: 'Grant', rating: 4.9, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80', details: 'Local Gov', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 403, title: 'DOST-SEI', location: 'Indang, Cavite', price: 'Stipend', rating: 5.0, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Sci & Tech', beds: 0, baths: 0, sqft: 'N/A' },
@@ -113,10 +89,7 @@ const HomeScreen = () => {
     { id: 408, title: 'OWWA Scholarship', location: 'Cavite Region', price: 'Grant', rating: 4.7, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=1349&q=80', details: 'OFW Dep', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 409, title: 'Cebuana Schol', location: 'Indang Branches', price: 'Grant', rating: 4.4, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'ALS', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 410, title: 'Rotary Club Grant', location: 'Rotary Indang', price: 'Books', rating: 4.3, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1577896335477-2858506f48db?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Allowance', beds: 0, baths: 0, sqft: 'N/A' },
-
   ];
-
-
 
   const filteredData = allProperties.filter(item => 
     item.type === activeCategory && 
@@ -127,9 +100,13 @@ const HomeScreen = () => {
   const nearbyData = filteredData.slice().reverse(); 
 
   // COMPONENT: PROPERTY DETAILS PAGE
-
   const PropertyDetailsScreen = ({ item, onBack }) => {
-    const tabs = ['About', 'Gallery', 'Review'];
+    
+    // CONDITION: If Scholarship, remove gallery and review tabs
+    const tabs = item.type === 'Scholarship' 
+        ? ['About'] 
+        : ['About', 'Gallery', 'Review'];
+
     const [activeTab, setActiveTab] = useState('About');
     
     // IMAGE VIEWER STATES
@@ -138,14 +115,12 @@ const HomeScreen = () => {
 
     //  MOCK DATA FOR TABS 
     const galleryImages = [
-
        item.image,
        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1453&q=80',
        'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
        'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80',
        'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
-
     ];
 
     const reviews = [
@@ -165,7 +140,7 @@ const HomeScreen = () => {
         if (activeTab === 'About') {
             return (
                 <View>
-                    {/* Facilities Icons */}
+                    {/* Facilities Icons (Only for Non-Scholarships) */}
                     {item.type !== 'Scholarship' && (
                     <View style={styles.facilitiesContainer}>
                         <View style={styles.facilityItem}>
@@ -190,28 +165,58 @@ const HomeScreen = () => {
                         <Text style={{ color: BRAND_BLUE, fontWeight: '700' }}> Read more</Text>
                     </Text>
 
-                    {/* Listing Agent */}
-                    <Text style={styles.descriptionTitle}>Listing Agent</Text>
-                    <View style={styles.agentContainer}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: wp(3) }}>
-                            <Image 
-                            source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' }} 
-                            style={styles.agentImage}
-                            />
-                            <View>
-                            <Text style={{ fontWeight: '700', fontSize: hp(2), color: 'black' }}>John Doe</Text>
-                            <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>Owner</Text>
+                    {/* DYNAMIC PROVIDER / AGENT SECTION */}
+                    {item.type === 'Scholarship' ? (
+                        // SCHOLARSHIP PROVIDER LAYOUT
+                        <>
+                             <Text style={styles.descriptionTitle}>Scholarship Provider</Text>
+                             <View style={styles.agentContainer}>
+                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: wp(3) }}>
+                                     {/* Generic University/Institution Icon */}
+                                     <View style={[styles.agentImage, { backgroundColor: '#F3F4F6', justifyContent:'center', alignItems:'center' }]}>
+                                         <FontAwesome5 name="university" size={hp(2.5)} color={BRAND_BLUE} />
+                                     </View>
+                                     <View>
+                                     <Text style={{ fontWeight: '700', fontSize: hp(2), color: 'black' }}>Student Affairs</Text>
+                                     <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>Gov / Agency</Text>
+                                     </View>
+                                 </View>
+                                 <View style={{ flexDirection: 'row', gap: wp(4) }}>
+                                     <TouchableOpacity style={styles.agentBtn}>
+                                        <Ionicons name="mail-outline" size={hp(2.5)} color="white" />
+                                     </TouchableOpacity>
+                                     <TouchableOpacity style={styles.agentBtn}>
+                                        <Ionicons name="globe-outline" size={hp(2.5)} color="white" />
+                                     </TouchableOpacity>
+                                 </View>
+                             </View>
+                        </>
+                    ) : (
+                        // REAL ESTATE AGENT LAYOUT
+                        <>
+                            <Text style={styles.descriptionTitle}>Listing Agent</Text>
+                            <View style={styles.agentContainer}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: wp(3) }}>
+                                    <Image 
+                                    source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80' }} 
+                                    style={styles.agentImage}
+                                    />
+                                    <View>
+                                    <Text style={{ fontWeight: '700', fontSize: hp(2), color: 'black' }}>John Doe</Text>
+                                    <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>Owner</Text>
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: 'row', gap: wp(4) }}>
+                                    <TouchableOpacity style={styles.agentBtn}>
+                                    <Ionicons name="chatbubble-ellipses-outline" size={hp(2.5)} color="white" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.agentBtn}>
+                                    <Ionicons name="call-outline" size={hp(2.5)} color="white" />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
-                        <View style={{ flexDirection: 'row', gap: wp(4) }}>
-                            <TouchableOpacity style={styles.agentBtn}>
-                            <Ionicons name="chatbubble-ellipses-outline" size={hp(2.5)} color="white" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.agentBtn}>
-                            <Ionicons name="call-outline" size={hp(2.5)} color="white" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                        </>
+                    )}
                 </View>
             );
         } else if (activeTab === 'Gallery') {
@@ -260,7 +265,7 @@ const HomeScreen = () => {
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         
-        {/*  IMAGE MODAL */}
+        {/* IMAGE MODAL */}
         <Modal 
             visible={isViewerVisible} 
             transparent={true} 
@@ -324,11 +329,13 @@ const HomeScreen = () => {
                       {item.type}
                     </Text>
                  </View>
-                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                    <Ionicons name="star" size={hp(2)} color="#FFD700" />
-                    <Text style={{ fontWeight: 'bold', fontSize: hp(1.8) }}>{item.rating}</Text>
-                    <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>(365 reviews)</Text>
-                 </View>
+                 {item.type !== 'Scholarship' && (
+                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                      <Ionicons name="star" size={hp(2)} color="#FFD700" />
+                      <Text style={{ fontWeight: 'bold', fontSize: hp(1.8) }}>{item.rating}</Text>
+                      <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>(365 reviews)</Text>
+                   </View>
+                 )}
               </View>
 
               {/* Title & Address */}
@@ -344,7 +351,7 @@ const HomeScreen = () => {
                       onPress={() => setActiveTab(tab)}
                     >
                       <Text style={[styles.tabText, activeTab === tab ? { color: BRAND_BLUE, fontWeight: '700' } : { color: '#9CA3AF' }]}>
-                         {tab}
+                          {tab}
                       </Text>
                     </TouchableOpacity>
                  ))}
@@ -356,7 +363,7 @@ const HomeScreen = () => {
           </View>
         </ScrollView>
 
-        {/* Bottom Footer - Chat Button */}
+        {/* Bottom Footer - Button Changes based on Type */}
         <View style={styles.footerBar}>
            <View>
               <Text style={{ color: '#9CA3AF', fontSize: hp(1.6), fontWeight: '500' }}>Total Price</Text>
@@ -366,7 +373,10 @@ const HomeScreen = () => {
               </Text>
            </View>
            <TouchableOpacity style={[styles.bookBtn, { backgroundColor: BRAND_BLUE }]}>
-              <Text style={styles.bookBtnText}>Chat</Text>
+              {/* Conditional Button Text */}
+              <Text style={styles.bookBtnText}>
+                  {item.type === 'Scholarship' ? 'Apply' : 'Chat'}
+              </Text>
            </TouchableOpacity>
         </View>
       </View>
@@ -408,10 +418,12 @@ const HomeScreen = () => {
             {item.type === 'Scholarship' ? item.price : `₱${item.price}`}
             {item.type !== 'Scholarship' && <Text style={styles.priceSubText}> /mo</Text>}
            </Text>
-           <View style={styles.ratingBadge}>
-             <Ionicons name="star" size={hp(1.6)} color="#FFD700" />
-             <Text style={styles.ratingText}>{item.rating}</Text>
-           </View>
+           {item.type !== 'Scholarship' && (
+             <View style={styles.ratingBadge}>
+               <Ionicons name="star" size={hp(1.6)} color="#FFD700" />
+               <Text style={styles.ratingText}>{item.rating}</Text>
+             </View>
+           )}
         </View>
       </View>
     </TouchableOpacity>
@@ -429,10 +441,12 @@ const HomeScreen = () => {
             <View style={styles.smallTypeTag}>
                 <Text style={[styles.smallTypeText, { color: BRAND_BLUE }]}>{item.type}</Text>
             </View>
-            <View style={styles.ratingBadge}>
-               <Ionicons name="star" size={hp(1.6)} color="#FFD700" />
-               <Text style={styles.ratingText}>{item.rating}</Text>
-            </View>
+            {item.type !== 'Scholarship' && (
+              <View style={styles.ratingBadge}>
+                 <Ionicons name="star" size={hp(1.6)} color="#FFD700" />
+                 <Text style={styles.ratingText}>{item.rating}</Text>
+              </View>
+            )}
          </View>
          <Text style={[styles.nearbyTitle, { color: BRAND_BLUE }]}>{item.title}</Text>
          <View style={styles.locationRow}>
@@ -468,17 +482,17 @@ const HomeScreen = () => {
           
           {/* Header */}
           <View style={styles.header}>
-             <View>
-                 <Text style={styles.locationLabel}>Location</Text>
-                 <View style={styles.locationRowMain}>
-                     <Ionicons name="location" size={hp(2.5)} color={BRAND_RED} />
-                     <Text style={[styles.locationMainText, { color: BRAND_BLUE }]}>Indang, Cavite</Text>
-                 </View>
-             </View>
-             <View style={styles.notificationBtn}>
-                <Ionicons name="notifications-outline" size={hp(3)} color="black" />
-                <View style={[styles.notificationDot, { backgroundColor: BRAND_RED }]} />
-             </View>
+              <View>
+                  <Text style={styles.locationLabel}>Location</Text>
+                  <View style={styles.locationRowMain}>
+                      <Ionicons name="location" size={hp(2.5)} color={BRAND_RED} />
+                      <Text style={[styles.locationMainText, { color: BRAND_BLUE }]}>Indang, Cavite</Text>
+                  </View>
+              </View>
+              <View style={styles.notificationBtn}>
+                 <Ionicons name="notifications-outline" size={hp(3)} color="black" />
+                 <View style={[styles.notificationDot, { backgroundColor: BRAND_RED }]} />
+              </View>
           </View>
 
           {/* Search */}
@@ -493,9 +507,6 @@ const HomeScreen = () => {
                 onChangeText={setSearchText}
               />
             </View>
-            <TouchableOpacity style={[styles.filterBtn, { backgroundColor: BRAND_RED }]}>
-               <Ionicons name="options-outline" size={hp(3)} color="white" />
-            </TouchableOpacity>
           </View>
 
           {/* Categories */}
@@ -549,7 +560,6 @@ const styles = StyleSheet.create({
   searchContainer: { flexDirection: 'row', paddingHorizontal: wp(5), marginTop: hp(3), gap: wp(3) },
   searchInputWrapper: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 15, paddingHorizontal: wp(4), height: hp(6.5), elevation: 1, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5 },
   searchInput: { flex: 1, marginLeft: wp(2), fontSize: hp(1.8), color: '#1F2937' },
-  filterBtn: { width: hp(6.5), height: hp(6.5), borderRadius: 15, justifyContent: 'center', alignItems: 'center' },
 
   categoriesContainer: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(5), marginTop: hp(3) },
   categoryItem: { alignItems: 'center' },
