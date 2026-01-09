@@ -1,0 +1,481 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  StatusBar,
+  Animated,
+  Alert,
+  Keyboard,
+  LogBox,
+  Linking, // Added for Google Maps
+  Switch   // Added for Discount Toggle
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import axios from 'axios';
+import { hp, wp } from "../../helpers/common";
+import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
+import { recommendations } from '../../constants/recommendations';
+
+// Ignore specific warnings
+LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+
+const TransportIcon = ({ name, icon, onPress, isSelected }) => (
+  <TouchableOpacity onPress={onPress} style={styles.transportItem}>
+    <View style={[styles.transportIconContainer, isSelected && styles.selectedTransportIcon]}>
+      <Icon name={icon} size={32} color={isSelected ? "#FFF" : "#D32F2F"} />
+    </View>
+    <Text style={styles.transportName}>{name}</Text>
+  </TouchableOpacity>
+);
+
+export default function App() {
+  const [userName, setUserName] = useState('North');
+  const [timeGreeting, setTimeGreeting] = useState('');
+  const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+
+  // SEARCH STATE
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRecommendations, setFilteredRecommendations] = useState(recommendations.slice(0, 3));
+
+  // STATE FOR LOCATIONS & FARE 
+  const [origin, setOrigin] = useState(null); 
+  const [destination, setDestination] = useState(null); 
+  
+  const [distance, setDistance] = useState(''); 
+  const [duration, setDuration] = useState(''); 
+  const [fare, setFare] = useState(null);
+  
+  const [selectedTransport, setSelectedTransport] = useState('');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const originRef = useRef();
+  const destRef = useRef();
+
+  // TRICYCLE & DISCOUNT STATE 
+  const [tricycleType, setTricycleType] = useState('Regular');
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [isDiscounted, setIsDiscounted] = useState(false); // For Student/Senior/PWD
+
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    let greeting = 'Good Morning';
+    if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+    else if (hour >= 17) greeting = 'Good Evening';
+    setTimeGreeting(greeting);
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  // SEARCH FILTERING EFFECT
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredRecommendations(recommendations.slice(0, 3));
+    } else {
+      const filtered = recommendations.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.distance.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredRecommendations(filtered.slice(0, 10)); // Limit to 10 results for performance
+    }
+  }, [searchQuery]);
+
+  // --- INDANG SPECIFIC FARE LOGIC ---
+  const calculateFareHandler = async () => {
+    try {
+      const result = await calculateFare(selectedTransport, tricycleType, passengerCount, isDiscounted, origin, destination);
+      setFare(result.fare);
+      setDistance(result.distance);
+      setDuration(result.duration);
+      Keyboard.dismiss();
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  // --- GOOGLE MAPS REDIRECT ---
+  const handleDirection = async () => {
+    try {
+      const url = getGoogleMapsUrl(origin, destination);
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "Google Maps is not installed or supported.");
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const incrementPassenger = () => {
+    if (passengerCount < 6) setPassengerCount(prev => prev + 1);
+  };
+
+  const decrementPassenger = () => {
+    if (passengerCount > 1) setPassengerCount(prev => prev - 1);
+  };
+
+  const swapLocations = () => {
+    const temp = origin;
+    setOrigin(destination);
+    setDestination(temp);
+    
+    originRef.current?.setAddressText(destination?.desc || '');
+    destRef.current?.setAddressText(origin?.desc || '');
+  };
+
+  const handleRecommendationPress = (item) => {
+    // Show place details
+    Alert.alert(
+      item.title,
+      item.distance,
+      [
+        { text: 'Set as Origin', onPress: () => {
+          setOrigin({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          originRef.current?.setAddressText(item.title);
+        }},
+        { text: 'Set as Destination', onPress: () => {
+          setDestination({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          destRef.current?.setAddressText(item.title);
+        }},
+        { text: 'Cancel', style: 'cancel' }
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Fixed Header */}
+      <View style={styles.fixedHeader}>
+        <View style={styles.header}>
+          <View style={styles.profileSection}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+            </View>
+            <View>
+              <Text style={styles.greeting}>Hi {userName}</Text>
+              <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Search Bar - Local search for Indang recommendations */}
+        <View style={styles.searchContainer}>
+          <View style={[styles.searchBar, { zIndex: 1100 }]}>
+            <Icon name="search" size={18} color="#D32F2F" style={{marginRight: 10}} />
+            <TextInput
+              placeholder='Search Indang places...'
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={autocompleteStyles.textInput}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
+        contentContainerStyle={styles.scrollContent}
+      >
+
+        {/* Transportation Grid */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Transportation</Text>
+          </View>
+          <View style={styles.transportContainer}>
+            <View style={styles.transportGrid}>
+              <TransportIcon name="Tricycle" icon="pedal-bike" onPress={() => setSelectedTransport('Tricycle')} isSelected={selectedTransport === 'Tricycle'} />
+              <TransportIcon name="Bus" icon="directions-bus" onPress={() => setSelectedTransport('Bus')} isSelected={selectedTransport === 'Bus'} />
+              <TransportIcon name="Jeep" icon="directions-car" onPress={() => setSelectedTransport('Jeep')} isSelected={selectedTransport === 'Jeep'} />
+              <TransportIcon name="Car" icon="drive-eta" onPress={() => setSelectedTransport('Personal Car')} isSelected={selectedTransport === 'Personal Car'} />
+            </View>
+          </View>
+        </View>
+
+        {/* Fare Calculator */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Fare Calculator</Text>
+          </View>
+          <View style={styles.calculatorCard}>
+            
+            {/* Tricycle Specific Inputs */}
+            {selectedTransport === 'Tricycle' && (
+                <View style={styles.tricycleContainer}>
+                    <Text style={styles.tricycleLabel}>Trip Type:</Text>
+                    <View style={styles.trikeTypeRow}>
+                        <TouchableOpacity 
+                            style={[styles.typeBtn, tricycleType === 'Regular' && styles.activeTypeBtn]}
+                            onPress={() => setTricycleType('Regular')}
+                        >
+                            <Text style={[styles.typeBtnText, tricycleType === 'Regular' && styles.activeTypeBtnText]}>Regular</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={[styles.typeBtn, tricycleType === 'Special' && styles.activeTypeBtn]}
+                            onPress={() => setTricycleType('Special')}
+                        >
+                            <Text style={[styles.typeBtnText, tricycleType === 'Special' && styles.activeTypeBtnText]}>Special</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {tricycleType === 'Regular' && (
+                        <View style={styles.passengerRow}>
+                            <Text style={styles.tricycleLabel}>Passengers:</Text>
+                            <View style={styles.counterContainer}>
+                                <TouchableOpacity onPress={decrementPassenger} style={styles.counterBtn}>
+                                    <Icon name="remove" size={20} color="white" />
+                                </TouchableOpacity>
+                                <Text style={styles.counterText}>{passengerCount}</Text>
+                                <TouchableOpacity onPress={incrementPassenger} style={styles.counterBtn}>
+                                    <Icon name="add" size={20} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )}
+                    <View style={styles.divider} />
+                </View>
+            )}
+
+            {/* Discount Toggle for Jeep and Bus */}
+            {(selectedTransport === 'Jeep' || selectedTransport === 'Bus') && (
+                 <View style={styles.discountRow}>
+                    <Text style={styles.tricycleLabel}>Student/Senior/PWD (20% off):</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#ffadad" }}
+                        thumbColor={isDiscounted ? "#D32F2F" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => setIsDiscounted(!isDiscounted)}
+                        value={isDiscounted}
+                    />
+                 </View>
+            )}
+
+            <View style={styles.calculatorRow}>
+              <View style={styles.leftIconsColumn}>
+                <Icon name="radio-button-unchecked" size={20} color="#333" style={{marginTop: 15}} />
+                <View style={styles.verticalLine} />
+                <Icon name="location-on" size={20} color="#D32F2F" style={{marginBottom: 15}}/>
+              </View>
+
+              <View style={styles.inputsColumn}>
+                <View style={[styles.inputWrapperTop, { zIndex: 1000 }]}>
+                  <GooglePlacesAutocomplete
+                    ref={originRef}
+                    placeholder='Starting Point'
+                    fetchDetails={true}
+                    minLength={1}
+                    debounce={200}
+                    onPress={(data, details = null) => {
+                      setOrigin({
+                        lat: details.geometry.location.lat,
+                        lng: details.geometry.location.lng,
+                        desc: data.description
+                      });
+                    }}
+                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
+                    styles={autocompleteStyles}
+                    enablePoweredByContainer={false}
+                  />
+                </View>
+
+                <View style={[styles.inputWrapperBottom, { zIndex: 900 }]}>
+                  <GooglePlacesAutocomplete
+                    ref={destRef}
+                    placeholder='Destination'
+                    fetchDetails={true}
+                    minLength={1}
+                    debounce={200}
+                    onPress={(data, details = null) => {
+                      setDestination({
+                        lat: details.geometry.location.lat,
+                        lng: details.geometry.location.lng,
+                        desc: data.description
+                      });
+                    }}
+                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
+                    styles={autocompleteStyles}
+                    enablePoweredByContainer={false}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity onPress={swapLocations} style={styles.swapButton}>
+                <Icon name="swap-vert" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            {distance !== '' && (
+                 <View style={{marginTop: 10, flexDirection: 'row', alignItems: 'center'}}>
+                     <Text style={{fontSize: hp(1.6), color: '#666'}}>
+                         Dist: <Text style={{fontWeight:'bold', color: 'black'}}>{distance} km</Text>
+                     </Text>
+                     <Text style={{fontSize: hp(1.6), color: '#666', marginLeft: 10}}>
+                         Time: <Text style={{fontWeight:'bold', color: 'black'}}>{duration}</Text>
+                     </Text>
+                 </View>
+            )}
+
+            <View style={styles.distanceRow}>
+              <TouchableOpacity style={styles.calculateBtn} onPress={selectedTransport === 'Personal Car' ? handleDirection : calculateFareHandler}>
+                <Text style={styles.calculateBtnText}>
+                    {selectedTransport === 'Personal Car' ? 'Open Maps' : 'Calculate'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {fare && (
+              <View style={styles.fareResultCard}>
+                <Text style={styles.fareResultText}>Estimated Fare: ₱{fare}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* Recommendations Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              {searchQuery.trim() ? `Search Results (${filteredRecommendations.length})` : 'Featured Places'}
+            </Text>
+            <TouchableOpacity onPress={() => setShowAllRecommendations(!showAllRecommendations)}>
+              <Text style={styles.showAll}>
+                {showAllRecommendations ? 'Show less' : searchQuery.trim() ? 'Show all results' : 'Show featured'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {showAllRecommendations ? (
+            <ScrollView style={styles.fullRecommendationsContainer} showsVerticalScrollIndicator={false}>
+              {filteredRecommendations.map((item) => (
+                <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => handleRecommendationPress(item)}>
+                  <View style={styles.fullCardImageContainer}>
+                    <View style={styles.cardImagePlaceholder}>
+                      <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
+                    </View>
+                  </View>
+                  <View style={styles.fullCardContent}>
+                    <Text style={styles.fullCardTitle}>{item.title}</Text>
+                    <View style={styles.row}>
+                      <Icon name="location-on" size={Math.round(hp(2.6))} color="#BBDEFB" />
+                      <Text style={styles.fullCardDistance}>{item.distance}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <Animated.View style={{ opacity: fadeAnim }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendationsContainer}>
+                {filteredRecommendations.slice(0, 3).map((item, index) => (
+                  <View key={index} style={styles.card}>
+                    <View style={styles.cardImageContainer}>
+                      <View style={styles.cardImage}>
+                        <View style={styles.blankImage} />
+                      </View>
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>{item.title}</Text>
+                      <Text style={styles.cardDistance}>{item.distance}</Text>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            </Animated.View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+// --- AUTOCOMPLETE STYLES ---
+const autocompleteStyles = {
+  container: { flex: 1, overflow: 'visible' },
+  textInput: { height: hp(5.5), color: '#333', fontSize: hp(1.7), backgroundColor: 'transparent', marginTop: 2 },
+  listView: { position: 'absolute', top: 45, left: 0, right: 0, zIndex: 10000, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#EEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 },
+  row: { backgroundColor: 'white', padding: 13, height: 44, flexDirection: 'row' },
+  separator: { height: 0.5, backgroundColor: '#c8c7cc' },
+  description: { fontSize: 14, color: '#333' },
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F8FAFF' },
+  fixedHeader: { backgroundColor: '#F8FAFF', paddingTop: hp(6), paddingBottom: hp(2) },
+  scrollView: { flex: 1, backgroundColor: '#F8FAFF' },
+  scrollContent: { paddingBottom: hp(5) },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), paddingBottom: hp(2) },
+  profileSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  avatar: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: '#003087', justifyContent: 'center', alignItems: 'center' },
+  avatarText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  greeting: { fontSize: 13, color: '#003087' },
+  timeGreeting: { fontSize: 18, fontWeight: '600', color: '#003087' },
+  searchContainer: { flexDirection: 'row', paddingHorizontal: wp(5), marginBottom: hp(3), gap: 10 },
+  searchBar: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, paddingHorizontal: 15, height: 50 },
+  section: { marginBottom: hp(3) },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), marginBottom: hp(2) },
+  sectionTitle: { fontSize: 20, fontWeight: '600', color: '#003087' },
+  showAll: { fontSize: 14, color: '#D32F2F' },
+  transportGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 15, justifyContent: 'space-around' },
+  transportContainer: { paddingHorizontal: wp(5) },
+  transportItem: { alignItems: 'center', gap: 8 },
+  transportIconContainer: { width: 70, height: 70, borderRadius: 15, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  selectedTransportIcon: { backgroundColor: '#D32F2F' },
+  transportName: { fontSize: 12, color: '#003087', textAlign: 'center', maxWidth: 70 },
+  tricycleContainer: { marginBottom: 15 },
+  tricycleLabel: { fontSize: 14, color: '#666', marginBottom: 8, fontWeight: '500' },
+  trikeTypeRow: { flexDirection: 'row', gap: 10, marginBottom: 15 },
+  typeBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#D32F2F', alignItems: 'center' },
+  activeTypeBtn: { backgroundColor: '#D32F2F' },
+  typeBtnText: { color: '#D32F2F', fontWeight: '600' },
+  activeTypeBtnText: { color: 'white' },
+  passengerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  counterContainer: { flexDirection: 'row', alignItems: 'center', gap: 15 },
+  counterBtn: { backgroundColor: '#003087', width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' },
+  counterText: { fontSize: 18, fontWeight: 'bold', color: '#333', width: 20, textAlign: 'center' },
+  divider: { height: 1, backgroundColor: '#EEE', marginBottom: 15 },
+  discountRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  card: { width: 250, marginRight: wp(3), backgroundColor: '#FFF', borderRadius: 15, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
+  cardImageContainer: { position: 'relative', height: 180, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
+  cardImage: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
+  cardContent: { padding: 15 },
+  cardTitle: { fontSize: 16, fontWeight: '600', color: '#003087', marginBottom: 4 },
+  cardDistance: { fontSize: 13, color: '#666' },
+  recommendationsContainer: { paddingHorizontal: wp(5) },
+  blankImage: { backgroundColor: '#BBDEFB', flex: 1 },
+  fullRecommendationsContainer: { paddingHorizontal: wp(5) },
+  fullCard: { backgroundColor: 'white', borderRadius: 14, marginBottom: hp(2), overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 5, flexDirection: 'row', alignItems: 'center' },
+  fullCardImageContainer: { width: wp(35), height: hp(12) },
+  cardImagePlaceholder: { flex: 1, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
+  fullCardContent: { padding: wp(3), flex: 1, justifyContent: 'center' },
+  fullCardTitle: { fontSize: hp(2.0), fontWeight: '600', color: '#003087', marginBottom: hp(0.6) },
+  fullCardDistance: { fontSize: hp(1.6), color: '#666' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: wp(1.5) },
+  calculatorCard: { marginHorizontal: wp(5), backgroundColor: 'white', borderRadius: 20, padding: wp(5), shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, position: 'relative' },
+  calculatorRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  leftIconsColumn: { alignItems: 'center', marginRight: wp(2), paddingTop: 5 },
+  verticalLine: { width: 0, height: hp(5.5), borderLeftWidth: 2, borderColor: '#CCC', borderStyle: 'dotted', marginVertical: 4 },
+  inputsColumn: { flex: 1, gap: hp(1.5) },
+  inputWrapperTop: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
+  inputWrapperBottom: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
+  swapButton: { marginLeft: wp(3), padding: 8, alignSelf: 'center' },
+  distanceRow: { flexDirection: 'row', marginTop: hp(2.5), gap: wp(3) },
+  calculateBtn: { backgroundColor: '#D32F2F', borderRadius: 15, paddingHorizontal: wp(6), height: hp(5.5), justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, position: 'absolute', bottom: -35, right: 0, left: 170 },
+  calculateBtnText: { color: 'white', fontSize: hp(1.7), fontWeight: '600' },
+  fareResultCard: { marginTop: hp(2), backgroundColor: '#F8FAFF', padding: hp(2), borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#BBDEFB' },
+  fareResultText: { fontSize: hp(2), fontWeight: '700', color: '#003087' },
+});
