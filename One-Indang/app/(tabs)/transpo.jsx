@@ -12,7 +12,8 @@ import {
   Keyboard,
   LogBox,
   Linking, // Added for Google Maps
-  Switch   // Added for Discount Toggle
+  Switch,   // Added for Discount Toggle
+  Modal     // Added for Receipt Modal
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -61,6 +62,10 @@ export default function App() {
   const [passengerCount, setPassengerCount] = useState(1);
   const [isDiscounted, setIsDiscounted] = useState(false); // For Student/Senior/PWD
 
+  // RECEIPT MODAL STATE
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
+
   useEffect(() => {
     const now = new Date();
     const hour = now.getHours();
@@ -93,9 +98,25 @@ export default function App() {
   const calculateFareHandler = async () => {
     try {
       const result = await calculateFare(selectedTransport, tricycleType, passengerCount, isDiscounted, origin, destination);
+      
+      // Prepare receipt data
+      const receipt = {
+        transportType: selectedTransport,
+        origin: origin?.desc || 'Not specified',
+        destination: destination?.desc || 'Not specified',
+        distance: result.distance,
+        duration: result.duration,
+        fare: result.fare,
+        tricycleType: selectedTransport === 'Tricycle' ? tricycleType : null,
+        passengerCount: selectedTransport === 'Tricycle' && tricycleType === 'Regular' ? passengerCount : null,
+        isDiscounted: (selectedTransport === 'Jeep' || selectedTransport === 'Bus') && isDiscounted
+      };
+      
+      setReceiptData(receipt);
       setFare(result.fare);
       setDistance(result.distance);
       setDuration(result.duration);
+      setShowReceiptModal(true);
       Keyboard.dismiss();
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -153,9 +174,138 @@ export default function App() {
     );
   };
 
+  // RECEIPT MODAL COMPONENT
+  const ReceiptModal = () => (
+    <Modal
+      visible={showReceiptModal}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={() => setShowReceiptModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.receiptContainer}>
+          {/* Header */}
+          <View style={styles.receiptHeader}>
+            <Text style={styles.receiptTitle}>Trip Receipt</Text>
+            <TouchableOpacity 
+              onPress={() => setShowReceiptModal(false)}
+              style={styles.closeButton}
+            >
+              <Icon name="close" size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Transport Type */}
+          <View style={styles.receiptSection}>
+            <View style={styles.transportBadge}>
+              <Icon 
+                name={
+                  receiptData?.transportType === 'Tricycle' ? 'pedal-bike' :
+                  receiptData?.transportType === 'Bus' ? 'directions-bus' :
+                  receiptData?.transportType === 'Jeep' ? 'directions-car' : 'drive-eta'
+                } 
+                size={20} 
+                color="#D32F2F" 
+              />
+              <Text style={styles.transportBadgeText}>{receiptData?.transportType}</Text>
+            </View>
+          </View>
+
+          {/* Trip Details */}
+          <View style={styles.receiptSection}>
+            <View style={styles.receiptRow}>
+              <Icon name="radio-button-unchecked" size={16} color="#666" />
+              <Text style={styles.receiptLabel}>From:</Text>
+              <Text style={styles.receiptValue} numberOfLines={2}>{receiptData?.origin}</Text>
+            </View>
+            
+            <View style={styles.receiptDivider} />
+            
+            <View style={styles.receiptRow}>
+              <Icon name="location-on" size={16} color="#D32F2F" />
+              <Text style={styles.receiptLabel}>To:</Text>
+              <Text style={styles.receiptValue} numberOfLines={2}>{receiptData?.destination}</Text>
+            </View>
+          </View>
+
+          {/* Trip Info */}
+          <View style={styles.receiptSection}>
+            <View style={styles.receiptRow}>
+              <Icon name="straighten" size={16} color="#666" />
+              <Text style={styles.receiptLabel}>Distance:</Text>
+              <Text style={styles.receiptValue}>{receiptData?.distance} km</Text>
+            </View>
+            
+            <View style={styles.receiptRow}>
+              <Icon name="schedule" size={16} color="#666" />
+              <Text style={styles.receiptLabel}>Duration:</Text>
+              <Text style={styles.receiptValue}>{receiptData?.duration}</Text>
+            </View>
+          </View>
+
+          {/* Additional Details */}
+          {receiptData?.tricycleType && (
+            <View style={styles.receiptSection}>
+              <View style={styles.receiptRow}>
+                <Icon name="info" size={16} color="#666" />
+                <Text style={styles.receiptLabel}>Type:</Text>
+                <Text style={styles.receiptValue}>{receiptData.tricycleType}</Text>
+              </View>
+              {receiptData.passengerCount && (
+                <View style={styles.receiptRow}>
+                  <Icon name="group" size={16} color="#666" />
+                  <Text style={styles.receiptLabel}>Passengers:</Text>
+                  <Text style={styles.receiptValue}>{receiptData.passengerCount}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {receiptData?.isDiscounted && (
+            <View style={styles.receiptSection}>
+              <View style={styles.discountBadge}>
+                <Icon name="local-offer" size={16} color="#4CAF50" />
+                <Text style={styles.discountBadgeText}>20% Student/Senior/PWD Discount Applied</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Total Fare */}
+          <View style={styles.receiptTotal}>
+            <Text style={styles.totalLabel}>Total Fare</Text>
+            <Text style={styles.totalAmount}>₱{receiptData?.fare}</Text>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.receiptActions}>
+            <TouchableOpacity 
+              style={styles.actionButtonSecondary}
+              onPress={() => setShowReceiptModal(false)}
+            >
+              <Text style={styles.actionButtonTextSecondary}>Close</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.actionButtonPrimary}
+              onPress={() => {
+                setShowReceiptModal(false);
+                handleDirection();
+              }}
+            >
+              <Text style={styles.actionButtonTextPrimary}>Get Directions</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
+
+      {/* Receipt Modal */}
+      <ReceiptModal />
 
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
@@ -338,12 +488,6 @@ export default function App() {
                 </Text>
               </TouchableOpacity>
             </View>
-
-            {fare && (
-              <View style={styles.fareResultCard}>
-                <Text style={styles.fareResultText}>Estimated Fare: ₱{fare}</Text>
-              </View>
-            )}
           </View>
         </View>
 
@@ -407,7 +551,7 @@ export default function App() {
 const autocompleteStyles = {
   container: { flex: 1, overflow: 'visible' },
   textInput: { height: hp(5.5), color: '#333', fontSize: hp(1.7), backgroundColor: 'transparent', marginTop: 2 },
-  listView: { position: 'absolute', top: 45, left: 0, right: 0, zIndex: 10000, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#EEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 },
+  listView: { position: 'absolute', top: 45, left: 0, right: 0, zIndex: 10000, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#EEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, maxHeight: 132, overflow: 'hidden' },
   row: { backgroundColor: 'white', padding: 13, height: 44, flexDirection: 'row' },
   separator: { height: 0.5, backgroundColor: '#c8c7cc' },
   description: { fontSize: 14, color: '#333' },
@@ -476,6 +620,28 @@ const styles = StyleSheet.create({
   distanceRow: { flexDirection: 'row', marginTop: hp(2.5), gap: wp(3) },
   calculateBtn: { backgroundColor: '#D32F2F', borderRadius: 15, paddingHorizontal: wp(6), height: hp(5.5), justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, position: 'absolute', bottom: -35, right: 0, left: 170 },
   calculateBtnText: { color: 'white', fontSize: hp(1.7), fontWeight: '600' },
-  fareResultCard: { marginTop: hp(2), backgroundColor: '#F8FAFF', padding: hp(2), borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#BBDEFB' },
-  fareResultText: { fontSize: hp(2), fontWeight: '700', color: '#003087' },
+
+  // RECEIPT MODAL STYLES
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: wp(5) },
+  receiptContainer: { backgroundColor: 'white', borderRadius: 20, width: '100%', maxWidth: wp(90), shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 10 },
+  receiptHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: wp(5), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  receiptTitle: { fontSize: hp(2.5), fontWeight: 'bold', color: '#003087' },
+  closeButton: { padding: 5 },
+  receiptSection: { paddingHorizontal: wp(5), paddingVertical: hp(1.5) },
+  transportBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', backgroundColor: '#FFF5F5', paddingHorizontal: wp(4), paddingVertical: hp(1), borderRadius: 20, borderWidth: 1, borderColor: '#FFE5E5' },
+  transportBadgeText: { fontSize: hp(1.8), fontWeight: '600', color: '#D32F2F', marginLeft: wp(2) },
+  receiptRow: { flexDirection: 'row', alignItems: 'center', marginVertical: hp(0.5) },
+  receiptLabel: { fontSize: hp(1.6), color: '#666', marginLeft: wp(2), minWidth: wp(15) },
+  receiptValue: { fontSize: hp(1.6), color: '#333', fontWeight: '500', flex: 1, textAlign: 'right' },
+  receiptDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: hp(1), marginLeft: wp(8) },
+  discountBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', backgroundColor: '#E8F5E8', paddingHorizontal: wp(4), paddingVertical: hp(1), borderRadius: 15, borderWidth: 1, borderColor: '#C8E6C9' },
+  discountBadgeText: { fontSize: hp(1.4), color: '#2E7D32', marginLeft: wp(2) },
+  receiptTotal: { backgroundColor: '#F8FAFF', margin: wp(5), marginBottom: hp(2), padding: wp(4), borderRadius: 15, borderWidth: 2, borderColor: '#BBDEFB', alignItems: 'center' },
+  totalLabel: { fontSize: hp(1.8), color: '#666', marginBottom: hp(0.5) },
+  totalAmount: { fontSize: hp(3), fontWeight: 'bold', color: '#003087' },
+  receiptActions: { flexDirection: 'row', padding: wp(5), paddingTop: 0, gap: wp(3) },
+  actionButtonSecondary: { flex: 1, backgroundColor: '#F5F5F5', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center', borderWidth: 1, borderColor: '#E0E0E0' },
+  actionButtonTextSecondary: { fontSize: hp(1.6), color: '#666', fontWeight: '600' },
+  actionButtonPrimary: { flex: 1, backgroundColor: '#D32F2F', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center' },
+  actionButtonTextPrimary: { fontSize: hp(1.6), color: '#FFF', fontWeight: '600' },
 });

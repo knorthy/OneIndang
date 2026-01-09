@@ -132,6 +132,35 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
   const routeDetails = await fetchRouteDetails(origin, destination);
   const distKm = routeDetails.distValue;
 
+  // Helper function to check if destination is within Indang area (before Trece Martires)
+  const isIndangAreaDestination = (destDesc) => {
+    if (!destDesc) return false;
+    const indangPlaces = ['buna cerca', 'kaytapos', 'alulod', 'mahabang kahoy', 'regina', 'indang'];
+    return indangPlaces.some(place => destDesc.toLowerCase().includes(place));
+  };
+
+  // Helper function to check specific tricycle special routes
+  const getTricycleSpecialFare = (originDesc, destDesc) => {
+    if (!originDesc || !destDesc) return null;
+
+    const originLower = originDesc.toLowerCase();
+    const destLower = destDesc.toLowerCase();
+
+    // Indang to Buna Cerca
+    if (originLower.includes('indang') && destLower.includes('buna cerca')) return 30;
+    // Katpaos to Buna
+    if (originLower.includes('katpaos') && destLower.includes('buna')) return 30;
+    // CVSU to Buna Cerca
+    if (originLower.includes('cvsu') && destLower.includes('buna cerca')) return 30;
+
+    return null; // No special fare
+  };
+
+  // Helper function to round to nearest multiple of 5
+  const roundToNearestFive = (num) => {
+    return Math.round(num / 5) * 5;
+  };
+
   let finalFare = 0;
 
   // 2. Apply Rules
@@ -140,31 +169,45 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
       // Flat 20 pesos per person regardless of distance (within town)
       finalFare = 20 * validPassengerCount;
     } else {
-      // Special: 30 base + 5 per km in excess of 3km
-      let base = 30;
-      if (distKm > 3) {
-        const excess = distKm - 3;
-        base += (excess * 5);
+      // Check for special routes first
+      const specialFare = getTricycleSpecialFare(origin?.desc, destination?.desc);
+      if (specialFare !== null) {
+        finalFare = specialFare;
+      } else {
+        // Special: 30 base + 5 per km in excess of 3km
+        let base = 30;
+        if (distKm > 3) {
+          const excess = distKm - 3;
+          base += (excess * 5);
+        }
+        finalFare = base;
       }
-      finalFare = base;
     }
+    // Round tricycle fares to nearest multiple of 5
+    finalFare = roundToNearestFive(finalFare);
   }
   else if (selectedTransport === 'Bus') {
-    // Short Range (<= 15km): 20 pesos
-    if (distKm <= 15) {
+    // Check if destination is within Indang area (before Trece Martires City)
+    if (isIndangAreaDestination(destination?.desc)) {
+      // Flat 20 pesos regardless of discount for Indang area destinations
       finalFare = 20;
-    } else if (distKm <= 28) {
-      // Long Range (> 15km to 28km): Scale from 20 to 45
-      const slope = 25 / 13; // (45 - 20) / (28 - 15)
-      const excess = distKm - 15;
-      finalFare = 20 + (excess * slope);
     } else {
-      // Cap at 45 for distances > 28km (or adjust as needed)
-      finalFare = 45;
-    }
+      // Regular fare calculation for destinations outside Indang area
+      if (distKm <= 15) {
+        finalFare = 20;
+      } else if (distKm <= 28) {
+        // Long Range (> 15km to 28km): Scale from 20 to 45
+        const slope = 25 / 13; // (45 - 20) / (28 - 15)
+        const excess = distKm - 15;
+        finalFare = 20 + (excess * slope);
+      } else {
+        // Cap at 45 for distances > 28km (or adjust as needed)
+        finalFare = 45;
+      }
 
-    // Apply Discount
-    if (isDiscounted) finalFare = finalFare * 0.80;
+      // Apply Discount only for destinations outside Indang area
+      if (isDiscounted) finalFare = finalFare * 0.80;
+    }
   }
   else if (selectedTransport === 'Jeep') {
     // Minimum (<= 4km): 13 pesos
