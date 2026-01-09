@@ -27,6 +27,7 @@ const AccountSetupScreen = () => {
  
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +40,7 @@ const AccountSetupScreen = () => {
   // ERROR STATE
   const [errors, setErrors] = useState({
     phone: false,
+    email: false,
     firstName: false,
     lastName: false,
     password: false,
@@ -83,6 +85,11 @@ const AccountSetupScreen = () => {
     if(errors.phone) setErrors({...errors, phone: false});
   };
 
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    if(errors.email) setErrors({...errors, email: false});
+  };
+
   const handleNameChange = (text, setter, errorField) => {
     const alphabetValue = text.replace(/[^a-zA-Z\s]/g, '');
     setter(alphabetValue);
@@ -91,9 +98,11 @@ const AccountSetupScreen = () => {
 
   const validateAndSubmit = () => {
     let valid = true;
-    let newErrors = { phone: false, firstName: false, lastName: false, password: false };
+    let newErrors = { phone: false, email: false, firstName: false, lastName: false, password: false };
 
     if (!phone || phone.length < 10) { newErrors.phone = true; valid = false; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) { newErrors.email = true; valid = false; }
     if (!firstName.trim()) { newErrors.firstName = true; valid = false; }
     if (!lastName.trim()) { newErrors.lastName = true; valid = false; }
     if (!passwordCriteria.length || !passwordCriteria.format) { newErrors.password = true; valid = false; }
@@ -198,30 +207,31 @@ const AccountSetupScreen = () => {
                                 </View>
                             </View>
 
+
                             {/* First Name */}
                             <View>
-                                <Text style={styles.label}>First Name</Text>
+                                <Text style={styles.label}>Full Name</Text>
                                 <TextInput
                                     style={[styles.input, errors.firstName && styles.inputError]}
-                                    placeholder="Enter your full first name"
+                                    placeholder="Enter your full name"
                                     placeholderTextColor="#9CA3AF"
                                     value={firstName}
                                     onChangeText={(t) => handleNameChange(t, setFirstName, 'firstName')}
                                 />
                             </View>
-
-                            {/* Last Name */}
+                            {/* Email */}
                             <View>
-                                <Text style={styles.label}>Last Name</Text>
+                                <Text style={styles.label}>Enter your email</Text>
                                 <TextInput
-                                    style={[styles.input, errors.lastName && styles.inputError]}
-                                    placeholder="Enter your full last name"
+                                    style={[styles.input, errors.email && styles.inputError]}
+                                    value={email}
+                                    placeholder="Enter your email"
                                     placeholderTextColor="#9CA3AF"
-                                    value={lastName}
-                                    onChangeText={(t) => handleNameChange(t, setLastName, 'lastName')}
+                                    onChangeText={handleEmailChange}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
                                 />
                             </View>
-
                             {/* Password */}
                             <View>
                                 <Text style={styles.label}>Password</Text>
@@ -263,7 +273,7 @@ const AccountSetupScreen = () => {
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
                         <Text style={styles.subtitle}>
-                          We sent a 6 digit-code to +63 {phone}.
+                          We sent a 6 digit-code to {email}.
                         </Text>
 
                         <View style={styles.otpContainer}>
@@ -518,7 +528,7 @@ const styles = StyleSheet.create({
 
   footerContainer: {
     position: 'absolute',
-    bottom: hp(4),
+    bottom: hp(1),
     left: 0,
     right: 0,
     paddingHorizontal: wp(10),
