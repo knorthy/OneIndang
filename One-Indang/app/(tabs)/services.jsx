@@ -36,7 +36,7 @@ const FEATURED_SERVICES = [
   { id: 'livelihood', title: 'Livelihood Training & Loan Assistance', icon: 'toolbox', library: 'MaterialCommunityIcons', color: COLORS.secondary },
   { id: 'medical_cert', title: 'Medical Certificate', icon: 'stethoscope', library: 'MaterialCommunityIcons', color: COLORS.primary },
   { id: 'solo_parent', title: 'Solo Parent ID', icon: 'card-account-details-outline', library: 'MaterialCommunityIcons', color: COLORS.secondary },
-  { id: 'hiking', title: 'Mt. Isarog Hiking Permit', icon: 'landscape', library: 'MaterialIcons', color: COLORS.primary }, 
+  { id: 'hiking', title: 'River Resort & Eco-Tourism', icon: 'landscape', library: 'MaterialIcons', color: COLORS.primary }, 
   { id: 'senior', title: 'Senior Citizen ID', icon: 'account-tie', library: 'MaterialCommunityIcons', color: COLORS.secondary },
   { id: 'summer_job', title: 'Summer Employment', icon: 'school', library: 'MaterialCommunityIcons', color: COLORS.primary },
 ];
@@ -72,8 +72,8 @@ const POPULAR_SERVICES = [
   },
   { 
     id: 'grow', 
-    title: 'GrOW Negosyo Program', 
-    subtitle: 'Assistance for MSMEs.', 
+    title: 'Negosyo Center / SME Support', 
+    subtitle: 'Get support for business growth and development.', 
     icon: 'chart-line-variant', 
     color: COLORS.primary 
   },

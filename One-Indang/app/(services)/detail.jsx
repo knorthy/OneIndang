@@ -27,96 +27,96 @@ const SERVICES_DB = {
   'facilities': {
     title: 'Use of Government Facilities',
     office: "City Mayor's Office",
-    address: 'Room 201, 2/F Main Bldg., City Hall Complex, J. Miranda Avenue, Concepcion Pequeña',
-    email: 'cmo@naga.gov.ph',
-    about: 'This service allows residents and organizations to request the use of city-owned spaces for events like seminars/trainings, conferences, gatherings, sports, rallies, and other activities.',
-    who: ['Any resident of Naga City', 'Organizations or groups planning an activity']
+    address: 'A. Mojica St., Poblacion III, Indang City',
+    email: 'M1.INDANG@YAHOO.COM',
+    about: 'This facility facilitates the booking of public spaces by individuals and groups for various purposes, including training sessions, assemblies, and recreational activities.',
+    who: ['Any resident of the Municipality of Indang', 'Organizations or groups planning an activity']
   },
   'medical': {
     title: 'Medical Assistance',
-    office: 'City Social Welfare and Development Office',
-    address: 'G/F Social Development Center Bldg., City Hall Complex, J. Miranda Avenue, Concepcion Pequeña, Naga City',
-    email: 'cswd@naga.gov.ph',
-    about: 'The City Social Welfare and Development Office (CSWDO) provide emergency financial assistance or referrals for free service to individuals and families who are in extremely difficult situations and have inadequate resources.',
+    office: 'Indang Municipal Social Welfare and Development Office',
+    address: 'A. Mojica St., Poblacion III, Indang City',
+    email: 'M1.INDANG@YAHOO.COM',
+    about: 'Indang Municipal Social Welfare and Development Office (MSWDO) delivers community-based social protection and welfare programs, including support for families, children, women, and the elderly',
     who: ['Individuals and families with inadequate resources']
   },
   'transport': {
-    title: 'Transportation Assistance',
-    office: "City Mayor's Office",
-    address: 'Room 201, 2/F Main Bldg., City Hall Complex, J. Miranda Avenue, Concepcion Pequeña, Naga City',
-    email: 'cmo@naga.gov.ph',
-    about: 'This service provides transportation support to residents, barangay officials, and city departments/offices requiring transportation within or outside the city.',
-    who: ['Any resident of Naga City', 'Barangay officials', 'City government departments or offices']
+    title: 'Transport & Vehicle Assistance',
+    office: "Municipal Mayor's Office",
+    address: '2/F Municipal Hall, Poblacion IV, Indang, Cavite',
+    email: 'mayorsoffice@indang.gov.ph',
+    about: 'This service provides vehicle assistance to Barangays, Schools, and registered organizations in Indang for official travel, medical emergencies (non-critical), or participation in provincial/national events.',
+    who: ['Barangay Officials of Indang', 'Public Schools in Indang', 'Registered NGOs/CSOs']
   },
   'training': {
-    title: 'Request for Training',
-    office: "City Mayor's Office",
-    address: 'Room 201, 2/F Main Bldg., City Hall Complex, J. Miranda Avenue, Concepcion Pequeña, Naga City',
-    email: 'cmo@naga.gov.ph',
-    about: 'The city offers a range of free and accessible training and information services designed to equip individuals, groups, and communities with valuable knowledge and practical skills. These cover diverse areas such as agriculture, food production, environmental awareness, and safety.',
-    who: ['Any resident of Naga City', 'Organizations or groups planning an activity']
+    title: 'Agri-Livelihood Training',
+    office: "Municipal Agriculture Office (MAO)",
+    address: 'Ground Floor, Municipal Hall Compound, Indang, Cavite',
+    email: 'agriculture@indang.gov.ph',
+    about: 'As the Agri-Tourism Hub of Cavite, Indang offers free technical training on coffee processing, dragon fruit cultivation, vinegar making, and organic farming to empower local farmers and enthusiasts.',
+    who: ['Indang Farmers and Fisherfolks', 'Agri-business owners', 'Interested residents']
   },
   'grow': {
-    title: 'GrOW Negosyo Program',
-    office: 'Metro Public Employment Service',
-    address: 'G/F DOLE Bldg., J. Miranda Ave., Concepcion Pequeña, Naga City',
-    email: 'metropeso@naga.gov.ph',
-    about: 'The Metro PESO, in service to the Nagueños through the Naga GrOW Negosyo Program, assists small & micro enterprises which are substantial and important component of the city’s local economy. The program has four (4) main services: Skills Training/Workshop, Product Development, Equipment Support, and Marketing Support.',
-    who: ['Bona fide residents of Naga City (present any valid id)', 'Must have a new or existing business', 'Must be a manufacturer/producer', 'Must present a product sample']
+    title: 'Negosyo Center / SME Support',
+    office: 'Indang PESO & LEIPO',
+    address: 'Municipal Hall Compound, Poblacion IV, Indang, Cavite',
+    email: 'peso@indang.gov.ph',
+    about: 'The Local Economic and Investment Promotion Office (LEIPO) assists aspiring entrepreneurs in Indang. We provide business name registration (DTI), product development seminars, and market matching for local products like Kalamay and Tablea.',
+    who: ['Bona fide residents of Indang', 'Aspiring Entrepreneurs', 'Owners of MSMEs']
   },
   'livelihood': {
-    title: 'Livelihood Training & Loan Assistance',
-    office: 'Metro Public Employment Service',
-    address: 'GF DOLE Bldg., J. Miranda Ave., Concepcion Pequeña, Naga City',
-    email: 'metropeso@naga.gov.ph',
-    about: 'Metro PESO, through its Enterprise Development Center (EDC), implements a livelihood program that aims to improve the socio-economic well-being of the low-income population. It provides training and soft loans for income-generating projects.',
-    who: ['be a bonafide resident of Naga City', 'be 18 years old and above', 'not be an employee of the City Government of Naga', 'not have any existing loan or overdue Metro PESO livelihood loan', 'have a new or existing business'],
-    requirements: ['Metro PESO EDC Forms: L-1, L-1b, L-2, L-3', 'Two 1.5" x 1.5" photos (borrower & co-maker)', 'Valid government-issued IDs (with Naga address)', 'Community Tax Certificates (borrower & co-maker)', 'Business License / Mayor’s Permit (for loans P10,000.00 up)', 'Barangay Business Permit & Clearance (for loans below P10,000.00)'],
-    process: ['Go to Metro PESO EDC and approach staff', 'Interview + fill out NSRP form', 'Fill out Form L-1 (Loan Application)', 'Submit form + requirements', 'Record check via LiBIS (loan history)', 'Credit investigation and Approval']
+    title: 'Capital Assistance Program',
+    office: 'Municipal Social Welfare (MSWDO)',
+    address: 'MSWDO Bldg., Municipal Hall Cmpd., Indang, Cavite',
+    email: 'mswdo@indang.gov.ph',
+    about: 'The Sustainable Livelihood Program (SLP) provides capital assistance (Sea-K or similar) to qualified indigent families to start small businesses such as sari-sari stores or food vending.',
+    who: ['Indigent families (4Ps beneficiaries prioritized)', 'Residents of Indang for at least 6 months', 'Must pass the CI (Case Study)'],
+    requirements: ['Certificate of Indigency (Barangay)', 'Valid ID', 'Project Proposal (Simple Format)', 'Social Case Study Report (from MSWDO)'],
+    process: ['Visit MSWDO for assessment', 'Submit requirements', 'Wait for validation and home visit', 'Approval and releasing of assistance']
   },
   'medical_cert': {
     title: 'Medical Certificate Issuance',
-    office: 'City Health Office',
-    address: 'G/F Naga City Center for Health and Nutrition Bldg., Naga City Hall Complex',
-    email: 'cho@naga.gov.ph',
-    about: 'Health and medical certificates are commonly required by government agencies like the LTO, employers, and schools. These documents are issued by the City Health Office (CHO) and serve as proof of medical clearance.',
-    requirements: ['Fecalysis results', 'Results of Blood Test/ (CBC)', 'Results of Chest X-ray(PA)', 'Results of Urinalysis', 'Results of Drug Test', 'From Cashier: Certification Fee receipt']
+    office: 'Municipal Health Office (RHU)',
+    address: 'Indang Rural Health Unit, Poblacion, Indang, Cavite',
+    email: 'rhu@indang.gov.ph',
+    about: 'The Medical Certificate is issued by the Municipal Health Officer for employment, school enrollment, or driver’s license application, certifying the individual’s physical fitness.',
+    requirements: ['Official Receipt (payment at Treasurer)', 'Laboratory Results (Urinalysis, Fecalysis, CBC)', 'Chest X-ray result', 'Drug Test result (for employment)']
   },
   'solo_parent': {
-    title: 'Solo Parent ID',
-    office: 'Naga City Solo Parents Affairs Office (NCSPAO)',
-    address: '2/F Ako Bicol Bldg., City Hall Complex Miranda Avenue, Concepcion Pequeña',
-    email: 'cswdo@naga.gov.ph',
-    about: 'This service provides qualified individuals with a Solo Parent Identification Card and a Certificate of Indigency, enabling access to support programs offered by the Naga City Solo Parents Affairs Office (NCSPAO).',
-    who: ['A woman who gave birth as a result of rape', 'Parent left solo or alone due to death of spouse', 'Parent left solo while spouse is detained', 'Unmarried mother/father who prefers to keep the child', 'Any family member assuming head of family'],
-    requirements: ['1pc 1x1 and 1pc 2x2 photos', 'Duly accomplished application form', 'Duly accomplished ID form', 'Filling up of Membership Renewal Form (For Renewal)', 'Validation of Member (For Renewal)']
+    title: 'Solo Parent ID Application',
+    office: 'MSWDO Indang',
+    address: 'MSWDO Bldg., Municipal Hall Cmpd., Indang, Cavite',
+    email: 'mswdo@indang.gov.ph',
+    about: 'Issuance of Solo Parent ID to qualified single parents in Indang to avail of benefits such as additional leave credits and discounts on basic commodities (per RA 11861).',
+    who: ['Single parents due to death of spouse', 'Unmarried mothers/fathers', 'Legal guardians/foster parents'],
+    requirements: ['Barangay Certificate of Residency', 'Birth Certificate of Child/Children', 'Affidavit of Solo Parent', '1x1 ID Picture', 'Certificate of No Marriage (CENOMAR) if applicable']
   },
   'hiking': {
-    title: 'Mt. Isarog Hiking Permit',
-    office: 'City Environment and Natural Resources',
-    address: 'Naga City Hall Complex, Naga City',
-    email: 'cenro.nagacity@gmail.com',
-    about: 'Individuals who wish to hike or visit Mt. Isarog Natural Park are required to secure a hiking permit from the City ENRO and pay the necessary environmental fees to the City Treasurer\'s Office.',
-    requirements: ['Download, accomplish, and scan waiver release form', 'Scan valid IDs of all hikers', 'Fill up online form linked below', 'Wait for confirmation and approval of application'],
-    fees: ['Climbing Permit: Filipino (P100/day), Foreign (P500/day)', 'Entrance Fee: Filipino (P10/person), Foreign (P50/person)', 'Guide Fee: P1,000.00 per guide per day (5 guests to 1 guide)']
+    title: 'River Resort & Eco-Tourism', // Replaced Hiking since Indang is famous for Resorts
+    office: 'Tourism Office',
+    address: 'Indang Municipal Hall, Cavite',
+    email: 'tourism@indang.gov.ph',
+    about: 'Indang is known as the "Spring Resort Capital of Cavite". This service assists in booking, coordinating group tours, or registering new resorts. It also covers visits to the Bonifacio Shrine.',
+    requirements: ['Booking Request Letter (for large groups)', 'Environmental Fee (for specific protected areas)', 'Business Permit (for resort owners)'],
+    fees: ['Resort Entrance Fees: Varies by establishment', 'Environmental Fee: Php 20.00 (select areas)', 'Bonifacio Shrine: Donation based']
   },
   'senior': {
     title: 'Senior Citizen ID',
-    office: 'Office of the Senior Citizens Affairs Office',
-    address: 'Senior Citizens Center, Naga City Hall Complex, Juan Q. Miranda Ave.',
-    email: 'osca@naga.gov.ph',
-    about: 'The Senior Citizens ID card entitles qualified bearers to avail of benefits and privileges mandated under RA 9994, including discounts on transport fares, groceries, and prescription medicines.',
-    who: ['Residents of Naga City for at least one (1) year', 'Registered voter of the City of Naga (except bedridden senior citizens)'],
-    services: ['Issuance of new IDs, discount booklets', 'Replacement of mutilated ID cards and booklets', 'Replacement of lost IDs and booklets']
+    office: 'OSCA Indang',
+    address: 'OSCA Office, Municipal Hall Compound, Indang, Cavite',
+    email: 'osca@indang.gov.ph',
+    about: 'The OSCA ID provides Indang senior citizens (60+) with 20% discounts on medicines, food, and transportation, plus access to the Social Pension program for the indigent.',
+    who: ['Residents of Indang aged 60 years old and above'],
+    services: ['New ID Application', 'Purchase Booklet Issuance', 'Social Pension Application', 'Birthday Cash Gift Processing']
   },
   'summer_job': {
-    title: 'Summer Employment Program',
-    office: 'Metro Public Employment Service',
-    address: 'GF DOLE Bldg., J. Miranda Ave., Concepcion Pequeña, Naga City',
-    email: 'metropeso@naga.gov.ph',
-    about: 'The Summer Employment for Enrolment (SEFE) aims to help students in senior high school, out of school youth, college students, and dependents of displaced workers. This program was created under City Ordinance No. 2019-041.',
-    who: ['Senior High School Students', 'College Students'],
-    requirements: ['Accomplished application form', 'Photocopy of Birth Certificate OR valid document', 'Photocopy of Parents ITR or Certificate of Indigence', 'Photocopy of grades (85 or above)', 'For OSY: Certification as OSY issued by DSWD/CSWD']
+    title: 'SPES (Student Employment)',
+    office: 'Indang PESO',
+    address: 'Municipal Hall Compound, Poblacion IV, Indang, Cavite',
+    email: 'peso@indang.gov.ph',
+    about: 'The Special Program for Employment of Students (SPES) is a joint undertaking of DOLE and the LGU of Indang to provide temporary employment to poor but deserving students during summer or Christmas vacation.',
+    who: ['Students / Out-of-School Youth (15-30 years old)', 'Parents\' combined income must not exceed poverty threshold', 'Must have passing grades'],
+    requirements: ['SPES Application Form', 'Copy of Birth Certificate', 'Copy of Grades / Form 138', 'Certificate of Indigency of Parents']
   }
 };
 

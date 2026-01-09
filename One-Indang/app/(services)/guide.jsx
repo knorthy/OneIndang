@@ -18,8 +18,8 @@ import { hp, wp } from '../../helpers/common';
 
 // --- THEME COLORS ---
 const COLORS = {
-  primary: '#003087',
-  secondary: '#D32F2F',
+  primary: '#003087', // Indang Blue
+  secondary: '#D32F2F', // Indang Red
   background: '#fff',
   text: '#333',
   gray: '#999',
@@ -27,117 +27,168 @@ const COLORS = {
   border: '#e0e0e0',
 };
 
-// --- DATA ---
+// --- DATA FOR INDANG GUIDE (COMPLETE) ---
 const GUIDE_DATA = {
+  // 1. HEALTH
   'health': {
-    title: 'Health and Nutrition',
+    title: 'Health & Nutrition',
     offices: [
       {
-        name: 'City Health Office',
+        name: 'Municipal Health Office (RHU)',
         items: [
-          'Securing a Health / Medical Certificate',
-          'Availing of Outpatient Consultation at City Health Office',
-          'Availing of Immunization Services',
-          'Availing of Maternal Care Services',
-          'Availing of Free Medicines',
-          'Availing of Anti-Tuberculosis Drugs',
-          'Availing of Leprosy Drugs',
-          'Availing of Dental Examination, Tooth Extraction'
+          'Medical Consultation / Check-up',
+          'Immunization Services (EPI)',
+          'Maternal Care & Pre-natal',
+          'Sanitary Permit for Businesses',
+          'Medical Certificate Issuance',
+          'TB-DOTS Program',
+          'Family Planning Services'
         ]
       },
-      {
-        name: 'City Population and Nutrition Office',
-        items: [
-          'Availing of Counselling on Nutrition and Family Planning',
-          'Requesting Information on Nutrition, Population and Family Planning',
-          'Availing of Supplemental Feeding Preparations',
-          'Availing Services of the Naga City Breastfeeding Center',
-          'Securing Family Planning Supplies for Walk-in Clients',
-          'Arranging Administration of DMPA Injections',
-          'Attending Pre-Marriage Orientation and Counseling'
-        ]
-      },
-      { name: 'Naga City Hospital', items: ['Admitting a Patient', 'Emergency Room Services', 'Outpatient Department Services'] },
-      { name: 'Our Lady of Lourdes Infirmary', items: ['General Consultation', 'Minor Surgeries', 'Laboratory Services'] }
+      { name: 'M.V. Santiago Medical Center', items: ['Emergency Room', 'Outpatient Services', 'Laboratory Services'] }
     ]
   },
+
+  // 2. SOCIAL SERVICES
   'social': {
     title: 'Social Services',
     offices: [
-      { name: 'City Civil Registry Office', items: ['Registration of Birth', 'Registration of Marriage', 'Registration of Death', 'Requesting Certified True Copies'] },
-      { name: 'City Mayor\'s Office - Office of the Senior Citizens Affairs', items: ['Application for Senior Citizen ID', 'Purchase of Medicine Booklet', 'Filing Complaints'] },
-      { name: 'City Social Welfare and Development Office', items: ['Crisis Intervention Unit', 'Solo Parent ID Application', 'Child Development Centers'] },
-      { name: 'City Veterinary Office', items: ['Animal Vaccination', 'Animal Impounding', 'Meat Inspection'] },
-      { name: 'Lingkod Barangay Office', items: ['Barangay Clearance Assistance', 'Community Affairs'] },
-      { name: 'Persons with Disability Affairs Office', items: ['PWD ID Application', 'Assistive Devices Request'] }
+      { 
+        name: 'Municipal Social Welfare (MSWDO)', 
+        items: [
+          'AICS (Financial Assistance)',
+          'Solo Parent ID Application',
+          'PWD ID Application',
+          'Senior Citizen ID Application',
+          'Certificate of Indigency',
+          'Pre-Marriage Counseling'
+        ] 
+      },
+      { name: 'OSCA (Senior Citizens)', items: ['Social Pension', 'Senior Citizen Booklet', 'Birthday Cash Gift'] }
     ]
   },
+
+  // 3. HOUSING (Missing Fixed)
   'housing': {
-    title: 'Housing and Urban Poor',
+    title: 'Housing & Zoning',
     offices: [
-      { name: 'Housing and Settlement Office', items: ['Application for Socialized Housing', 'Relocation Assistance', 'Dispute Resolution'] }
+      { 
+        name: 'Municipal Planning (MPDO)', 
+        items: [
+          'Zoning Clearance',
+          'Locational Clearance',
+          'Development Permit',
+          'Land Use Assistance'
+        ] 
+      },
+      { name: 'National Housing Authority (Region IV)', items: ['Housing Loan Inquiry', 'Relocation Assistance'] }
     ]
   },
+
+  // 4. EDUCATION (Missing Fixed)
   'education': {
-    title: 'Education, Arts, Culture, and Sports',
+    title: 'Education & Sports',
     offices: [
-      { name: 'Education, Scholarships & Sports Office', items: ['Scholarship Application', 'Sports Equipment Request', 'Facility Booking'] }
+      { 
+        name: 'Municipal Scholarship Office', 
+        items: [
+          'College Scholarship Application',
+          'Financial Assistance for Students',
+          'ALS (Alternative Learning System)'
+        ] 
+      },
+      { name: 'Sports Development Office', items: ['Sports Equipment Request', 'Gymnasium Reservation'] }
     ]
   },
+
+  // 5. LEGAL (Missing Fixed)
   'legal': {
     title: 'Legal Assistance',
     offices: [
-      { name: 'City Legal Office', items: ['Legal Counseling', 'Notary Services', 'Drafting of Legal Documents'] }
+      { name: 'Municipal Legal Officer', items: ['Legal Counseling', 'Notary Services (Indigent)', 'Drafting of Affidavits'] },
+      { name: 'Public Attorney\'s Office (PAO)', items: ['Free Legal Representation', 'Mediation Services'] }
     ]
   },
+
+  // 6. LIVELIHOOD (Merged Agri + Employment)
   'livelihood': {
-    title: 'Livelihood, Employment, Agriculture',
+    title: 'Livelihood & Agriculture',
     offices: [
-      { name: 'City Agriculturist Office', items: ['Seed Distribution', 'Technical Assistance on Farming', 'Tilapia Fingerlings Distribution'] },
-      { name: 'City Human Resource Management Office', items: ['Job Application Reception', 'Issuance of Service Record', 'Leave Application'] },
-      { name: 'Metro Public Employment Service Office', items: ['Job Fair Registration', 'Special Program for Employment of Students (SPES)', 'Livelihood Assistance'] },
-      { name: 'Naga City District Abattoir', items: ['Slaughterhouse Services', 'Meat Inspection Certificate'] }
+      { 
+        name: 'Municipal Agriculture Office', 
+        items: [
+          'Seed & Fertilizer Distribution',
+          'Tractor / Farm Equipment Lending',
+          'Technical Assistance on Farming',
+          'Anti-Rabies Vaccination',
+          'Crop Insurance'
+        ] 
+      },
+      { name: 'Indang PESO', items: ['Job Fair Registration', 'SPES (Student Employment)', 'OFW Assistance', 'Livelihood Training'] }
     ]
   },
+
+  // 7. TRANSPARENCY (Renamed from 'treasury')
   'transparency': {
-    title: 'Transparency & Accountability',
+    title: 'Transparency & Taxes',
     offices: [
-      { name: 'City Accounting Office', items: ['Processing of Disbursement Vouchers', 'Issuance of Accountant\'s Advice'] },
-      { name: 'City Assessor\'s Office', items: ['Issuance of Tax Declaration', 'Assessment of Real Property', 'Transfer of Ownership'] }
+      { name: 'Municipal Treasurer\'s Office', items: ['Real Property Tax Payment', 'Community Tax Certificate (Cedula)', 'Business Tax Payment'] },
+      { name: 'Municipal Assessor\'s Office', items: ['Tax Declaration Issuance', 'Property Assessment', 'Transfer of Tax Dec'] },
+      { name: 'Business Permit & Licensing (BPLO)', items: ['New Business Permit', 'Renewal of Business Permit', 'Retirement of Business'] }
     ]
   },
+
+  // 8. ENGINEERING (Renamed from 'eng')
   'engineering': {
-    title: 'Engineering & General Services',
+    title: 'Engineering & Works',
     offices: [
-      { name: 'City Engineer\'s Office', items: ['Building Permit Application', 'Electrical Permit', 'Occupancy Permit'] },
-      { name: 'General Services Office', items: ['Inventory Management', 'Procurement Services'] },
-      { name: 'Building Maintenance Office', items: ['Repair Request', 'Facility Maintenance'] },
-      { name: 'Water Services Division', items: ['Water Connection Application', 'Repair of Water Lines'] },
-      { name: 'City Events Protocol Office', items: ['Event Coordination', 'Protocol Services'] }
+      { 
+        name: 'Municipal Engineering Office', 
+        items: [
+          'Building Permit Application',
+          'Occupancy Permit',
+          'Electrical Permit',
+          'Fencing Permit',
+          'Excavation Permit'
+        ] 
+      },
+      { name: 'General Services Office', items: ['Streetlight Repair Request', 'Facility Maintenance'] }
     ]
   },
+
+  // 9. ENVIRONMENT (Missing Fixed)
   'environment': {
-    title: 'Cleanliness and Environmental Protection',
+    title: 'Environment (MENRO)',
     offices: [
-      { name: 'City Environment and Natural Resources Office', items: ['Mt. Isarog Hiking Permit', 'Tree Cutting Permit', 'Quarry Permit'] },
-      { name: 'Parks and Recreational Facilities', items: ['Park Reservation', 'Sports Facility Usage'] },
-      { name: 'Solid Waste Management Office', items: ['Garbage Collection Schedule', 'Request for Special Waste Collection'] }
+      { 
+        name: 'Municipal Environment Office (MENRO)', 
+        items: [
+          'Tree Cutting Permit',
+          'Solid Waste Management',
+          'Environmental Compliance Certificate (ECC) Assist',
+          'Garbage Collection Schedule'
+        ] 
+      },
+      { name: 'Tourism Office', items: ['Resort Inspection', 'River Clean-up Drives'] }
     ]
   },
+
+  // 10. PEACE AND ORDER
   'peace': {
-    title: 'Peace and Order, Public Safety',
+    title: 'Peace & Order',
     offices: [
-      { name: 'Bicol Central Station', items: ['Bus Terminal Assistance', 'Lost and Found'] },
-      { name: 'City Disaster Risk Reduction Management Office', items: ['Emergency Response', 'Disaster Training Request'] },
-      { name: 'Public Safety Office', items: ['Traffic Assistance', 'Reporting of Violations'] },
-      { name: 'Sangguniang Panglungsod', items: ['Request for City Council Resolution', 'Public Hearing Schedules'] }
+      { name: 'Indang Municipal Police', items: ['Police Clearance', 'Blotter Report', 'Peace & Order Assistance'] },
+      { name: 'MDRRMO', items: ['Disaster Rescue', 'Emergency Response Training', 'Ambulance Request'] },
+      { name: 'BFP Indang', items: ['Fire Safety Inspection', 'Fire Drill Request'] }
     ]
   },
+
+  // 11. IT (Missing Fixed)
   'it': {
-    title: 'Information Technology and Investment',
+    title: 'IT & Investment',
     offices: [
-      { name: 'Information Technology Office', items: ['GovNet Connectivity', 'Technical Support'] },
-      { name: 'Naga City Investment Board', items: ['Investment Incentives Application', 'Business Matching'] }
+      { name: 'Local Econ. & Investment (LEIPO)', items: ['Investment Incentives', 'Business Matching', 'DTI Registration Assist'] },
+      { name: 'Admin - MIS Section', items: ['GovNet Connectivity', 'LGU Website Concerns'] }
     ]
   }
 };
@@ -146,16 +197,11 @@ export default function GuideScreen() {
   const { categoryId } = useLocalSearchParams();
   const data = GUIDE_DATA[categoryId];
   
-  // State for search text
   const [searchText, setSearchText] = useState('');
-  
-  // State for Accordion (Expanded Index)
   const [expandedOffice, setExpandedOffice] = useState(null);
 
   const toggleOffice = (index) => {
-    // If we are searching, toggling shouldn't really close items because we want to see results
     if (searchText.length > 0) return; 
-    
     if (expandedOffice === index) {
       setExpandedOffice(null);
     } else {
@@ -164,45 +210,29 @@ export default function GuideScreen() {
   };
 
   const openPdf = (itemName) => {
-    Alert.alert("Opening Document", `Downloading sample.pdf for "${itemName}"...`, [{ text: "OK" }]);
+    Alert.alert("Opening Document", `Downloading requirements for "${itemName}"...`, [{ text: "OK" }]);
   };
 
-  // --- ROBUST FILTERING FUNCTION ---
   const getFilteredOffices = () => {
     if (!data) return [];
-    
-    // If search is empty, return original list
-    if (searchText.trim() === '') {
-      return data.offices;
-    }
+    if (searchText.trim() === '') return data.offices;
 
     const lowerText = searchText.toLowerCase();
-
-    // Use reduce to build a NEW array containing only matching offices/items
     return data.offices.reduce((acc, office) => {
-      // 1. Check if the OFFICE NAME matches
       const officeNameMatches = office.name.toLowerCase().includes(lowerText);
-
-      // 2. Check if any ITEMS match
       const matchingItems = office.items.filter(item => 
         item.toLowerCase().includes(lowerText)
       );
 
-      // LOGIC:
-      // If Office Name matches, show the office and ALL its items (user wants the whole office)
-      // If Office Name doesn't match, but Items DO match, show the office with ONLY the matching items
-      
       if (officeNameMatches) {
         acc.push(office);
       } else if (matchingItems.length > 0) {
         acc.push({ ...office, items: matchingItems });
       }
-
       return acc;
     }, []);
   };
 
-  // Calculate filtered list
   const filteredOffices = getFilteredOffices();
 
   if (!data) {
@@ -210,7 +240,7 @@ export default function GuideScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
            <TouchableOpacity onPress={() => router.back()}><Ionicons name="arrow-back" size={24} /></TouchableOpacity>
-           <Text style={{marginLeft: 10}}>Category not found</Text>
+           <Text style={{marginLeft: 10, fontSize: 16}}>Category "{categoryId}" not found</Text>
         </View>
       </SafeAreaView>
     );
@@ -225,7 +255,7 @@ export default function GuideScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={hp(3.5)} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={2}>{data.title}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>{data.title}</Text>
         <View style={{ width: wp(8) }} /> 
       </View>
 
@@ -255,24 +285,18 @@ export default function GuideScreen() {
         {/* Results List */}
         {filteredOffices.length > 0 ? (
           filteredOffices.map((office, index) => {
-            // Force expand if searching, otherwise use manual state
             const isExpanded = searchText.length > 0 ? true : expandedOffice === index;
-            // Use name as key because index changes when filtering
             const uniqueKey = office.name; 
 
             return (
               <View key={uniqueKey} style={styles.officeContainer}>
-                {/* Accordion Header */}
                 <TouchableOpacity 
                   style={[styles.officeHeader, isExpanded && styles.officeHeaderExpanded]} 
                   onPress={() => toggleOffice(index)}
                   activeOpacity={0.7}
-                  // Optional: Disable collapsing while searching to prevent confusion
                   disabled={searchText.length > 0} 
                 >
                   <Text style={styles.officeTitle}>{office.name}</Text>
-                  
-                  {/* Hide +/- icon while searching to indicate it's auto-expanded */}
                   {searchText.length === 0 && (
                     <Ionicons 
                       name={isExpanded ? "remove" : "add"} 
@@ -282,7 +306,6 @@ export default function GuideScreen() {
                   )}
                 </TouchableOpacity>
 
-                {/* Accordion Content */}
                 {isExpanded && (
                   <View style={styles.itemsContainer}>
                     {office.items.map((item, i) => (
@@ -292,7 +315,7 @@ export default function GuideScreen() {
                         onPress={() => openPdf(item)}
                       >
                         <View style={styles.pdfIcon}>
-                          <MaterialCommunityIcons name="file-pdf-box" size={hp(3)} color={COLORS.secondary} />
+                          <MaterialCommunityIcons name="file-document-outline" size={hp(3)} color={COLORS.secondary} />
                         </View>
                         <Text style={styles.itemText}>{item}</Text>
                         <Ionicons name="arrow-forward-outline" size={hp(2)} color={COLORS.gray} style={{marginLeft: 'auto'}} />
@@ -304,7 +327,6 @@ export default function GuideScreen() {
             );
           })
         ) : (
-          /* Empty State */
           <View style={styles.emptyState}>
             <Ionicons name="search-outline" size={hp(6)} color="#eee" />
             <Text style={styles.emptyText}>No results found for "{searchText}"</Text>
@@ -343,7 +365,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: wp(5),
   },
-  // Search Bar
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -367,7 +388,6 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
     color: COLORS.text,
   },
-  // Accordion
   officeContainer: {
     marginBottom: hp(1.5),
     backgroundColor: COLORS.lightGray,
@@ -412,7 +432,6 @@ const styles = StyleSheet.create({
     lineHeight: hp(2.5),
     marginRight: wp(2),
   },
-  // Empty State
   emptyState: {
     alignItems: 'center',
     marginTop: hp(5),
