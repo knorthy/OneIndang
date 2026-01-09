@@ -43,7 +43,7 @@ export const fetchRouteDetails = async (origin, destination) => {
         }
       },
       travelMode: "DRIVE",
-      routingPreference: "TRAFFIC_AWARE",
+      routingPreference: "TRAFFIC_AWARE_OPTIMAL",
       computeAlternativeRoutes: false,
       routeModifiers: {
         avoidTolls: false,
@@ -53,6 +53,8 @@ export const fetchRouteDetails = async (origin, destination) => {
       languageCode: "en-US",
       units: "METRIC"
     };
+
+    console.log('Request Body:', JSON.stringify(requestBody, null, 2));
 
     const response = await axios.post(url, requestBody, {
       headers: {
