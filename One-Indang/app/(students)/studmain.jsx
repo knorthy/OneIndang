@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -11,33 +11,53 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
-  ImageBackground
+  ImageBackground,
+  Modal,
+  Dimensions
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 
 // Importing your helpers
 import { hp, wp } from '../../helpers/common';
 
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 const HomeScreen = () => {
+
   // --- STATE ---
+
   const [activeCategory, setActiveCategory] = useState('House');
+
   const [searchText, setSearchText] = useState('');
-  const [selectedProperty, setSelectedProperty] = useState(null); 
+
+  const [selectedProperty, setSelectedProperty] = useState(null);
+
+
 
   // --- BRAND COLORS ---
+
   const BRAND_BLUE = '#003087';
+
   const BRAND_RED = '#D32F2F';
 
+
+
   // --- DATA ---
+
   const categories = [
+
     { id: 1, name: 'House', icon: 'home' },
     { id: 2, name: 'Bed Space', icon: 'bed' },
     { id: 3, name: 'Apartment', icon: 'building' },
     { id: 4, name: 'Scholarship', icon: 'graduation-cap' },
+
   ];
 
+
+
   const allProperties = [
-    // --- HOUSES (10 Items) ---
+
+    // HOUSES 
     { id: 101, title: 'Sunrise Family Home', location: 'Poblacion 1, Indang', price: '15,000', rating: 4.7, type: 'House', image: 'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: '3 Bedroom, 2 Bath, Garage', beds: 3, baths: 2, sqft: '1,848' },
     { id: 102, title: 'Casa Verde Bungalow', location: 'Bancod, Indang', price: '12,500', rating: 4.5, type: 'House', image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: '2 Bedroom, Garden', beds: 2, baths: 1, sqft: '1,200' },
     { id: 103, title: 'Villa Alfonso Rental', location: 'Kaytapos, Indang', price: '18,000', rating: 4.8, type: 'House', image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Fully Furnished', beds: 4, baths: 3, sqft: '2,100' },
@@ -49,7 +69,10 @@ const HomeScreen = () => {
     { id: 109, title: 'Modern Minimalist', location: 'Poblacion 4, Indang', price: '16,500', rating: 4.7, type: 'House', image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80', details: 'Newly renovated', beds: 2, baths: 1, sqft: '1,100' },
     { id: 110, title: 'Farm View House', location: 'Tambo Kulit, Indang', price: '9,500', rating: 4.5, type: 'House', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Scenic view', beds: 2, baths: 1, sqft: '950' },
 
-    // --- BED SPACES (10 Items) ---
+
+
+    // BED SPACES 
+
     { id: 201, title: 'Lola Fely\'s Dormitory', location: 'Near CvSU Main', price: '1,500', rating: 4.8, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1469&q=80', details: 'Female only', beds: 1, baths: 1, sqft: 'N/A' },
     { id: 202, title: 'CvSU Student Lodge', location: 'Bancod, Indang', price: '1,800', rating: 4.2, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1596276020587-8044fe049813?ixlib=rb-4.0.3&auto=format&fit=crop&w=1478&q=80', details: 'Walking distance', beds: 1, baths: 2, sqft: 'N/A' },
     { id: 203, title: 'SHO Dormitory', location: 'Rough Road, Indang', price: '2,000', rating: 4.9, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Airconditioned', beds: 1, baths: 1, sqft: 'N/A' },
@@ -61,7 +84,10 @@ const HomeScreen = () => {
     { id: 209, title: 'Yellow Gate Boarding', location: 'Bancod, Indang', price: '1,300', rating: 4.1, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=1473&q=80', details: 'Budget friendly', beds: 1, baths: 2, sqft: 'N/A' },
     { id: 210, title: 'Cristian Jay Dorm', location: 'Near 7-11 Indang', price: '2,200', rating: 4.4, type: 'Bed Space', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Male quarters', beds: 1, baths: 2, sqft: 'N/A' },
 
-    // --- APARTMENTS (10 Items) ---
+
+
+    // APARTMENTS 
+
     { id: 301, title: 'Woodland Apartments', location: 'Rough Road, Indang', price: '5,500', rating: 4.5, type: 'Apartment', image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Studio Type', beds: 1, baths: 1, sqft: '500' },
     { id: 302, title: 'Poblacion Heights', location: 'Poblacion 4, Indang', price: '7,000', rating: 4.6, type: 'Apartment', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=1380&q=80', details: '1 BR, Balcony', beds: 1, baths: 1, sqft: '700' },
     { id: 303, title: 'CvSU Gate 2 Apts', location: 'Bancod, Indang', price: '4,500', rating: 4.3, type: 'Apartment', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Unfurnished', beds: 1, baths: 1, sqft: '400' },
@@ -73,7 +99,10 @@ const HomeScreen = () => {
     { id: 309, title: 'White House Units', location: 'Kaytapos, Indang', price: '4,000', rating: 4.2, type: 'Apartment', image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Water pump', beds: 1, baths: 1, sqft: '400' },
     { id: 310, title: 'East Wood Rental', location: 'Buna Cerca, Indang', price: '5,500', rating: 4.3, type: 'Apartment', image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Studio w/ loft', beds: 1, baths: 1, sqft: '500' },
 
-    // --- SCHOLARSHIPS (10 Items) ---
+
+
+    // SCHOLARSHIPS 
+
     { id: 401, title: 'CvSU Academic', location: 'Cavite State U', price: 'Full', rating: 5.0, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Dean\'s List', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 402, title: 'Provincial Schol', location: 'Provincial Gov', price: 'Grant', rating: 4.9, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80', details: 'Local Gov', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 403, title: 'DOST-SEI', location: 'Indang, Cavite', price: 'Stipend', rating: 5.0, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Sci & Tech', beds: 0, baths: 0, sqft: 'N/A' },
@@ -84,7 +113,10 @@ const HomeScreen = () => {
     { id: 408, title: 'OWWA Scholarship', location: 'Cavite Region', price: 'Grant', rating: 4.7, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=1349&q=80', details: 'OFW Dep', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 409, title: 'Cebuana Schol', location: 'Indang Branches', price: 'Grant', rating: 4.4, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'ALS', beds: 0, baths: 0, sqft: 'N/A' },
     { id: 410, title: 'Rotary Club Grant', location: 'Rotary Indang', price: 'Books', rating: 4.3, type: 'Scholarship', image: 'https://images.unsplash.com/photo-1577896335477-2858506f48db?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80', details: 'Allowance', beds: 0, baths: 0, sqft: 'N/A' },
+
   ];
+
+
 
   const filteredData = allProperties.filter(item => 
     item.type === activeCategory && 
@@ -94,21 +126,26 @@ const HomeScreen = () => {
 
   const nearbyData = filteredData.slice().reverse(); 
 
-  // ==========================================================
   // COMPONENT: PROPERTY DETAILS PAGE
-  // ==========================================================
+
   const PropertyDetailsScreen = ({ item, onBack }) => {
     const tabs = ['About', 'Gallery', 'Review'];
     const [activeTab, setActiveTab] = useState('About');
+    
+    // IMAGE VIEWER STATES
+    const [isViewerVisible, setIsViewerVisible] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-    // --- MOCK DATA FOR TABS ---
+    //  MOCK DATA FOR TABS 
     const galleryImages = [
+
        item.image,
        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1453&q=80',
        'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
        'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80',
        'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
+
     ];
 
     const reviews = [
@@ -117,7 +154,13 @@ const HomeScreen = () => {
        { id: 3, name: 'Sarah Joy', rating: 5, date: 'Nov 22, 2025', comment: 'Best boarding house I stayed in Indang so far. Fast WiFi!' },
     ];
 
-    // --- RENDER CONTENT BASED ON TAB ---
+    // Helper to open viewer
+    const openImageViewer = (index) => {
+        setSelectedImageIndex(index);
+        setIsViewerVisible(true);
+    };
+
+    // LOGIC TO SWITCH CONTENT 
     const renderContent = () => {
         if (activeTab === 'About') {
             return (
@@ -175,7 +218,13 @@ const HomeScreen = () => {
             return (
                 <View style={styles.galleryContainer}>
                     {galleryImages.map((img, index) => (
-                        <Image key={index} source={{ uri: img }} style={styles.galleryImage} />
+                        <TouchableOpacity 
+                            key={index} 
+                            onPress={() => openImageViewer(index)}
+                            activeOpacity={0.8}
+                        >
+                            <Image source={{ uri: img }} style={styles.galleryImage} />
+                        </TouchableOpacity>
                     ))}
                 </View>
             );
@@ -210,11 +259,49 @@ const HomeScreen = () => {
 
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
+        
+        {/*  IMAGE MODAL */}
+        <Modal 
+            visible={isViewerVisible} 
+            transparent={true} 
+            animationType="fade"
+            onRequestClose={() => setIsViewerVisible(false)}
+        >
+            <View style={styles.modalContainer}>
+                <TouchableOpacity 
+                    style={styles.closeButton} 
+                    onPress={() => setIsViewerVisible(false)}
+                >
+                    <Ionicons name="close" size={hp(4)} color="white" />
+                </TouchableOpacity>
+
+                <FlatList 
+                    data={galleryImages}
+                    horizontal
+                    pagingEnabled
+                    initialScrollIndex={selectedImageIndex}
+                    getItemLayout={(data, index) => (
+                        {length: SCREEN_WIDTH, offset: SCREEN_WIDTH * index, index}
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(_, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.fullScreenImageContainer}>
+                            <Image 
+                                source={{ uri: item }} 
+                                style={styles.fullScreenImage} 
+                                resizeMode="contain" 
+                            />
+                        </View>
+                    )}
+                />
+            </View>
+        </Modal>
+
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: hp(12) }}>
           
           {/* Main Image Header */}
           <ImageBackground source={{ uri: item.image }} style={styles.detailsImage} resizeMode="cover">
-            {/* Header Icons */}
             <View style={styles.detailsHeaderIcons}>
               <TouchableOpacity style={styles.iconCircle} onPress={onBack}>
                 <Ionicons name="arrow-back" size={hp(3)} color="black" />
@@ -229,42 +316,42 @@ const HomeScreen = () => {
 
           {/* Body Content */}
           <View style={styles.detailsBody}>
-             
-             {/* Tag & Rating */}
-             <View style={styles.flexRowBetween}>
-                <View style={[styles.blueTag, { backgroundColor: '#EFF6FF' }]}>
-                   <Text style={{ color: BRAND_BLUE, fontWeight: '600', fontSize: hp(1.6) }}>
-                     {item.type}
-                   </Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                   <Ionicons name="star" size={hp(2)} color="#FFD700" />
-                   <Text style={{ fontWeight: 'bold', fontSize: hp(1.8) }}>{item.rating}</Text>
-                   <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>(365 reviews)</Text>
-                </View>
-             </View>
+              
+              {/* Tag & Rating */}
+              <View style={styles.flexRowBetween}>
+                 <View style={[styles.blueTag, { backgroundColor: '#EFF6FF' }]}>
+                    <Text style={{ color: BRAND_BLUE, fontWeight: '600', fontSize: hp(1.6) }}>
+                      {item.type}
+                    </Text>
+                 </View>
+                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                    <Ionicons name="star" size={hp(2)} color="#FFD700" />
+                    <Text style={{ fontWeight: 'bold', fontSize: hp(1.8) }}>{item.rating}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: hp(1.6) }}>(365 reviews)</Text>
+                 </View>
+              </View>
 
-             {/* Title & Address */}
-             <Text style={[styles.detailsTitle, { color: 'black' }]}>{item.title}</Text>
-             <Text style={[styles.detailsLocation, { color: '#6B7280' }]}>{item.location}</Text>
+              {/* Title & Address */}
+              <Text style={[styles.detailsTitle, { color: 'black' }]}>{item.title}</Text>
+              <Text style={[styles.detailsLocation, { color: '#6B7280' }]}>{item.location}</Text>
 
-             {/* Tabs */}
-             <View style={styles.tabContainer}>
-                {tabs.map(tab => (
-                   <TouchableOpacity 
-                     key={tab} 
-                     style={[styles.tabItem, activeTab === tab && { borderBottomColor: BRAND_BLUE, borderBottomWidth: 3 }]}
-                     onPress={() => setActiveTab(tab)}
-                   >
-                     <Text style={[styles.tabText, activeTab === tab ? { color: BRAND_BLUE, fontWeight: '700' } : { color: '#9CA3AF' }]}>
-                        {tab}
-                     </Text>
-                   </TouchableOpacity>
-                ))}
-             </View>
+              {/* Tabs */}
+              <View style={styles.tabContainer}>
+                 {tabs.map(tab => (
+                    <TouchableOpacity 
+                      key={tab} 
+                      style={[styles.tabItem, activeTab === tab && { borderBottomColor: BRAND_BLUE, borderBottomWidth: 3 }]}
+                      onPress={() => setActiveTab(tab)}
+                    >
+                      <Text style={[styles.tabText, activeTab === tab ? { color: BRAND_BLUE, fontWeight: '700' } : { color: '#9CA3AF' }]}>
+                         {tab}
+                      </Text>
+                    </TouchableOpacity>
+                 ))}
+              </View>
 
-             {/* Dynamic Content (About / Gallery / Review) */}
-             {renderContent()}
+              {/* Dynamic Content */}
+              {renderContent()}
 
           </View>
         </ScrollView>
@@ -286,9 +373,7 @@ const HomeScreen = () => {
     );
   };
 
-  // ==========================================================
-  // MAIN RENDER (Conditional)
-  // ==========================================================
+  // MAIN RENDER (Conditional)  
   if (selectedProperty) {
     return (
       <SafeAreaView style={styles.container}>
@@ -299,15 +384,12 @@ const HomeScreen = () => {
     );
   }
 
-  // ==========================================================
-  // LIST RENDER (Home Screen)
-  // ==========================================================
-  
+
   const renderRecommendedCard = ({ item }) => (
     <TouchableOpacity 
       style={styles.cardContainer} 
       activeOpacity={0.9} 
-      onPress={() => setSelectedProperty(item)}
+      onPress={() => setSelectedProperty(item)} 
     >
       <View style={styles.cardImageContainer}>
         <Image source={{ uri: item.image }} style={styles.cardImage} />
@@ -339,7 +421,7 @@ const HomeScreen = () => {
     <TouchableOpacity 
       style={styles.nearbyContainer} 
       activeOpacity={0.9}
-      onPress={() => setSelectedProperty(item)}
+      onPress={() => setSelectedProperty(item)} 
     >
       <Image source={{ uri: item.image }} style={styles.nearbyImage} />
       <View style={styles.nearbyContent}>
@@ -456,7 +538,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFF' },
   scrollContent: { paddingBottom: hp(5) },
 
-  // --- Header & Home Styles ---
+  // Header & Home Styles
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), marginTop: hp(2) },
   locationLabel: { fontSize: hp(1.6), color: '#9CA3AF', marginBottom: hp(0.5) },
   locationRowMain: { flexDirection: 'row', alignItems: 'center' },
@@ -478,7 +560,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: hp(2.2), fontWeight: '700' },
   seeAllText: { fontSize: hp(1.8), fontWeight: '600' },
 
-  // --- List Cards Styles ---
+  // List Cards Styles 
   horizontalList: { paddingLeft: wp(5), paddingRight: wp(2) },
   cardContainer: { width: wp(65), backgroundColor: 'white', borderRadius: 20, marginRight: wp(4), padding: wp(3), shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, marginBottom: hp(2) },
   cardImageContainer: { position: 'relative', width: '100%', height: hp(18), borderRadius: 15, overflow: 'hidden', marginBottom: hp(1.5) },
@@ -505,9 +587,7 @@ const styles = StyleSheet.create({
   nearbyTitle: { fontSize: hp(1.9), fontWeight: '700' },
   priceTextSmall: { fontSize: hp(1.9), fontWeight: '700', marginTop: hp(0.5) },
 
-  // ===================================
   // PROPERTY DETAILS STYLES
-  // ===================================
   detailsImage: { width: '100%', height: hp(40), justifyContent: 'space-between', paddingBottom: hp(2) },
   detailsHeaderIcons: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(5), marginTop: hp(2) },
   iconCircle: { width: hp(5), height: hp(5), backgroundColor: 'white', borderRadius: 50, justifyContent: 'center', alignItems: 'center', elevation: 2 },
@@ -534,11 +614,17 @@ const styles = StyleSheet.create({
   agentImage: { width: hp(6), height: hp(6), borderRadius: 50 },
   agentBtn: { width: hp(6), height: hp(6), backgroundColor: '#003087', borderRadius: 50, justifyContent: 'center', alignItems: 'center' },
 
-  // Gallery Styles (NEW)
+  // Gallery Styles
   galleryContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: wp(6), marginBottom: hp(4), justifyContent: 'center' },
   galleryImage: { width: wp(40), height: wp(40), borderRadius: 10, backgroundColor: '#F3F4F6', resizeMode: 'cover' },
 
-  // Review Styles (NEW)
+  // IMAGE VIEWER MODAL STYLES
+  modalContainer: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' },
+  closeButton: { position: 'absolute', top: Platform.OS === 'ios' ? hp(6) : hp(3), right: wp(5), zIndex: 10, backgroundColor: 'rgba(0,0,0,0.5)', padding: 8, borderRadius: 50 },
+  fullScreenImageContainer: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT, justifyContent: 'center', alignItems: 'center' },
+  fullScreenImage: { width: '100%', height: '80%' },
+
+  // Review Styles
   reviewsContainer: { marginBottom: hp(4) },
   reviewItem: { marginBottom: hp(3), borderBottomWidth: 1, borderBottomColor: '#F3F4F6', paddingBottom: hp(2) },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: hp(1) },
