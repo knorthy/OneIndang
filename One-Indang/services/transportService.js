@@ -31,7 +31,12 @@ export const fetchRouteDetails = async (origin, destination) => {
         }
       },
       travelMode: "DRIVE",
+<<<<<<< HEAD
       routingPreference: "BEST_GUESS",
+=======
+      // --- FIX: Changed BEST_GUESS to TRAFFIC_AWARE ---
+      routingPreference: "TRAFFIC_AWARE", 
+>>>>>>> 3f51e62f3c723a20474e14df7a78c8a30aae9048
       computeAlternativeRoutes: false,
       routeModifiers: {
         avoidTolls: false,
@@ -50,7 +55,11 @@ export const fetchRouteDetails = async (origin, destination) => {
       }
     });
 
+<<<<<<< HEAD
     console.log('Routes API Response:', response.data); // Debug log
+=======
+    console.log('Routes API Response:', response.data); 
+>>>>>>> 3f51e62f3c723a20474e14df7a78c8a30aae9048
 
     if (response.data.routes && response.data.routes.length > 0) {
       const route = response.data.routes[0];
@@ -61,6 +70,10 @@ export const fetchRouteDetails = async (origin, destination) => {
       const durationSeconds = parseInt(route.duration.replace('s', ''));
       const hours = Math.floor(durationSeconds / 3600);
       const minutes = Math.floor((durationSeconds % 3600) / 60);
+<<<<<<< HEAD
+=======
+      
+>>>>>>> 3f51e62f3c723a20474e14df7a78c8a30aae9048
       let durationText = '';
       if (hours > 0) {
         durationText += `${hours} hour${hours > 1 ? 's' : ''} `;
@@ -174,7 +187,11 @@ export const getGoogleMapsUrl = (origin, destination) => {
     throw new Error('Please enter start and destination points.');
   }
 
+<<<<<<< HEAD
   // Construct Universal Google Maps URL for navigation
+=======
+  // --- FIX: Corrected URL format for opening Google Maps App ---
+>>>>>>> 3f51e62f3c723a20474e14df7a78c8a30aae9048
   const url = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=driving`;
 
   return url;
