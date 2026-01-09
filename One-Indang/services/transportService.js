@@ -2,9 +2,9 @@ import axios from 'axios';
 
 // Google API Keys
 export const PLACES_API_KEY = 'AIzaSyC9Rlh2lJUrPJKkK8hBhyXIl_xlZkXxm8s';
-const DIRECTIONS_API_KEY = PLACES_API_KEY; // Use same key for both APIs
+const DIRECTIONS_API_KEY = 'AIzaSyCOLL_G8QOrG8KWcBZA7H2WHsACGQmlRR8'; 
 
-// API FUNCTION: Uses ROUTES API (New)
+// API FUNCTION: Uses ROUTES API
 export const fetchRouteDetails = async (origin, destination) => {
   if (!origin || !destination) {
     throw new Error('Please select a valid starting point and destination.');
