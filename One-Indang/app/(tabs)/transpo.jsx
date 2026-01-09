@@ -3,17 +3,21 @@ import {
   View,
   Text,
   TextInput,
-  Image,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
   StatusBar,
   Animated,
   Alert,
-} from 'react-native';
-import { hp, wp } from '../../helpers/common';
+} from 'react-native';   
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+
+// Helper for responsiveness (Mocking imports if you don't have the file)
+import { Dimensions } from 'react-native';
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const hp = (percentage) => (percentage * SCREEN_HEIGHT) / 100;
+const wp = (percentage) => (percentage * SCREEN_WIDTH) / 100;
 
 const TransportIcon = ({ name, icon, onPress, isSelected }) => (
   <TouchableOpacity onPress={onPress} style={styles.transportItem}>
@@ -25,16 +29,19 @@ const TransportIcon = ({ name, icon, onPress, isSelected }) => (
 );
 
 export default function App() {
-  const navigation = useNavigation();
   const [userName, setUserName] = useState('North');
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [startingPoint, setStartingPoint] = useState('');
   const [destination, setDestination] = useState('');
-  const [distance, setDistance] = useState('');
+  const [distance, setDistance] = useState(''); // Note: User needs to input distance or API needs to fetch it.
   const [fare, setFare] = useState(null);
   const [selectedTransport, setSelectedTransport] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // --- NEW STATE FOR TRICYCLE ---
+  const [tricycleType, setTricycleType] = useState('Regular'); // 'Regular' or 'Special'
+  const [passengerCount, setPassengerCount] = useState(1);
 
   const recommendations = [
     { id: 1, title: 'Grand Canyon National Park', distance: '277 miles away' },
@@ -67,59 +74,57 @@ export default function App() {
     setDestination(temp);
   };
 
+  // --- UPDATED PASSENGER HANDLERS ---
+  const incrementPassenger = () => {
+    if (passengerCount < 6) setPassengerCount(prev => prev + 1);
+  };
+
+  const decrementPassenger = () => {
+    if (passengerCount > 1) setPassengerCount(prev => prev - 1);
+  };
+
   const calculateFare = () => {
-    let rate = 12; 
-    if (selectedTransport === 'Tricycle') rate = 10;
+    // Note: For this to work, 'distance' needs a value. 
+    // Since there is no map API here, I'm assuming user inputs distance 
+    // or we assume a dummy distance for demo if empty.
+    const distValue = distance ? parseFloat(distance) : 5; // Default 5km if empty for demo
+
+    let rate = 0;
+    
+    if (selectedTransport === 'Tricycle') {
+        if (tricycleType === 'Regular') {
+            // Example: 15 pesos base + (distance * 2) per person
+            const baseFare = 15;
+            rate = (baseFare + (distValue * 2)) * passengerCount;
+        } else {
+            // Special: Flat rate usually higher, ignoring passengers (paying for whole trike)
+            // Example: 50 base + (distance * 5)
+            rate = 50 + (distValue * 5);
+        }
+        // Direct set for Tricycle since logic is complex
+        setFare(rate.toFixed(2));
+        return; 
+    } 
+    
+    // Logic for other vehicles
     else if (selectedTransport === 'Bus') rate = 12;
-    else if (selectedTransport === 'Jeep') rate = 8;
+    else if (selectedTransport === 'Jeep') rate = 13;
     else if (selectedTransport === 'Personal Car') rate = 15;
-    if (distance) {
-      const calculated = parseFloat(distance) * rate;
-      setFare(calculated.toFixed(2));
-    }
+
+    const calculated = distValue * rate;
+    setFare(calculated.toFixed(2));
   };
 
   const handleDirection = () => {
-    // Handle directions for personal car
     if (startingPoint && destination) {
-      const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(startingPoint)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-      // In a real app, you might use Linking.openURL(url) or a maps library
-      console.log('Opening directions:', url);
-      // For now, show an alert
-      Alert.alert(
-        'Directions',
-        `Getting directions from ${startingPoint} to ${destination}`,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Directions', `Getting directions from ${startingPoint} to ${destination}`);
     } else {
-      Alert.alert(
-        'Missing Information',
-        'Please enter both starting point and destination for directions',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Missing Information', 'Please enter both starting point and destination');
     }
   };
 
   const handleRecommendationPress = (item) => {
-    // Handle recommendation item press
-    console.log('Selected recommendation:', item);
-    // In a real app, you might navigate to a details screen
-    Alert.alert(
-      'Recommendation Selected',
-      `Selected: ${item.title} - ${item.distance}`,
-      [{ text: 'OK' }]
-    );
-  };
-
-  const handleSearchSubmit = () => {
-    // Handle search submission
-    console.log('Search submitted');
-    // In a real app, you might perform a search
-    Alert.alert(
-      'Search',
-      'Search functionality coming soon!',
-      [{ text: 'OK' }]
-    );
+    Alert.alert('Recommendation Selected', `Selected: ${item.title}`);
   };
 
   return (
@@ -147,13 +152,11 @@ export default function App() {
               placeholder="Discover places"
               placeholderTextColor="#666"
               style={styles.searchInput}
-              onSubmitEditing={handleSearchSubmit}
-              returnKeyType="search"
             />
           </View>
         </View>
 
-        {/* Popular Transport Modes */}
+        {/* Transportation Grid */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Transportation</Text>
@@ -163,7 +166,7 @@ export default function App() {
               <TransportIcon name="Tricycle" icon="pedal-bike" onPress={() => setSelectedTransport('Tricycle')} isSelected={selectedTransport === 'Tricycle'} />
               <TransportIcon name="Bus" icon="directions-bus" onPress={() => setSelectedTransport('Bus')} isSelected={selectedTransport === 'Bus'} />
               <TransportIcon name="Jeep" icon="directions-car" onPress={() => setSelectedTransport('Jeep')} isSelected={selectedTransport === 'Jeep'} />
-              <TransportIcon name="Personal Car" icon="drive-eta" onPress={() => setSelectedTransport('Personal Car')} isSelected={selectedTransport === 'Personal Car'} />
+              <TransportIcon name="Car" icon="drive-eta" onPress={() => setSelectedTransport('Personal Car')} isSelected={selectedTransport === 'Personal Car'} />
             </View>
           </View>
         </View>
@@ -174,6 +177,46 @@ export default function App() {
             <Text style={styles.sectionTitle}>Fare Calculator</Text>
           </View>
           <View style={styles.calculatorCard}>
+            
+            {/* --- NEW TRICYCLE CONTAINER --- */}
+            {selectedTransport === 'Tricycle' && (
+                <View style={styles.tricycleContainer}>
+                    <Text style={styles.tricycleLabel}>Trip Type:</Text>
+                    <View style={styles.trikeTypeRow}>
+                        <TouchableOpacity 
+                            style={[styles.typeBtn, tricycleType === 'Regular' && styles.activeTypeBtn]}
+                            onPress={() => setTricycleType('Regular')}
+                        >
+                            <Text style={[styles.typeBtnText, tricycleType === 'Regular' && styles.activeTypeBtnText]}>Regular</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={[styles.typeBtn, tricycleType === 'Special' && styles.activeTypeBtn]}
+                            onPress={() => setTricycleType('Special')}
+                        >
+                            <Text style={[styles.typeBtnText, tricycleType === 'Special' && styles.activeTypeBtnText]}>Special</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Passenger Input (Only for Regular) */}
+                    {tricycleType === 'Regular' && (
+                        <View style={styles.passengerRow}>
+                            <Text style={styles.tricycleLabel}>Passengers:</Text>
+                            <View style={styles.counterContainer}>
+                                <TouchableOpacity onPress={decrementPassenger} style={styles.counterBtn}>
+                                    <Icon name="remove" size={20} color="white" />
+                                </TouchableOpacity>
+                                <Text style={styles.counterText}>{passengerCount}</Text>
+                                <TouchableOpacity onPress={incrementPassenger} style={styles.counterBtn}>
+                                    <Icon name="add" size={20} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )}
+                    <View style={styles.divider} />
+                </View>
+            )}
+            {/* --- END TRICYCLE CONTAINER --- */}
+
             <View style={styles.calculatorRow}>
               {/* Left Icons Column */}
               <View style={styles.leftIconsColumn}>
@@ -187,7 +230,7 @@ export default function App() {
                 <View style={styles.inputWrapperTop}>
                   <TextInput
                     style={styles.locationInput}
-                    placeholder="Choose starting point, enter destination"
+                    placeholder="Starting point"
                     placeholderTextColor="#666"
                     value={startingPoint}
                     onChangeText={setStartingPoint}
@@ -198,7 +241,7 @@ export default function App() {
                 <View style={styles.inputWrapperBottom}>
                   <TextInput
                     style={styles.locationInput}
-                    placeholder="Enter destination"
+                    placeholder="Destination"
                     placeholderTextColor="#666"
                     value={destination}
                     onChangeText={setDestination}
@@ -210,6 +253,18 @@ export default function App() {
               <TouchableOpacity onPress={swapLocations} style={styles.swapButton}>
                 <Icon name="swap-vert" size={24} color="#333" />
               </TouchableOpacity>
+            </View>
+
+            {/* Added a temporary distance input for demo calculation since we don't have map API */}
+            <View style={{marginTop: 10, flexDirection: 'row', alignItems: 'center'}}>
+                 <Text style={{fontSize: 12, color: '#666', marginRight: 10}}>Dist(km):</Text>
+                 <TextInput 
+                    style={{backgroundColor: '#F0F0F0', padding: 5, borderRadius: 5, width: 60}}
+                    placeholder="5"
+                    keyboardType='numeric'
+                    value={distance}
+                    onChangeText={setDistance}
+                 />
             </View>
 
             <View style={styles.distanceRow}>
@@ -395,6 +450,71 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 70,
   },
+  // --- NEW STYLES FOR TRICYCLE UI ---
+  tricycleContainer: {
+    marginBottom: 15,
+  },
+  tricycleLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  trikeTypeRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 15,
+  },
+  typeBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D32F2F',
+    alignItems: 'center',
+  },
+  activeTypeBtn: {
+    backgroundColor: '#D32F2F',
+  },
+  typeBtnText: {
+    color: '#D32F2F',
+    fontWeight: '600',
+  },
+  activeTypeBtnText: {
+    color: 'white',
+  },
+  passengerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  counterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  counterBtn: {
+    backgroundColor: '#003087',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  counterText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    width: 20,
+    textAlign: 'center',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EEE',
+    marginBottom: 15,
+  },
+  // --- END NEW STYLES ---
   card: {
     width: 250,
     marginRight: wp(3),
@@ -419,21 +539,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  favoriteButton: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    width: 40,
-    height: 40,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
   cardContent: {
     padding: 15,
@@ -565,15 +670,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: hp(2.5),
     gap: wp(3),
-  },
-  distanceInputSmall: {
-    flex: 1,
-    backgroundColor: '#F8FAFF',
-    borderRadius: 12,
-    paddingHorizontal: wp(4),
-    height: hp(6),
-    fontSize: hp(1.7),
-    color: '#003087',
   },
   calculateBtn: {
     backgroundColor: '#D32F2F',
