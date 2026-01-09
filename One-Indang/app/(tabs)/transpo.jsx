@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
@@ -9,17 +10,18 @@ import {
   Animated,
   Alert,
   Keyboard,
-  LogBox
+  LogBox,
+  Linking, // Added for Google Maps
+  Switch   // Added for Discount Toggle
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
 import { hp, wp } from "../../helpers/common";
+import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
+import { recommendations } from '../../constants/recommendations';
 
-// Google API Key
-const GOOGLE_API_KEY = 'AIzaSyAiVxp-IOyogjH3ju6IAT-gNmdNS5MNtRU';
-
-// Ignore specific warning from GoogleAutocomplete regarding VirtualizedLists
+// Ignore specific warnings
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
 
 const TransportIcon = ({ name, icon, onPress, isSelected }) => (
@@ -36,6 +38,10 @@ export default function App() {
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
+  // SEARCH STATE
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRecommendations, setFilteredRecommendations] = useState(recommendations.slice(0, 3));
+
   // STATE FOR LOCATIONS & FARE 
   const [origin, setOrigin] = useState(null); 
   const [destination, setDestination] = useState(null); 
@@ -50,17 +56,10 @@ export default function App() {
   const originRef = useRef();
   const destRef = useRef();
 
-  // TRICYCLE STATE 
+  // TRICYCLE & DISCOUNT STATE 
   const [tricycleType, setTricycleType] = useState('Regular');
   const [passengerCount, setPassengerCount] = useState(1);
-
-  const recommendations = [
-    { id: 1, title: 'Grand Canyon National Park', distance: '277 miles away' },
-    { id: 2, title: 'Yosemite National Park', distance: '150 miles away' },
-    { id: 3, title: 'Zion National Park', distance: '200 miles away' },
-    { id: 4, title: 'Banff National Park', distance: '320 miles away' },
-    { id: 5, title: 'Yellowstone National Park', distance: '420 miles away' },
-  ];
+  const [isDiscounted, setIsDiscounted] = useState(false); // For Student/Senior/PWD
 
   useEffect(() => {
     const now = new Date();
@@ -77,72 +76,44 @@ export default function App() {
     }).start();
   }, []);
 
-  // API FUNCTION: Uses the single GOOGLE_API_KEY
-  const fetchRouteDetails = async () => {
-    if (!origin || !destination) {
-      Alert.alert('Missing Info', 'Please select a valid starting point and destination from the dropdown.');
-      return null;
+  // SEARCH FILTERING EFFECT
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredRecommendations(recommendations.slice(0, 3));
+    } else {
+      const filtered = recommendations.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.distance.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredRecommendations(filtered.slice(0, 10)); // Limit to 10 results for performance
     }
+  }, [searchQuery]);
 
+  // --- INDANG SPECIFIC FARE LOGIC ---
+  const calculateFareHandler = async () => {
     try {
-      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&key=${GOOGLE_API_KEY}`;
-      
-      const response = await axios.get(url);
-      
-      if (response.data.routes.length) {
-        const leg = response.data.routes[0].legs[0];
-        const distMeters = leg.distance.value; 
-        const distKm = (distMeters / 1000).toFixed(2); 
-        
-        setDistance(distKm);
-        setDuration(leg.duration.text);
-        return parseFloat(distKm);
+      const result = await calculateFare(selectedTransport, tricycleType, passengerCount, isDiscounted, origin, destination);
+      setFare(result.fare);
+      setDistance(result.distance);
+      setDuration(result.duration);
+      Keyboard.dismiss();
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  // --- GOOGLE MAPS REDIRECT ---
+  const handleDirection = async () => {
+    try {
+      const url = getGoogleMapsUrl(origin, destination);
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
       } else {
-        Alert.alert('Error', 'No route found between these locations.');
-        return null;
+        Alert.alert("Error", "Google Maps is not installed or supported.");
       }
     } catch (error) {
-      console.error("API Error: ", error);
-      Alert.alert('Error', 'Could not fetch route. Check your internet or API Key.');
-      return null;
-    }
-  };
-
-  const calculateFare = async () => {
-    if (!selectedTransport) {
-        Alert.alert('Select Transport', 'Please select a vehicle type first.');
-        return;
-    }
-
-    const distKm = await fetchRouteDetails();
-    if (!distKm) return; 
-
-    let rate = 0;
-    
-    if (selectedTransport === 'Tricycle') {
-        if (tricycleType === 'Regular') {
-            const baseFare = 15;
-            rate = (baseFare + (distKm * 2)) * passengerCount;
-        } else {
-            rate = 50 + (distKm * 5);
-        }
-        setFare(rate.toFixed(2));
-        Keyboard.dismiss();
-        return; 
-    } 
-    else if (selectedTransport === 'Bus') rate = 12;
-    else if (selectedTransport === 'Jeep') rate = 13;
-    else if (selectedTransport === 'Personal Car') rate = 15;
-
-    const calculated = distKm * rate;
-    setFare(calculated.toFixed(2));
-    Keyboard.dismiss();
-  };
-
-  const handleDirection = async () => {
-    await fetchRouteDetails();
-    if(origin && destination) {
-       Alert.alert('Route Found', `Driving from ${origin.desc} to ${destination.desc}`);
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -155,31 +126,39 @@ export default function App() {
   };
 
   const swapLocations = () => {
-    const tempOrigin = origin;
-    const tempDest = destination;
-
-    setOrigin(tempDest);
-    setDestination(tempOrigin);
+    const temp = origin;
+    setOrigin(destination);
+    setDestination(temp);
     
-    // Update the text inputs visually
-    originRef.current?.setAddressText(tempDest?.desc || '');
-    destRef.current?.setAddressText(tempOrigin?.desc || '');
+    originRef.current?.setAddressText(destination?.desc || '');
+    destRef.current?.setAddressText(origin?.desc || '');
   };
 
   const handleRecommendationPress = (item) => {
-    Alert.alert('Selected', item.title);
+    // Show place details
+    Alert.alert(
+      item.title,
+      item.distance,
+      [
+        { text: 'Set as Origin', onPress: () => {
+          setOrigin({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          originRef.current?.setAddressText(item.title);
+        }},
+        { text: 'Set as Destination', onPress: () => {
+          setDestination({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          destRef.current?.setAddressText(item.title);
+        }},
+        { text: 'Cancel', style: 'cancel' }
+      ]
+    );
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
-      <ScrollView 
-        style={styles.scrollView} 
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="always" 
-      >
-        {/* Header */}
+
+      {/* Fixed Header */}
+      <View style={styles.fixedHeader}>
         <View style={styles.header}>
           <View style={styles.profileSection}>
             <View style={styles.avatar}>
@@ -192,29 +171,27 @@ export default function App() {
           </View>
         </View>
 
-        {/* Search Bar */}
+        {/* Search Bar - Local search for Indang recommendations */}
         <View style={styles.searchContainer}>
-          {/* zIndex 1100 ensures the search bar dropdown is on top of everything */}
           <View style={[styles.searchBar, { zIndex: 1100 }]}>
             <Icon name="search" size={18} color="#D32F2F" style={{marginRight: 10}} />
-            <GooglePlacesAutocomplete
-              placeholder='Discover places'
-              fetchDetails={true}
-              onPress={(data, details = null) => {
-                // Just log or alert for the search bar
-                Alert.alert('Selected Place', data.description);
-              }}
-              query={{
-                key: GOOGLE_API_KEY,
-                language: 'en',
-              }}
-              styles={autocompleteStyles}
-              enablePoweredByContainer={false}
-              debounce={300} // slight delay to reduce API calls
-              minLength={2}  // wait for 2 chars before searching
+            <TextInput
+              placeholder='Search Indang places...'
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={autocompleteStyles.textInput}
+              placeholderTextColor="#999"
             />
           </View>
         </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
+        contentContainerStyle={styles.scrollContent}
+      >
 
         {/* Transportation Grid */}
         <View style={styles.section}>
@@ -238,7 +215,7 @@ export default function App() {
           </View>
           <View style={styles.calculatorCard}>
             
-            {/* Tricycle Options */}
+            {/* Tricycle Specific Inputs */}
             {selectedTransport === 'Tricycle' && (
                 <View style={styles.tricycleContainer}>
                     <Text style={styles.tricycleLabel}>Trip Type:</Text>
@@ -275,25 +252,35 @@ export default function App() {
                 </View>
             )}
 
+            {/* Discount Toggle for Jeep and Bus */}
+            {(selectedTransport === 'Jeep' || selectedTransport === 'Bus') && (
+                 <View style={styles.discountRow}>
+                    <Text style={styles.tricycleLabel}>Student/Senior/PWD (20% off):</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#ffadad" }}
+                        thumbColor={isDiscounted ? "#D32F2F" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => setIsDiscounted(!isDiscounted)}
+                        value={isDiscounted}
+                    />
+                 </View>
+            )}
+
             <View style={styles.calculatorRow}>
-              {/* Left Icons */}
               <View style={styles.leftIconsColumn}>
                 <Icon name="radio-button-unchecked" size={20} color="#333" style={{marginTop: 15}} />
                 <View style={styles.verticalLine} />
                 <Icon name="location-on" size={20} color="#D32F2F" style={{marginBottom: 15}}/>
               </View>
 
-              {/* Inputs Column */}
               <View style={styles.inputsColumn}>
-                
-                {/* STARTING POINT 
-                   zIndex: 2000 ensures this dropdown floats OVER the destination input 
-                */}
-                <View style={[styles.inputWrapperTop, { zIndex: 2000, elevation: 2000 }]}>
+                <View style={[styles.inputWrapperTop, { zIndex: 1000 }]}>
                   <GooglePlacesAutocomplete
                     ref={originRef}
                     placeholder='Starting Point'
                     fetchDetails={true}
+                    minLength={1}
+                    debounce={200}
                     onPress={(data, details = null) => {
                       setOrigin({
                         lat: details.geometry.location.lat,
@@ -301,26 +288,19 @@ export default function App() {
                         desc: data.description
                       });
                     }}
-                    query={{
-                      key: GOOGLE_API_KEY, 
-                      language: 'en',
-                    }}
+                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
                     styles={autocompleteStyles}
                     enablePoweredByContainer={false}
-                    debounce={300}
-                    minLength={2}
-                    onFail={(error) => console.log(error)} // Check console if errors occur
                   />
                 </View>
 
-                {/* DESTINATION 
-                   zIndex: 1000 ensures this dropdown floats OVER the swap button/footer
-                */}
-                <View style={[styles.inputWrapperBottom, { zIndex: 1000, elevation: 1000 }]}>
+                <View style={[styles.inputWrapperBottom, { zIndex: 900 }]}>
                   <GooglePlacesAutocomplete
                     ref={destRef}
                     placeholder='Destination'
                     fetchDetails={true}
+                    minLength={1}
+                    debounce={200}
                     onPress={(data, details = null) => {
                       setDestination({
                         lat: details.geometry.location.lat,
@@ -328,14 +308,9 @@ export default function App() {
                         desc: data.description
                       });
                     }}
-                    query={{
-                      key: GOOGLE_API_KEY,
-                      language: 'en',
-                    }}
+                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
                     styles={autocompleteStyles}
                     enablePoweredByContainer={false}
-                    debounce={300}
-                    minLength={2}
                   />
                 </View>
               </View>
@@ -345,22 +320,21 @@ export default function App() {
               </TouchableOpacity>
             </View>
 
-            {/* Results Display */}
             {distance !== '' && (
                  <View style={{marginTop: 10, flexDirection: 'row', alignItems: 'center'}}>
                      <Text style={{fontSize: hp(1.6), color: '#666'}}>
-                         Distance: <Text style={{fontWeight:'bold', color: 'black'}}>{distance} km</Text>
+                         Dist: <Text style={{fontWeight:'bold', color: 'black'}}>{distance} km</Text>
                      </Text>
                      <Text style={{fontSize: hp(1.6), color: '#666', marginLeft: 10}}>
-                         Duration: <Text style={{fontWeight:'bold', color: 'black'}}>{duration}</Text>
+                         Time: <Text style={{fontWeight:'bold', color: 'black'}}>{duration}</Text>
                      </Text>
                  </View>
             )}
 
             <View style={styles.distanceRow}>
-              <TouchableOpacity style={styles.calculateBtn} onPress={selectedTransport === 'Personal Car' ? handleDirection : calculateFare}>
+              <TouchableOpacity style={styles.calculateBtn} onPress={selectedTransport === 'Personal Car' ? handleDirection : calculateFareHandler}>
                 <Text style={styles.calculateBtnText}>
-                    {selectedTransport === 'Personal Car' ? 'Get Route' : 'Calculate'}
+                    {selectedTransport === 'Personal Car' ? 'Open Maps' : 'Calculate'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -376,14 +350,18 @@ export default function App() {
         {/* Recommendations Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recommendation</Text>
+            <Text style={styles.sectionTitle}>
+              {searchQuery.trim() ? `Search Results (${filteredRecommendations.length})` : 'Featured Places'}
+            </Text>
             <TouchableOpacity onPress={() => setShowAllRecommendations(!showAllRecommendations)}>
-              <Text style={styles.showAll}>{showAllRecommendations ? 'Show less' : 'Show all'}</Text>
+              <Text style={styles.showAll}>
+                {showAllRecommendations ? 'Show less' : searchQuery.trim() ? 'Show all results' : 'Show featured'}
+              </Text>
             </TouchableOpacity>
           </View>
           {showAllRecommendations ? (
             <ScrollView style={styles.fullRecommendationsContainer} showsVerticalScrollIndicator={false}>
-              {recommendations.map((item) => (
+              {filteredRecommendations.map((item) => (
                 <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => handleRecommendationPress(item)}>
                   <View style={styles.fullCardImageContainer}>
                     <View style={styles.cardImagePlaceholder}>
@@ -403,7 +381,7 @@ export default function App() {
           ) : (
             <Animated.View style={{ opacity: fadeAnim }}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendationsContainer}>
-                {recommendations.slice(0, 3).map((item, index) => (
+                {filteredRecommendations.slice(0, 3).map((item, index) => (
                   <View key={index} style={styles.card}>
                     <View style={styles.cardImageContainer}>
                       <View style={styles.cardImage}>
@@ -425,46 +403,22 @@ export default function App() {
   );
 }
 
-// --- UPDATED AUTOCOMPLETE STYLES (CRITICAL FOR DROPDOWN VISIBILITY) ---
+// --- AUTOCOMPLETE STYLES ---
 const autocompleteStyles = {
-  textInput: {
-    height: hp(5.5),
-    color: '#333',
-    fontSize: hp(1.7),
-    backgroundColor: 'transparent',
-    marginTop: 2,
-  },
-  listView: {
-    position: 'absolute',
-    top: 45, // Pushes the list down below the input
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#EEE',
-    elevation: 5, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    zIndex: 9999, // Ensure it sits on top of everything
-  },
-  row: {
-    padding: 10,
-    height: 44,
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-  },
-  description: {
-    color: '#333',
-  }
+  container: { flex: 1, overflow: 'visible' },
+  textInput: { height: hp(5.5), color: '#333', fontSize: hp(1.7), backgroundColor: 'transparent', marginTop: 2 },
+  listView: { position: 'absolute', top: 45, left: 0, right: 0, zIndex: 10000, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#EEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 },
+  row: { backgroundColor: 'white', padding: 13, height: 44, flexDirection: 'row' },
+  separator: { height: 0.5, backgroundColor: '#c8c7cc' },
+  description: { fontSize: 14, color: '#333' },
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFF' },
-  scrollView: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), paddingTop: hp(6), paddingBottom: hp(2) },
+  fixedHeader: { backgroundColor: '#F8FAFF', paddingTop: hp(6), paddingBottom: hp(2) },
+  scrollView: { flex: 1, backgroundColor: '#F8FAFF' },
+  scrollContent: { paddingBottom: hp(5) },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), paddingBottom: hp(2) },
   profileSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: '#003087', justifyContent: 'center', alignItems: 'center' },
   avatarText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
@@ -494,6 +448,7 @@ const styles = StyleSheet.create({
   counterBtn: { backgroundColor: '#003087', width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' },
   counterText: { fontSize: 18, fontWeight: 'bold', color: '#333', width: 20, textAlign: 'center' },
   divider: { height: 1, backgroundColor: '#EEE', marginBottom: 15 },
+  discountRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   card: { width: 250, marginRight: wp(3), backgroundColor: '#FFF', borderRadius: 15, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
   cardImageContainer: { position: 'relative', height: 180, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
   cardImage: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
@@ -515,10 +470,8 @@ const styles = StyleSheet.create({
   leftIconsColumn: { alignItems: 'center', marginRight: wp(2), paddingTop: 5 },
   verticalLine: { width: 0, height: hp(5.5), borderLeftWidth: 2, borderColor: '#CCC', borderStyle: 'dotted', marginVertical: 4 },
   inputsColumn: { flex: 1, gap: hp(1.5) },
-  // Important: inputWrapperTop needs explicit white bg and high z-index
-  inputWrapperTop: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), backgroundColor: 'white' },
-  inputWrapperBottom: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), backgroundColor: 'white' },
-  inputSearchIcon: { marginLeft: 8 },
+  inputWrapperTop: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
+  inputWrapperBottom: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
   swapButton: { marginLeft: wp(3), padding: 8, alignSelf: 'center' },
   distanceRow: { flexDirection: 'row', marginTop: hp(2.5), gap: wp(3) },
   calculateBtn: { backgroundColor: '#D32F2F', borderRadius: 15, paddingHorizontal: wp(6), height: hp(5.5), justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, position: 'absolute', bottom: -35, right: 0, left: 170 },

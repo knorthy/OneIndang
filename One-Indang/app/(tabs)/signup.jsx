@@ -15,6 +15,7 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Link } from 'expo-router';
 
 
 import { hp, wp } from '../../helpers/common'; 
@@ -325,6 +326,12 @@ const AccountSetupScreen = () => {
                     <Text style={styles.buttonText}>Continue</Text>
                 </TouchableOpacity>
             )}
+            <View style={styles.signinContainer}>
+              <Text style={styles.signinText}>Already have an account? </Text>
+              <Link href="/login">
+                <Text style={styles.signinLinkText}>Signin</Text>
+              </Link>
+            </View>
           </View>
 
         </View>
@@ -533,6 +540,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: hp(2),
     fontWeight: '700',
+  },
+  signinContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp(2),
+  },
+  signinText: {
+    color: '#111',
+    fontSize: hp(1.8),
+  },
+  signinLinkText: {
+    color: '#D32F2F',
+    fontSize: hp(1.8),
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });
 
