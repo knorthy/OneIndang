@@ -1,13 +1,25 @@
 import axios from 'axios';
 
-// Google API Keys
-export const PLACES_API_KEY = 'AIzaSyC9Rlh2lJUrPJKkK8hBhyXIl_xlZkXxm8s';
-const DIRECTIONS_API_KEY = 'AIzaSyCOLL_G8QOrG8KWcBZA7H2WHsACGQmlRR8'; 
+// ⚠️ SECURITY WARNING: Move these to environment variables!
+// Create a .env file and use expo-constants or react-native-dotenv
+// Example: EXPO_PUBLIC_PLACES_API_KEY in .env
+export const PLACES_API_KEY = process.env.EXPO_PUBLIC_PLACES_API_KEY || 'AIzaSyC9Rlh2lJUrPJKkK8hBhyXIl_xlZkXxm8s';
+const DIRECTIONS_API_KEY = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY || 'AIzaSyCOLL_G8QOrG8KWcBZA7H2WHsACGQmlRR8';
 
 // API FUNCTION: Uses ROUTES API
 export const fetchRouteDetails = async (origin, destination) => {
+  // Improved validation
   if (!origin || !destination) {
     throw new Error('Please select a valid starting point and destination.');
+  }
+
+  // Validate that origin and destination have required properties
+  if (typeof origin.lat !== 'number' || typeof origin.lng !== 'number') {
+    throw new Error('Invalid origin coordinates. Please select a valid starting point.');
+  }
+
+  if (typeof destination.lat !== 'number' || typeof destination.lng !== 'number') {
+    throw new Error('Invalid destination coordinates. Please select a valid destination.');
   }
 
   try {
@@ -31,7 +43,7 @@ export const fetchRouteDetails = async (origin, destination) => {
         }
       },
       travelMode: "DRIVE",
-      routingPreference: "BEST_GUESS",
+      routingPreference: "TRAFFIC_AWARE",
       computeAlternativeRoutes: false,
       routeModifiers: {
         avoidTolls: false,
@@ -50,17 +62,27 @@ export const fetchRouteDetails = async (origin, destination) => {
       }
     });
 
-    console.log('Routes API Response:', response.data); // Debug log
+    console.log('Routes API Response:', response.data);
 
     if (response.data.routes && response.data.routes.length > 0) {
       const route = response.data.routes[0];
       const distMeters = route.distanceMeters;
       const distKm = (distMeters / 1000).toFixed(2);
-      
-      // Duration is in seconds, e.g., "123s"
-      const durationSeconds = parseInt(route.duration.replace('s', ''));
+
+      // Improved duration parsing with fallback
+      let durationSeconds = 0;
+      if (route.duration) {
+        // Handle both "123s" string format and numeric values
+        if (typeof route.duration === 'string') {
+          durationSeconds = parseInt(route.duration.replace('s', ''), 10) || 0;
+        } else if (typeof route.duration === 'number') {
+          durationSeconds = route.duration;
+        }
+      }
+
       const hours = Math.floor(durationSeconds / 3600);
       const minutes = Math.floor((durationSeconds % 3600) / 60);
+
       let durationText = '';
       if (hours > 0) {
         durationText += `${hours} hour${hours > 1 ? 's' : ''} `;
@@ -69,7 +91,7 @@ export const fetchRouteDetails = async (origin, destination) => {
         durationText += `${minutes} min${minutes > 1 ? 's' : ''}`;
       }
       if (hours === 0 && minutes === 0) {
-        durationText = `${durationSeconds} seconds`;
+        durationText = durationSeconds > 0 ? `${durationSeconds} seconds` : 'Less than a minute';
       }
 
       return {
@@ -101,6 +123,9 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
     throw new Error('Please select a vehicle type first.');
   }
 
+  // Validate passenger count
+  const validPassengerCount = Math.max(1, Math.min(6, parseInt(passengerCount, 10) || 1));
+
   // 1. Get Distance from API
   const routeDetails = await fetchRouteDetails(origin, destination);
   const distKm = routeDetails.distValue;
@@ -111,7 +136,7 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
   if (selectedTransport === 'Tricycle') {
     if (tricycleType === 'Regular') {
       // Flat 20 pesos per person regardless of distance (within town)
-      finalFare = 20 * passengerCount;
+      finalFare = 20 * validPassengerCount;
     } else {
       // Special: 30 base + 5 per km in excess of 3km
       let base = 30;
@@ -126,12 +151,14 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
     // Short Range (<= 15km): 20 pesos
     if (distKm <= 15) {
       finalFare = 20;
-    } else {
+    } else if (distKm <= 28) {
       // Long Range (> 15km to 28km): Scale from 20 to 45
-      // Slope (m) = (45 - 20) / (28 - 15) = 25 / 13 ≈ 1.92 pesos per km
-      const slope = 1.923;
+      const slope = 25 / 13; // (45 - 20) / (28 - 15)
       const excess = distKm - 15;
       finalFare = 20 + (excess * slope);
+    } else {
+      // Cap at 45 for distances > 28km (or adjust as needed)
+      finalFare = 45;
     }
 
     // Apply Discount
@@ -144,21 +171,30 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
     }
     // Medium (4km < dist <= 15km): Scale 13 to 20
     else if (distKm <= 15) {
-      // Slope = (20 - 13) / (15 - 4) = 7 / 11 ≈ 0.636
-      const slope = 0.636;
+      const slope = 7 / 11; // (20 - 13) / (15 - 4)
       const excess = distKm - 4;
       finalFare = 13 + (excess * slope);
     }
     // Long (15km < dist <= 28km): Scale 20 to 40
-    else {
-      // Slope = (40 - 20) / (28 - 15) = 20 / 13 ≈ 1.538
-      const slope = 1.538;
+    else if (distKm <= 28) {
+      const slope = 20 / 13; // (40 - 20) / (28 - 15)
       const excess = distKm - 15;
       finalFare = 20 + (excess * slope);
+    } else {
+      // Cap at 40 for distances > 28km (or adjust as needed)
+      finalFare = 40;
     }
 
     // Apply Discount
     if (isDiscounted) finalFare = finalFare * 0.80;
+  }
+  else if (selectedTransport === 'Personal Car') {
+    // No fare for personal car, just return route info
+    return {
+      fare: '0.00',
+      distance: routeDetails.distance,
+      duration: routeDetails.duration
+    };
   }
 
   return {
@@ -174,7 +210,12 @@ export const getGoogleMapsUrl = (origin, destination) => {
     throw new Error('Please enter start and destination points.');
   }
 
-  // Construct Universal Google Maps URL for navigation
+  // Validate coordinates
+  if (typeof origin.lat !== 'number' || typeof origin.lng !== 'number' ||
+      typeof destination.lat !== 'number' || typeof destination.lng !== 'number') {
+    throw new Error('Invalid coordinates. Please select valid locations.');
+  }
+
   const url = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=driving`;
 
   return url;
