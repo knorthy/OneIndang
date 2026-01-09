@@ -16,6 +16,7 @@ export default function StudentsLayout() {
         name="studmain"
         options={{
           title: 'Students',
+          headerShown: false,
         }}
       />
     </Stack>
