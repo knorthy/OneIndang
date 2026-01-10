@@ -13,7 +13,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    
    npx expo install react-native-reanimated
 
-   npm install react-native-google-places-autocomplete axios   
+   npm install react-native-google-places-autocomplete axios  
+
+   npx expo install expo-location 
+
+   npx expo install react-native-maps
+
+   npm install semver
    ```
 
 2. Start the app
@@ -22,6 +28,20 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
 
    npx expo start -c
+   ```
+
+3. Errors  encountered (NPM lazy token not registering)
+   ```
+
+   run step 1 in powershell step 2,3 bash
+   1. Remove-Item -Recurse -Force node_modules
+      Remove-Item -Force package-lock.json
+   
+   2. npm install
+
+   3. install  the dependecy that is not working because of the npm token error
+
+   4. npx expo start --clear 
    ```
 
 In the output, you'll find options to open the app in a

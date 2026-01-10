@@ -11,16 +11,20 @@ import {
   Alert,
   Keyboard,
   LogBox,
-  Linking, // Added for Google Maps
-  Switch,   // Added for Discount Toggle
-  Modal     // Added for Receipt Modal
+  Linking, //  for Google Maps
+  Switch,   //  for Discount Toggle
+  Modal,    //  for Receipt Modal
+  Image     //  for displaying recommendation images
 } from 'react-native';
+import LocationPickerModal from '../../components/LocationPickerModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
+import * as Location from 'expo-location'; // Added for GPS functionality
 import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
+import { popularDestinations, searchDestinations } from '../../constants/popularDestinations';
 
 // Ignore specific warnings
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
@@ -35,7 +39,7 @@ const TransportIcon = ({ name, icon, onPress, isSelected }) => (
 );
 
 export default function App() {
-  const [userName, setUserName] = useState('North');
+  const [userName, setUserName] = useState(null);
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
@@ -65,6 +69,13 @@ export default function App() {
   // RECEIPT MODAL STATE
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+
+  // LOCATION PERMISSION STATE
+  const [locationPermission, setLocationPermission] = useState(null);
+
+  // LOCATION PICKER MODAL STATE
+  const [showOriginPicker, setShowOriginPicker] = useState(false);
+  const [showDestinationPicker, setShowDestinationPicker] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -143,7 +154,7 @@ export default function App() {
   };
 
   const decrementPassenger = () => {
-    if (passengerCount > 1) setPassengerCount(prev => prev - 1);
+    if (passengerCount > 2) setPassengerCount(prev => prev - 1);
   };
 
   const swapLocations = () => {
@@ -155,18 +166,73 @@ export default function App() {
     destRef.current?.setAddressText(origin?.desc || '');
   };
 
+  // --- GET CURRENT LOCATION FUNCTION ---
+  const getCurrentLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationPermission(status);
+
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Location permission is required to use current location');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      // Reverse geocode to get address
+      const address = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const addressString = address[0] ?
+        `${address[0].name || ''}, ${address[0].city || ''}, ${address[0].region || ''}`.replace(/^, |, $/g, '') :
+        `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+      setOrigin({
+        lat: latitude,
+        lng: longitude,
+        desc: addressString
+      });
+
+      originRef.current?.setAddressText(addressString);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to get current location. Please check your GPS settings.');
+    }
+  };
+
   const handleRecommendationPress = (item) => {
-    // Show place details
+    // Find matching destination with coordinates
+    const matchedDestination = popularDestinations.find(
+      dest => dest.name.toLowerCase() === item.title.toLowerCase()
+    );
+    
+    // Show place details with option to set as origin/destination
     Alert.alert(
       item.title,
       item.distance,
       [
         { text: 'Set as Origin', onPress: () => {
-          setOrigin({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          if (matchedDestination?.coordinates) {
+            setOrigin({ 
+              lat: matchedDestination.coordinates.lat, 
+              lng: matchedDestination.coordinates.lng, 
+              desc: item.title 
+            });
+          } else {
+            // Open location picker to search for exact location
+            setShowOriginPicker(true);
+          }
           originRef.current?.setAddressText(item.title);
         }},
         { text: 'Set as Destination', onPress: () => {
-          setDestination({ lat: 0, lng: 0, desc: item.title }); // Placeholder coordinates
+          if (matchedDestination?.coordinates) {
+            setDestination({ 
+              lat: matchedDestination.coordinates.lat, 
+              lng: matchedDestination.coordinates.lng, 
+              desc: item.title 
+            });
+          } else {
+            // Open location picker to search for exact location
+            setShowDestinationPicker(true);
+          }
           destRef.current?.setAddressText(item.title);
         }},
         { text: 'Cancel', style: 'cancel' }
@@ -307,18 +373,50 @@ export default function App() {
       {/* Receipt Modal */}
       <ReceiptModal />
 
+      {/* Location Picker Modals */}
+      <LocationPickerModal
+        visible={showOriginPicker}
+        onClose={() => setShowOriginPicker(false)}
+        onSelectLocation={(location) => {
+          setOrigin(location);
+          originRef.current?.setAddressText(location.desc);
+        }}
+        type="origin"
+      />
+      <LocationPickerModal
+        visible={showDestinationPicker}
+        onClose={() => setShowDestinationPicker(false)}
+        onSelectLocation={(location) => {
+          setDestination(location);
+          destRef.current?.setAddressText(location.desc);
+        }}
+        type="destination"
+      />
+
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+          {userName ? (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+              </View>
+              <View>
+                <Text style={styles.greeting}>Hi {userName}</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.greeting}>Hi {userName}</Text>
-              <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+          ) : (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Icon name="person" size={24} color="#D32F2F" />
+              </View>
+              <View>
+                <Text style={styles.greeting}>Welcome to One-Indang</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Search Bar - Local search for Indang recommendations */}
@@ -424,45 +522,41 @@ export default function App() {
               </View>
 
               <View style={styles.inputsColumn}>
-                <View style={[styles.inputWrapperTop, { zIndex: 1000 }]}>
-                  <GooglePlacesAutocomplete
-                    ref={originRef}
-                    placeholder='Starting Point'
-                    fetchDetails={true}
-                    minLength={1}
-                    debounce={200}
-                    onPress={(data, details = null) => {
-                      setOrigin({
-                        lat: details.geometry.location.lat,
-                        lng: details.geometry.location.lng,
-                        desc: data.description
-                      });
+                <TouchableOpacity 
+                  style={[styles.inputWrapperTop, { zIndex: 1000 }]}
+                  onPress={() => setShowOriginPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text 
+                    style={[styles.locationInputText, !origin && styles.placeholderText]}
+                    numberOfLines={1}
+                  >
+                    {origin?.desc || 'Select starting point'}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.currentLocationBtn}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      getCurrentLocation();
                     }}
-                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
-                    styles={autocompleteStyles}
-                    enablePoweredByContainer={false}
-                  />
-                </View>
+                  >
+                    <Icon name="my-location" size={16} color="#D32F2F" />
+                  </TouchableOpacity>
+                </TouchableOpacity>
 
-                <View style={[styles.inputWrapperBottom, { zIndex: 900 }]}>
-                  <GooglePlacesAutocomplete
-                    ref={destRef}
-                    placeholder='Destination'
-                    fetchDetails={true}
-                    minLength={1}
-                    debounce={200}
-                    onPress={(data, details = null) => {
-                      setDestination({
-                        lat: details.geometry.location.lat,
-                        lng: details.geometry.location.lng,
-                        desc: data.description
-                      });
-                    }}
-                    query={{ key: PLACES_API_KEY, language: 'en', components: 'country:ph' }}
-                    styles={autocompleteStyles}
-                    enablePoweredByContainer={false}
-                  />
-                </View>
+                <TouchableOpacity 
+                  style={[styles.inputWrapperBottom, { zIndex: 900 }]}
+                  onPress={() => setShowDestinationPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text 
+                    style={[styles.locationInputText, !destination && styles.placeholderText]}
+                    numberOfLines={1}
+                  >
+                    {destination?.desc || 'Select destination'}
+                  </Text>
+                  <Icon name="chevron-right" size={20} color="#999" />
+                </TouchableOpacity>
               </View>
 
               <TouchableOpacity onPress={swapLocations} style={styles.swapButton}>
@@ -508,9 +602,13 @@ export default function App() {
               {filteredRecommendations.map((item) => (
                 <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => handleRecommendationPress(item)}>
                   <View style={styles.fullCardImageContainer}>
-                    <View style={styles.cardImagePlaceholder}>
-                      <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
-                    </View>
+                    {item.image ? (
+                      <Image source={item.image} style={styles.fullCardImage} resizeMode="cover" />
+                    ) : (
+                      <View style={styles.cardImagePlaceholder}>
+                        <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
+                      </View>
+                    )}
                   </View>
                   <View style={styles.fullCardContent}>
                     <Text style={styles.fullCardTitle}>{item.title}</Text>
@@ -529,7 +627,11 @@ export default function App() {
                   <View key={index} style={styles.card}>
                     <View style={styles.cardImageContainer}>
                       <View style={styles.cardImage}>
-                        <View style={styles.blankImage} />
+                        {item.image ? (
+                          <Image source={item.image} style={styles.cardImageFill} resizeMode="cover" />
+                        ) : (
+                          <View style={styles.blankImage} />
+                        )}
                       </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -605,6 +707,8 @@ const styles = StyleSheet.create({
   fullCard: { backgroundColor: 'white', borderRadius: 14, marginBottom: hp(2), overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 5, flexDirection: 'row', alignItems: 'center' },
   fullCardImageContainer: { width: wp(35), height: hp(12) },
   cardImagePlaceholder: { flex: 1, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
+  fullCardImage: { width: '100%', height: '100%' },
+  cardImageFill: { width: '100%', height: '100%' },
   fullCardContent: { padding: wp(3), flex: 1, justifyContent: 'center' },
   fullCardTitle: { fontSize: hp(2.0), fontWeight: '600', color: '#003087', marginBottom: hp(0.6) },
   fullCardDistance: { fontSize: hp(1.6), color: '#666' },
@@ -644,4 +748,36 @@ const styles = StyleSheet.create({
   actionButtonTextSecondary: { fontSize: hp(1.6), color: '#666', fontWeight: '600' },
   actionButtonPrimary: { flex: 1, backgroundColor: '#D32F2F', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center' },
   actionButtonTextPrimary: { fontSize: hp(1.6), color: '#FFF', fontWeight: '600' },
+
+  // CURRENT LOCATION BUTTON STYLES
+  currentLocationBtn: { 
+    position: 'absolute', 
+    right: 10, 
+    top: 10, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#F8FAFF', 
+    paddingHorizontal: 8, 
+    paddingVertical: 4, 
+    borderRadius: 12, 
+    borderWidth: 1, 
+    borderColor: '#D32F2F' 
+  },
+  currentLocationText: { 
+    fontSize: 12, 
+    color: '#D32F2F', 
+    marginLeft: 4, 
+    fontWeight: '500' 
+  },
+
+  // Location input text styles
+  locationInputText: {
+    flex: 1,
+    fontSize: hp(1.7),
+    color: '#333',
+    paddingVertical: 10,
+  },
+  placeholderText: {
+    color: '#999',
+  }
 });

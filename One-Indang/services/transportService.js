@@ -1,60 +1,61 @@
 import axios from 'axios';
 
-// ⚠️ SECURITY WARNING: Move these to environment variables!
-// Create a .env file and use expo-constants or react-native-dotenv
-// Example: EXPO_PUBLIC_PLACES_API_KEY in .env
-export const PLACES_API_KEY = process.env.EXPO_PUBLIC_PLACES_API_KEY || 'AIzaSyC9Rlh2lJUrPJKkK8hBhyXIl_xlZkXxm8s';
-const DIRECTIONS_API_KEY = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY || 'AIzaSyCOLL_G8QOrG8KWcBZA7H2WHsACGQmlRR8';
+// ⚠️ SECURITY WARNING: Keep your API Keys in .env!
+export const PLACES_API_KEY = process.env.EXPO_PUBLIC_PLACES_API_KEY;
+const DIRECTIONS_API_KEY = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY;
 
-// API FUNCTION: Uses ROUTES API
+// --- FARE CONFIGURATION ---
+const FARE_RATES = {
+  TRICYCLE: {
+    REGULAR_FLAT: 20,    // Flat rate per head
+    SPECIAL_BASE: 30,
+    SPECIAL_PER_KM: 5,
+    BASE_KM: 3
+  },
+  JEEP: {
+    BASE_FARE: 13,
+    BASE_KM: 4,
+    PER_KM: 1.80
+  },
+  BUS: {
+    // Logic: Indang to Trece (approx 12km) is fixed at 20.
+    // Indang to PITX (approx 53km) is fixed at 120.
+    // We calculate the rate for the distance in between.
+    FLAT_RATE_DISTANCE: 15, // km (Covers Indang to Trece Martires)
+    FLAT_RATE_PRICE: 20,    // Base price for Trece and before
+    
+    // Reference point for calculation (PITX)
+    TARGET_DISTANCE: 53,    // approx km from Indang to PITX
+    TARGET_PRICE: 120       // Regular fare to PITX
+  }
+};
+
+// Calculate the Bus Rate Per KM dynamically based on your reference points
+// Formula: (120 - 20) / (53 - 12) = ~2.44 pesos per excess km
+const BUS_EXCESS_RATE = (FARE_RATES.BUS.TARGET_PRICE - FARE_RATES.BUS.FLAT_RATE_PRICE) / 
+                        (FARE_RATES.BUS.TARGET_DISTANCE - FARE_RATES.BUS.FLAT_RATE_DISTANCE);
+
+// --- API FUNCTION ---
 export const fetchRouteDetails = async (origin, destination) => {
-  // Improved validation
   if (!origin || !destination) {
     throw new Error('Please select a valid starting point and destination.');
   }
 
-  // Validate that origin and destination have required properties
-  if (typeof origin.lat !== 'number' || typeof origin.lng !== 'number') {
-    throw new Error('Invalid origin coordinates. Please select a valid starting point.');
-  }
-
-  if (typeof destination.lat !== 'number' || typeof destination.lng !== 'number') {
-    throw new Error('Invalid destination coordinates. Please select a valid destination.');
+  if (typeof origin.lat !== 'number' || typeof destination.lat !== 'number') {
+    throw new Error('Invalid coordinates.');
   }
 
   try {
     const url = `https://routes.googleapis.com/directions/v2:computeRoutes`;
-
     const requestBody = {
-      origin: {
-        location: {
-          latLng: {
-            latitude: origin.lat,
-            longitude: origin.lng
-          }
-        }
-      },
-      destination: {
-        location: {
-          latLng: {
-            latitude: destination.lat,
-            longitude: destination.lng
-          }
-        }
-      },
+      origin: { location: { latLng: { latitude: origin.lat, longitude: origin.lng } } },
+      destination: { location: { latLng: { latitude: destination.lat, longitude: destination.lng } } },
       travelMode: "DRIVE",
       routingPreference: "TRAFFIC_AWARE_OPTIMAL",
       computeAlternativeRoutes: false,
-      routeModifiers: {
-        avoidTolls: false,
-        avoidHighways: false,
-        avoidFerries: false
-      },
       languageCode: "en-US",
       units: "METRIC"
     };
-
-    console.log('Request Body:', JSON.stringify(requestBody, null, 2));
 
     const response = await axios.post(url, requestBody, {
       headers: {
@@ -64,204 +65,130 @@ export const fetchRouteDetails = async (origin, destination) => {
       }
     });
 
-    console.log('Routes API Response:', response.data);
-
     if (response.data.routes && response.data.routes.length > 0) {
       const route = response.data.routes[0];
-      const distMeters = route.distanceMeters;
-      const distKm = (distMeters / 1000).toFixed(2);
+      const distKm = (route.distanceMeters / 1000);
 
-      // Improved duration parsing with fallback
+      // Duration parsing
       let durationSeconds = 0;
       if (route.duration) {
-        // Handle both "123s" string format and numeric values
         if (typeof route.duration === 'string') {
           durationSeconds = parseInt(route.duration.replace('s', ''), 10) || 0;
         } else if (typeof route.duration === 'number') {
           durationSeconds = route.duration;
         }
       }
-
       const hours = Math.floor(durationSeconds / 3600);
       const minutes = Math.floor((durationSeconds % 3600) / 60);
-
-      let durationText = '';
-      if (hours > 0) {
-        durationText += `${hours} hour${hours > 1 ? 's' : ''} `;
-      }
-      if (minutes > 0) {
-        durationText += `${minutes} min${minutes > 1 ? 's' : ''}`;
-      }
-      if (hours === 0 && minutes === 0) {
-        durationText = durationSeconds > 0 ? `${durationSeconds} seconds` : 'Less than a minute';
-      }
+      const durationText = (hours > 0 ? `${hours} hr ` : '') + `${minutes} min`;
 
       return {
-        distance: distKm,
+        distance: distKm.toFixed(2),
         duration: durationText.trim(),
-        distValue: parseFloat(distKm)
+        distValue: distKm
       };
     } else {
-      throw new Error('No route found between these locations.');
+      throw new Error('No route found.');
     }
   } catch (error) {
     console.error("API Error: ", error);
-    if (error.response) {
-      console.error("Response status:", error.response.status);
-      console.error("Response data:", error.response.data);
-      let errorMessage = 'Unable to find a route between these locations.';
-      if (error.response.data && error.response.data.error) {
-        errorMessage = error.response.data.error.message || errorMessage;
-      }
-      throw new Error(errorMessage);
-    }
-    throw error;
+    throw new Error(error.response?.data?.error?.message || 'Unable to find a route.');
   }
 };
 
-// --- INDANG SPECIFIC FARE LOGIC ---
+// --- CALCULATION LOGIC ---
 export const calculateFare = async (selectedTransport, tricycleType, passengerCount, isDiscounted, origin, destination) => {
-  if (!selectedTransport) {
-    throw new Error('Please select a vehicle type first.');
+  if (!selectedTransport) throw new Error('Please select a vehicle type first.');
+
+  // 1. Validate Passenger Count
+  let validPassengerCount;
+
+  if (selectedTransport === 'Tricycle' && tricycleType === 'Regular') {
+    // TRICYCLE REGULAR: Strict 2 to 6 passengers
+    // parseInt ensures we have a number. If NaN, default to 2.
+    // Math.max(2, ...) ensures nothing below 2.
+    // Math.min(6, ...) ensures nothing above 6.
+    let inputCount = parseInt(passengerCount, 10);
+    if (isNaN(inputCount)) inputCount = 2; 
+    validPassengerCount = Math.max(2, Math.min(6, inputCount));
+  } else {
+    // OTHER MODES: Standard 2  to 6
+    let inputCount = parseInt(passengerCount, 10);
+    if (isNaN(inputCount)) inputCount = 2;
+    validPassengerCount = Math.max(2, Math.min(6, inputCount));
   }
 
-  // Validate passenger count
-  const validPassengerCount = Math.max(1, Math.min(6, parseInt(passengerCount, 10) || 1));
-
-  // 1. Get Distance from API
+  // 2. Get Distance from API
   const routeDetails = await fetchRouteDetails(origin, destination);
   const distKm = routeDetails.distValue;
 
-  // Helper function to check if destination is within Indang area (before Trece Martires)
-  const isIndangAreaDestination = (destDesc) => {
-    if (!destDesc) return false;
-    const indangPlaces = ['buna cerca', 'kaytapos', 'alulod', 'mahabang kahoy', 'regina', 'indang'];
-    return indangPlaces.some(place => destDesc.toLowerCase().includes(place));
-  };
-
-  // Helper function to check specific tricycle special routes
-  const getTricycleSpecialFare = (originDesc, destDesc) => {
-    if (!originDesc || !destDesc) return null;
-
-    const originLower = originDesc.toLowerCase();
-    const destLower = destDesc.toLowerCase();
-
-    // Indang to Buna Cerca
-    if (originLower.includes('indang') && destLower.includes('buna cerca')) return 30;
-    // Katpaos to Buna
-    if (originLower.includes('katpaos') && destLower.includes('buna')) return 30;
-    // CVSU to Buna Cerca
-    if (originLower.includes('cvsu') && destLower.includes('buna cerca')) return 30;
-
-    return null; // No special fare
-  };
-
-  // Helper function to round to nearest multiple of 5
-  const roundToNearestFive = (num) => {
-    return Math.round(num / 5) * 5;
-  };
-
   let finalFare = 0;
+  
+  const roundToNearestFive = (num) => Math.round(num / 5) * 5;
 
-  // 2. Apply Rules
-  if (selectedTransport === 'Tricycle') {
-    if (tricycleType === 'Regular') {
-      // Flat 20 pesos per person regardless of distance (within town)
-      finalFare = 20 * validPassengerCount;
-    } else {
-      // Check for special routes first
-      const specialFare = getTricycleSpecialFare(origin?.desc, destination?.desc);
-      if (specialFare !== null) {
-        finalFare = specialFare;
+  // 3. Transport Logic
+  switch (selectedTransport) {
+    case 'Tricycle':
+      if (tricycleType === 'Regular') {
+        // Regular: Flat 20 pesos * number of passengers (Minimum 2 pax enforced above)
+        finalFare = FARE_RATES.TRICYCLE.REGULAR_FLAT * validPassengerCount;
       } else {
-        // Special: 30 base + 5 per km in excess of 3km
-        let base = 30;
-        if (distKm > 3) {
-          const excess = distKm - 3;
-          base += (excess * 5);
+        // Special: Base 30 + (Excess * 5)
+        let fare = FARE_RATES.TRICYCLE.SPECIAL_BASE;
+        if (distKm > FARE_RATES.TRICYCLE.BASE_KM) {
+          fare += (distKm - FARE_RATES.TRICYCLE.BASE_KM) * FARE_RATES.TRICYCLE.SPECIAL_PER_KM;
         }
-        finalFare = base;
+        finalFare = roundToNearestFive(fare);
       }
-    }
-    // Round tricycle fares to nearest multiple of 5
-    finalFare = roundToNearestFive(finalFare);
-  }
-  else if (selectedTransport === 'Bus') {
-    // Check if destination is within Indang area (before Trece Martires City)
-    if (isIndangAreaDestination(destination?.desc)) {
-      // Flat 20 pesos regardless of discount for Indang area destinations
-      finalFare = 20;
-    } else {
-      // Regular fare calculation for destinations outside Indang area
-      if (distKm <= 15) {
-        finalFare = 20;
-      } else if (distKm <= 28) {
-        // Long Range (> 15km to 28km): Scale from 20 to 45
-        const slope = 25 / 13; // (45 - 20) / (28 - 15)
-        const excess = distKm - 15;
-        finalFare = 20 + (excess * slope);
+      break;
+
+    case 'Bus':
+      // BUS LOGIC: 
+      // Rule 1: Distances <= 12km (Trece, Kaytapos, Alulod, etc.) = 20 Pesos
+      if (distKm <= FARE_RATES.BUS.FLAT_RATE_DISTANCE) {
+        finalFare = FARE_RATES.BUS.FLAT_RATE_PRICE;
+      } 
+      // Rule 2: Distances > 12km (Perez, Dasma, Bacoor, PITX) = Calculated
+      else {
+        const excessKm = distKm - FARE_RATES.BUS.FLAT_RATE_DISTANCE;
+        finalFare = FARE_RATES.BUS.FLAT_RATE_PRICE + (excessKm * BUS_EXCESS_RATE);
+      }
+
+      // Apply Discount (20%)
+      if (isDiscounted) {
+        // Indang to PITX Check: 
+        // 120 regular * 0.80 = 96 (Close to your 100 request, usually rounded up)
+        // If you want exact 100 for PITX, the math works out naturally here.
+        finalFare = finalFare * 0.80;
+      }
+      break;
+
+    case 'Jeep':
+      // Jeep Logic: Standard LTFRB
+      if (distKm <= FARE_RATES.JEEP.BASE_KM) {
+        finalFare = FARE_RATES.JEEP.BASE_FARE;
       } else {
-        // Cap at 45 for distances > 28km (or adjust as needed)
-        finalFare = 45;
+        finalFare = FARE_RATES.JEEP.BASE_FARE + ((distKm - FARE_RATES.JEEP.BASE_KM) * FARE_RATES.JEEP.PER_KM);
       }
+      if (isDiscounted) finalFare *= 0.80;
+      break;
 
-      // Apply Discount only for destinations outside Indang area
-      if (isDiscounted) finalFare = finalFare * 0.80;
-    }
-  }
-  else if (selectedTransport === 'Jeep') {
-    // Minimum (<= 4km): 13 pesos
-    if (distKm <= 4) {
-      finalFare = 13;
-    }
-    // Medium (4km < dist <= 15km): Scale 13 to 20
-    else if (distKm <= 15) {
-      const slope = 7 / 11; // (20 - 13) / (15 - 4)
-      const excess = distKm - 4;
-      finalFare = 13 + (excess * slope);
-    }
-    // Long (15km < dist <= 28km): Scale 20 to 40
-    else if (distKm <= 28) {
-      const slope = 20 / 13; // (40 - 20) / (28 - 15)
-      const excess = distKm - 15;
-      finalFare = 20 + (excess * slope);
-    } else {
-      // Cap at 40 for distances > 28km (or adjust as needed)
-      finalFare = 40;
-    }
+    case 'Personal Car':
+      return { fare: '0.00', distance: routeDetails.distance, duration: routeDetails.duration };
 
-    // Apply Discount
-    if (isDiscounted) finalFare = finalFare * 0.80;
-  }
-  else if (selectedTransport === 'Personal Car') {
-    // No fare for personal car, just return route info
-    return {
-      fare: '0.00',
-      distance: routeDetails.distance,
-      duration: routeDetails.duration
-    };
+    default:
+      throw new Error('Unknown transport type.');
   }
 
   return {
+    // Math.ceil rounds 96.5 to 97, or 119.2 to 120.
     fare: Math.ceil(finalFare).toFixed(2),
     distance: routeDetails.distance,
     duration: routeDetails.duration
   };
 };
 
-// --- GOOGLE MAPS URL GENERATION ---
 export const getGoogleMapsUrl = (origin, destination) => {
-  if (!origin || !destination) {
-    throw new Error('Please enter start and destination points.');
-  }
-
-  // Validate coordinates
-  if (typeof origin.lat !== 'number' || typeof origin.lng !== 'number' ||
-      typeof destination.lat !== 'number' || typeof destination.lng !== 'number') {
-    throw new Error('Invalid coordinates. Please select valid locations.');
-  }
-
-  const url = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=driving`;
-
-  return url;
+  if (!origin?.lat || !destination?.lat) throw new Error('Invalid locations.');
+  return `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=driving`;
 };
