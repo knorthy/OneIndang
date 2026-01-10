@@ -13,6 +13,14 @@ import {
   Alert 
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  RETAIL_BUSINESSES, 
+  RETAIL_FILTERS, 
+  RETAIL_GALLERY_IMGS, 
+  RETAIL_REVIEWS_DATA 
+} from '../../constants/businessData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -25,38 +33,6 @@ const wp = (p) => (p * deviceWidth) / 100;
 const RETAIL_BLUE = '#3F51B5'; 
 const LIGHT_BLUE_BG = '#E8EAF6';
 const HEART_ORANGE = '#FF8C00'; // UPDATED: Orange for Heart
-
-// --- DATA ---
-const BASE_DATA = [
-  { id: '1', name: 'Indang Public Market', sub: 'Fresh Produce & Dry Goods', rating: '4.4', distance: '0.2 km', image: 'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=400', tag: 'Central', verified: true, location: 'Poblacion 4', category: 'Market', price: 'Varies', beds: 'N/A', baths: 'Public', sqft: '2,000+', agent: 'Market Admin', phone: '0464150000' },
-  { id: '2', name: 'Savemore Indang', sub: 'Grocery & Supermarket', rating: '4.7', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400', tag: 'Verified', verified: true, location: 'Poblacion 1', category: 'Grocery', price: 'Retail', beds: 'N/A', baths: 'Private', sqft: '1,500', agent: 'Store Manager', phone: '0464151111' },
-  { id: '3', name: '7-Eleven Poblacion', sub: 'Convenience Store', rating: '4.3', distance: '0.1 km', image: 'https://images.unsplash.com/photo-1626315570050-61266e855799?w=400', tag: '24/7', verified: true, location: 'Poblacion 2', category: 'Grocery', price: 'Convenience', beds: 'N/A', baths: 'N/A', sqft: '200', agent: 'Shift Lead', phone: '09123456789' },
-  { id: '4', name: 'Fashion Hub Indang', sub: 'Clothing & Accessories', rating: '4.5', distance: '1.1 km', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400', tag: 'New', verified: false, location: 'Brgy. San Jose', category: 'Fashion', price: 'Affordable', beds: 'N/A', baths: 'Fitting Room', sqft: '450', agent: 'Shop Owner', phone: '09987654321' },
-  { id: '5', name: 'Mercury Drug Indang', sub: 'Pharmacy & Health Supplies', rating: '4.8', distance: '0.4 km', image: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=400', tag: 'Essential', verified: true, location: 'Poblacion 3', category: 'Health', price: 'Standard', beds: 'N/A', baths: 'N/A', sqft: '300', agent: 'Pharmacist', phone: '0464152222' },
-];
-
-// Expanded Data for Scrolling
-const RETAIL_BUSINESSES = [
-  ...BASE_DATA,
-  { ...BASE_DATA[0], id: '6', name: 'Indang Wet Market', location: 'Poblacion 4' },
-  { ...BASE_DATA[1], id: '7', name: 'Alfamart Indang', location: 'Brgy. Bancod' },
-  { ...BASE_DATA[3], id: '8', name: 'Style & Trends Boutique', location: 'Poblacion 2' },
-  { ...BASE_DATA[4], id: '9', name: 'The Generics Pharmacy', location: 'Town Plaza' },
-];
-
-const FILTERS = ['All', 'Market', 'Grocery', 'Fashion', 'Health', 'Services'];
-
-const GALLERY_IMGS = [
-  'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=400',
-  'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-  'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400',
-  'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=400',
-];
-
-const REVIEWS_DATA = [
-  { id: 1, user: 'Juanita A.', rating: 5, comment: 'Very fresh vegetables every morning!', date: '1 day ago' },
-  { id: 2, user: 'Mark D.', rating: 4, comment: 'Convenient location but parking is hard.', date: '3 days ago' },
-];
 
 export default function RetailScreen() {
   const router = useRouter();
@@ -126,7 +102,7 @@ export default function RetailScreen() {
   // 2. GALLERY TAB
   const renderGalleryTab = () => (
     <View style={styles.galleryGrid}>
-      {GALLERY_IMGS.map((img, index) => (
+      {RETAIL_GALLERY_IMGS.map((img, index) => (
         <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
       ))}
     </View>
@@ -135,7 +111,7 @@ export default function RetailScreen() {
   // 3. REVIEW TAB
   const renderReviewTab = () => (
     <View style={{ marginTop: hp(2) }}>
-      {REVIEWS_DATA.map((review) => (
+      {RETAIL_REVIEWS_DATA.map((review) => (
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -233,7 +209,7 @@ export default function RetailScreen() {
 
   // Filter Logic
   const filteredData = useMemo(() => {
-    const category = FILTERS[activeIndex];
+    const category = RETAIL_FILTERS[activeIndex];
     return RETAIL_BUSINESSES.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.sub.toLowerCase().includes(searchQuery.toLowerCase());
@@ -278,7 +254,7 @@ export default function RetailScreen() {
 
           <View style={styles.filterRowContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-              {FILTERS.map((filter, index) => (
+              {RETAIL_FILTERS.map((filter, index) => (
                 <TouchableOpacity 
                   key={filter} 
                   onPress={() => setActiveIndex(index)}

@@ -9,18 +9,13 @@ const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
 const hp = (p) => (p * deviceHeight) / 100;
 const wp = (p) => (p * deviceWidth) / 100;
 
+// IMPORT DATA
+import { FOOD_DATA } from '../../constants/businessData';
+
 // THEME COLORS
 const VIBRANT_ORANGE = '#FF7043'; 
 const LIGHT_ORANGE_BG = '#FFF3E0'; 
 const PRIMARY_BLUE = '#2D6BFF'; // For spec icons
-
-const FOOD_DATA = [
-  { id: '1', name: 'Jollibee Indang', sub: 'Fast Food • Town Plaza', rating: '4.8', distance: '0.2 km', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500', verified: true, location: 'Indang Town Plaza', tag: 'Popular', category: 'Fast Food', price: '250', capacity: '100+', time: '24/7', agent: 'Manager On Duty' },
-  { id: '2', name: 'Siglo Farm Café', sub: 'Native Coffee • Filipino Fusion', rating: '4.9', distance: '1.5 km', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500', verified: true, location: 'Brgy. Kaytapos', tag: 'Must Try', category: 'Cafes', price: '450', capacity: '40', time: '8AM-9PM', agent: 'Chef Aris' },
-  { id: '3', name: 'Celyns Inasal', sub: 'Grilled Chicken • Local Favorites', rating: '4.6', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500', verified: false, location: 'San Gregorio St.', tag: 'Trending', category: 'Native', price: '180', capacity: '60', time: '10AM-8PM', agent: 'Celyn S.' },
-  { id: '4', name: 'Indang Town Milk Tea', sub: 'Refreshments • Snacks', rating: '4.5', distance: '0.3 km', image: 'https://images.unsplash.com/photo-1572715376701-98568319fd0b?w=500', verified: false, location: 'Poblacion 1', tag: 'Best Seller', category: 'Desserts', price: '95', capacity: '15', time: '11AM-7PM', agent: 'Store Lead' },
-  { id: '5', name: 'Kusina ni Lolo', sub: 'Authentic Bulalo & Sinigang', rating: '4.7', distance: '2.1 km', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500', verified: true, location: 'Brgy. Alulod', tag: 'Top Rated', category: 'Native', price: '600', capacity: '80', time: '9AM-10PM', agent: 'Lolo Bert' },
-];
 
 const FILTERS = ['All', 'Fast Food', 'Cafes', 'Native', 'Desserts'];
 

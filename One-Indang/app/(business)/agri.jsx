@@ -13,6 +13,14 @@ import {
   Alert 
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  AGRICULTURE_DATA, 
+  AGRICULTURE_FILTERS, 
+  AGRICULTURE_GALLERY_IMGS, 
+  AGRICULTURE_REVIEWS_DATA 
+} from '../../constants/businessData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -25,40 +33,6 @@ const wp = (p) => (p * deviceWidth) / 100;
 const GRAB_GREEN = '#00B14F';
 const LIGHT_GREEN_BG = '#E8F5E9';
 const HEART_RED = '#EF4444';
-
-// --- DATA ---
-const BASE_DATA = [
-  { id: '1', name: 'Indang Farm Heritage', category: 'Agriculture', sub: 'Organic Vegetables & Tours', rating: '4.9', distance: '0.8 km', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400', verified: true, location: 'Brgy. Mataas na Lupa', tag: 'Popular', type: 'Farms', price: '500', sqft: '5,000', agent: 'Farmer Jun', phone: '09123456789' },
-  { id: '2', name: 'Silan Dragon Fruit Farm', category: 'Agriculture', sub: 'Pick-and-Pay Fruit Orchard', rating: '4.8', distance: '3.1 km', image: 'https://images.unsplash.com/photo-1527333323140-79886a8969bb?w=400', verified: true, location: 'Brgy. Tambo Munti', tag: 'Must Try', type: 'Produce', price: '300', sqft: '10,000', agent: 'Ms. Silan', phone: '09987654321' },
-  { id: '3', name: 'EMV Flower Farm', category: 'Agriculture', sub: 'Ornamental Flowers & Events', rating: '4.7', distance: '2.4 km', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=400', verified: true, location: 'Sitio Colong', tag: 'Trending', type: 'Farms', price: '450', sqft: '7,500', agent: 'Admin Rose', phone: '09112223333' },
-];
-
-// Expanded Data for Scrolling
-const AGRI_DATA = [
-  ...BASE_DATA,
-  { ...BASE_DATA[0], id: '4', name: 'Cavite Green House', location: 'Brgy. Buna Lejos' },
-  { ...BASE_DATA[1], id: '5', name: 'Harvest Moon Fields', location: 'Brgy. Kayquit' },
-  { ...BASE_DATA[2], id: '6', name: 'Sunny Side Orchards', location: 'Brgy. Alulod' },
-  { ...BASE_DATA[0], id: '7', name: 'Indang Eco Park', location: 'Poblacion' },
-  { ...BASE_DATA[1], id: '8', name: 'Buna Lejos Agri', location: 'Brgy. Buna' },
-];
-
-const FILTERS = ['All', 'Farms', 'Produce', 'Services', 'Suppliers'];
-
-const GALLERY_IMGS = [
-  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400',
-  'https://images.unsplash.com/photo-1625246333195-58197bd4773d?w=400',
-  'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400',
-  'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400',
-  'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=400',
-  'https://images.unsplash.com/photo-1527333323140-79886a8969bb?w=400',
-];
-
-const REVIEWS_DATA = [
-  { id: 1, user: 'Maria Santos', rating: 5, comment: 'Sobrang ganda ng place! Fresh air and fresh veggies.', date: '2 days ago' },
-  { id: 2, user: 'John Doe', rating: 4, comment: 'Nice experience but the road going there is a bit narrow.', date: '1 week ago' },
-  { id: 3, user: 'Anna Cruz', rating: 5, comment: 'Very accomodating staff and the dragon fruit shake is a must try!', date: '3 weeks ago' },
-];
 
 export default function AgriScreen() {
   const router = useRouter();
@@ -140,7 +114,7 @@ export default function AgriScreen() {
   // 2. GALLERY TAB
   const renderGalleryTab = () => (
     <View style={styles.galleryGrid}>
-      {GALLERY_IMGS.map((img, index) => (
+      {AGRICULTURE_GALLERY_IMGS.map((img, index) => (
         <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
       ))}
     </View>
@@ -149,7 +123,7 @@ export default function AgriScreen() {
   // 3. REVIEW TAB
   const renderReviewTab = () => (
     <View style={{ marginTop: hp(2) }}>
-      {REVIEWS_DATA.map((review) => (
+      {AGRICULTURE_REVIEWS_DATA.map((review) => (
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -249,8 +223,8 @@ export default function AgriScreen() {
 
   // FILTER LOGIC
   const filteredData = useMemo(() => {
-    const categoryFilter = FILTERS[activeIndex];
-    return AGRI_DATA.filter(item => {
+    const categoryFilter = AGRICULTURE_FILTERS[activeIndex];
+    return AGRICULTURE_DATA.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.sub.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'All' || item.type === categoryFilter;
@@ -299,10 +273,10 @@ export default function AgriScreen() {
 
           <View style={styles.filterRowContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-              {FILTERS.map((filter, index) => (
+              {AGRICULTURE_FILTERS.map((filter, index) => (
                 <TouchableOpacity 
                   key={filter} 
-                  onPress={() => setActiveIndex(index)} 
+                  onPress={() => setActiveIndex(index)}
                   style={[styles.filterPill, activeIndex === index && styles.activePill]}
                 >
                   <Text style={[styles.filterText, activeIndex === index && styles.activeFilterText]}>{filter}</Text>
