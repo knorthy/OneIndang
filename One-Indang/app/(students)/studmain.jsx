@@ -20,7 +20,7 @@ import { hp, wp } from '../../helpers/common';
 
 // Importing student data constants
 import { STUDENT_CATEGORIES, STUDENT_PROPERTIES, GALLERY_IMAGES, MOCK_REVIEWS } from '../../constants/studentData';
-import { styles, BRAND_BLUE, BRAND_RED, SCREEN_WIDTH, SCREEN_HEIGHT } from '../styles/studmainStyles.js';
+import { styles, BRAND_BLUE, BRAND_RED, SCREEN_WIDTH, SCREEN_HEIGHT } from '../../styles/studmainStyles.js';
 
 const HomeScreen = () => {
 

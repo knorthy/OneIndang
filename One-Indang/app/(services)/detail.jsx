@@ -10,7 +10,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
-import styles from '../styles/detailStyles';
+import styles from '../../styles/detailStyles';
 
 // --- THEME COLORS ---
 const COLORS = {

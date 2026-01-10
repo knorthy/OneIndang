@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { hp, wp } from '../../helpers/common';
+import { hp, wp } from '../helpers/common';
 
 const styles = StyleSheet.create({
   container: {
