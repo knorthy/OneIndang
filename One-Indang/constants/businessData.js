@@ -138,6 +138,25 @@ export const RETAIL_BASE_DATA = [
   { id: '4', name: 'Tech World Indang', sub: 'Electronics & Gadgets', rating: '4.8', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400', tag: 'Best Prices', verified: true, category: 'Electronics', location: 'Poblacion 4', price: '2,000', beds: '0', baths: '1', sqft: '2,500', agent: 'Tech Support', phone: '09223334444' },
 ];
 
+export const RETAIL_BUSINESSES = [
+  ...RETAIL_BASE_DATA,
+  { ...RETAIL_BASE_DATA[0], id: '5', name: 'Indang Mini Mart', location: 'Brgy. Kayquit' },
+  { ...RETAIL_BASE_DATA[1], id: '6', name: 'Buna Market Hub', location: 'Brgy. Buna' },
+  { ...RETAIL_BASE_DATA[2], id: '7', name: 'Style Central', location: 'Poblacion 5' },
+  { ...RETAIL_BASE_DATA[3], id: '8', name: 'Gadget Zone', location: 'Brgy. Bancod' },
+];
+
+export const RETAIL_FILTERS = ['All', 'Department', 'Market', 'Fashion', 'Electronics'];
+
+export const RETAIL_GALLERY_IMGS = [
+  'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400',
+  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400',
+  'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400',
+  'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400',
+  'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
+  'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=400',
+];
+
 export const RETAIL_REVIEWS_DATA = [
   { id: 1, user: 'Shopping Queen', rating: 5, comment: 'Complete shopping experience! Everything under one roof.', date: '1 day ago' },
   { id: 2, user: 'Local Buyer', rating: 4, comment: 'Good selection but parking can be crowded during weekends.', date: '3 days ago' },
@@ -157,4 +176,21 @@ export const TOURISM_DATA = [
   { ...TOURISM_BASE_DATA[1], id: '6', name: 'Hidden Falls Trek', location: 'Brgy. Bancod' },
   { ...TOURISM_BASE_DATA[2], id: '7', name: 'Bamboo Rafting', location: 'Brgy. Buna' },
   { ...TOURISM_BASE_DATA[3], id: '8', name: 'Mountain Resort', location: 'Brgy. Mataas na Lupa' },
+];
+
+export const TOURISM_FILTERS = ['All', 'Museums', 'Nature', 'Adventure', 'Resorts'];
+
+export const TOURISM_GALLERY_IMGS = [
+  'https://images.unsplash.com/photo-1566127992631-137a41c5b5da?w=400',
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+  'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400',
+  'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400',
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+  'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400',
+];
+
+export const TOURISM_REVIEWS_DATA = [
+  { id: 1, user: 'Culture Lover', rating: 5, comment: 'Amazing historical artifacts! A must visit for history enthusiasts.', date: '2 days ago' },
+  { id: 2, user: 'Nature Seeker', rating: 4, comment: 'Breathtaking views from the mountain. Worth the hike!', date: '1 week ago' },
+  { id: 3, user: 'Adventure Fan', rating: 5, comment: 'River adventure was thrilling! Great guides and equipment.', date: '3 days ago' },
 ];

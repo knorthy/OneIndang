@@ -33,10 +33,18 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 export default function EmergencyScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [contentType, setContentType] = useState("hospitals");
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const bottomSheetRef = useRef(null);
 
-  const snapPoints = useMemo(() => ["80%"], []);
+  const snapPoints = useMemo(() => ["70%"], []);
+
+  const handleSheetOpen = (type) => {
+    setContentType(type);
+    bottomSheetRef.current?.expand();
+  };
+
+  const handleSheetClose = () => {
+    bottomSheetRef.current?.close();
+  };
 
   const dialNumber = (number) => {
     const cleanNumber = number.replace(/[^0-9+]/g, "");
@@ -66,16 +74,14 @@ export default function EmergencyScreen() {
 
   const renderBackdrop = useCallback(
     (props) => (
-      isSheetOpen ? (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          opacity={0.5}
-        />
-      ) : null
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+      />
     ),
-    [isSheetOpen]
+    []
   );
 
   return (
@@ -84,7 +90,7 @@ export default function EmergencyScreen() {
 
         <View style={styles.appHeader}>
           <Text style={styles.headerTitle}>Emergency</Text>
-          <TouchableOpacity style={styles.iconCircle}>
+          <TouchableOpacity style={styles.iconCircle} onPress={() => Alert.alert("Notifications", "No new emergency alerts at this time.")}>
             <Ionicons name="notifications-outline" size={wp(6)} color="#003087" />
           </TouchableOpacity>
         </View>
@@ -142,7 +148,7 @@ export default function EmergencyScreen() {
           <View style={styles.quickActionsRow}>
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("hospitals"); setIsSheetOpen(true); }}
+              onPress={() => handleSheetOpen("hospitals")}
             >
               <MaterialCommunityIcons name="hospital-building" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Hospitals</Text>
@@ -150,7 +156,7 @@ export default function EmergencyScreen() {
 
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("fire"); setIsSheetOpen(true); }}
+              onPress={() => handleSheetOpen("fire")}
             >
               <MaterialIcons name="local-fire-department" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Fire Protection</Text>
@@ -160,19 +166,18 @@ export default function EmergencyScreen() {
 
         <BottomSheet
           ref={bottomSheetRef}
-          index={isSheetOpen ? 0 : -1}
           snapPoints={snapPoints}
           enablePanDownToClose
-          onClose={() => setIsSheetOpen(false)}
+          onClose={handleSheetClose}
           backdropComponent={renderBackdrop}
           handleIndicatorStyle={{ backgroundColor: "#333", width: wp(12) }}
           backgroundStyle={{ borderRadius: wp(10) }}
         >
           <View style={{ flex: 1 }}>
             {contentType === "hospitals" ? (
-              <HospitalsContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
+              <HospitalsContent onCall={dialNumber} onClose={handleSheetClose} />
             ) : (
-              <FireProtectionContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
+              <FireProtectionContent onCall={dialNumber} onClose={handleSheetClose} />
             )}
           </View>
         </BottomSheet>
