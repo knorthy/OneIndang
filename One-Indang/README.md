@@ -15,9 +15,11 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    npm install react-native-google-places-autocomplete axios  
 
-   expo install expo-location 
+   npx expo install expo-location 
 
    npx expo install react-native-maps
+
+   npm install semver
    ```
 
 2. Start the app

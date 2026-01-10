@@ -20,7 +20,7 @@ import LocationPickerModal from '../../components/LocationPickerModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
-import * as Location from 'expo-location'; //  for GPS functionality
+import * as Location from 'expo-location'; // Added for GPS functionality
 import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
