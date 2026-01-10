@@ -6,18 +6,26 @@ import { useRouter } from 'expo-router';
 import { hp, wp } from '../../helpers/common';
 import { useCart } from '../../context/CartContext';
 
-const VIBRANT_ORANGE = '#FF7043';
+// --- THEME COLORS ---
+const COLORS = {
+  primary: '#003087', // Deep Blue
+  secondary: '#D32F2F', // Bright Red
+  background: '#ffffff',
+  text: '#003087',
+  textGray: '#666666',
+  lightRedBg: '#FFEBEE', 
+  lightBlueBg: '#E3F2FD', 
+};
 
 export default function OrdersScreen() {
   const router = useRouter();
-  const { orders } = useCart(); // Get orders from context
+  const { orders } = useCart(); 
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Orders</Text>
       </View>
@@ -46,7 +54,6 @@ export default function OrdersScreen() {
 
               <View style={styles.divider} />
 
-              {/* Items Summary */}
               <View style={styles.itemsContainer}>
                 {order.items.map((item, index) => (
                     <Text key={index} style={styles.itemText} numberOfLines={1}>
@@ -73,28 +80,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: { flexDirection: 'row', alignItems: 'center', padding: wp(5), backgroundColor: '#FFF', elevation: 2 },
   backBtn: { marginRight: 15 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#111' },
-  
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: COLORS.text },
   scrollContent: { padding: wp(5) },
-  
   emptyContainer: { alignItems: 'center', marginTop: hp(15) },
-  emptyText: { color: '#999', fontSize: 16, marginTop: 10 },
-  browseBtn: { marginTop: 15, backgroundColor: VIBRANT_ORANGE, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20 },
+  emptyText: { color: COLORS.textGray, fontSize: 16, marginTop: 10 },
+  browseBtn: { marginTop: 15, backgroundColor: COLORS.secondary, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 20 },
   browseText: { color: '#FFF', fontWeight: 'bold' },
-
   orderCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, marginBottom: 15, elevation: 2 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  restaurantName: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  orderDate: { fontSize: 12, color: '#888', marginTop: 2 },
-  statusBadge: { backgroundColor: '#E3F2FD', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
-  statusText: { color: '#1976D2', fontSize: 12, fontWeight: 'bold' },
-  
+  restaurantName: { fontSize: 16, fontWeight: 'bold', color: COLORS.text },
+  orderDate: { fontSize: 12, color: COLORS.textGray, marginTop: 2 },
+  statusBadge: { backgroundColor: COLORS.lightBlueBg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  statusText: { color: COLORS.primary, fontSize: 12, fontWeight: 'bold' },
   divider: { height: 1, backgroundColor: '#EEE', marginVertical: 10 },
-  
   itemsContainer: { marginBottom: 5 },
   itemText: { fontSize: 14, color: '#555', marginBottom: 2 },
-  
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  totalLabel: { fontSize: 14, color: '#888' },
-  totalValue: { fontSize: 16, fontWeight: 'bold', color: VIBRANT_ORANGE },
+  totalLabel: { fontSize: 14, color: COLORS.textGray },
+  totalValue: { fontSize: 16, fontWeight: 'bold', color: COLORS.secondary },
 });
