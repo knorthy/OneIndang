@@ -3,8 +3,8 @@ import axios from 'axios';
 // ⚠️ SECURITY WARNING: Move these to environment variables!
 // Create a .env file and use expo-constants or react-native-dotenv
 // Example: EXPO_PUBLIC_PLACES_API_KEY in .env
-export const PLACES_API_KEY = process.env.EXPO_PUBLIC_PLACES_API_KEY || 'AIzaSyC9Rlh2lJUrPJKkK8hBhyXIl_xlZkXxm8s';
-const DIRECTIONS_API_KEY = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY || 'AIzaSyCOLL_G8QOrG8KWcBZA7H2WHsACGQmlRR8';
+export const PLACES_API_KEY = process.env.EXPO_PUBLIC_PLACES_API_KEY;
+const DIRECTIONS_API_KEY = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY;
 
 // API FUNCTION: Uses ROUTES API
 export const fetchRouteDetails = async (origin, destination) => {
