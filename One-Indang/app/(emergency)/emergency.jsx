@@ -66,14 +66,16 @@ export default function EmergencyScreen() {
 
   const renderBackdrop = useCallback(
     (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
+      isSheetOpen ? (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          opacity={0.5}
+        />
+      ) : null
     ),
-    []
+    [isSheetOpen]
   );
 
   return (
@@ -156,26 +158,24 @@ export default function EmergencyScreen() {
           </View>
         </ScrollView>
 
-        {isSheetOpen && (
-          <BottomSheet
-            ref={bottomSheetRef}
-            index={0}
-            snapPoints={snapPoints}
-            enablePanDownToClose
-            onClose={() => setIsSheetOpen(false)}
-            backdropComponent={renderBackdrop}
-            handleIndicatorStyle={{ backgroundColor: "#333", width: wp(12) }}
-            backgroundStyle={{ borderRadius: wp(10) }}
-          >
-            <View style={{ flex: 1 }}>
-              {contentType === "hospitals" ? (
-                <HospitalsContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
-              ) : (
-                <FireProtectionContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
-              )}
-            </View>
-          </BottomSheet>
-        )}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={isSheetOpen ? 0 : -1}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          onClose={() => setIsSheetOpen(false)}
+          backdropComponent={renderBackdrop}
+          handleIndicatorStyle={{ backgroundColor: "#333", width: wp(12) }}
+          backgroundStyle={{ borderRadius: wp(10) }}
+        >
+          <View style={{ flex: 1 }}>
+            {contentType === "hospitals" ? (
+              <HospitalsContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
+            ) : (
+              <FireProtectionContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
+            )}
+          </View>
+        </BottomSheet>
       </SafeAreaView>
   );
 }
