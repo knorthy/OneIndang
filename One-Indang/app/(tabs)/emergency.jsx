@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   Linking,
   Platform,
   TextInput,
@@ -18,6 +17,7 @@ import { hp, wp } from "../../helpers/common";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import styles from './styles/emergency.styles';
 
 // GORHOM BOTTOM SHEET IMPORTS
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -252,34 +252,3 @@ const SlideToCall911 = ({ onCall }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F8FAFF" },
-  appHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: wp(5), paddingTop: hp(4), paddingBottom: hp(1) },
-  headerTitle: { fontSize: wp(8), fontWeight: "900", color: "#003087" },
-  iconCircle: { backgroundColor: "#FFF", padding: wp(2.5), borderRadius: wp(10), elevation: 3 },
-  searchSection: { paddingHorizontal: wp(5), marginVertical: hp(2) },
-  searchBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#FFF", paddingHorizontal: wp(4), height: hp(6), borderRadius: wp(10), elevation: 2 },
-  searchInput: { flex: 1, marginLeft: wp(2), fontSize: wp(4) },
-  scrollPadding: { paddingBottom: hp(5) },
-  mainCard: { backgroundColor: "#FFF", marginHorizontal: wp(5), marginBottom: hp(2), borderRadius: wp(5), padding: wp(5), elevation: 2 },
-  cardHeaderRow: { flexDirection: "row", alignItems: "center", marginBottom: hp(2) },
-  cardHeaderText: { fontSize: wp(4.2), fontWeight: "700", marginLeft: wp(2), color: "#333" },
-  sliderTrack: { height: hp(7), backgroundColor: "#FFF1F1", borderRadius: wp(10), borderWidth: 1, borderColor: "#FFDADA", justifyContent: "center", alignItems: "center", overflow: "hidden", position: 'relative' },
-  sliderContent: { width: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' },
-  sliderText: { color: "#D32F2F", fontWeight: "700", fontSize: wp(4) },
-  arrowPos: { position: "absolute", right: wp(5) },
-  sliderKnob: { position: "absolute", left: 5, width: hp(6), height: hp(6), backgroundColor: "#D32F2F", borderRadius: wp(10), justifyContent: "center", alignItems: "center", elevation: 5, zIndex: 10 },
-  sectionTitle: { fontSize: wp(5.5), fontWeight: "900", color: "#003087", marginBottom: hp(0.8) },
-  comcenDescription: { fontSize: wp(3.4), color: "#666", lineHeight: wp(4.8), marginBottom: hp(1) },
-  hotlineListContainer: { marginTop: hp(0.5) },
-  hotlineRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#FDFDFD", padding: wp(3), borderRadius: wp(4), borderWidth: 1, borderColor: "#F0F0F0", marginTop: hp(1) },
-  hotlineInfo: { flex: 1, marginRight: wp(2) },
-  hotlineText: { fontSize: wp(3.5), color: "#003087" },
-  boldLabel: { fontWeight: "900" },
-  rowActions: { flexDirection: "row", alignItems: "center" },
-  actionIcon: { backgroundColor: "#F8FAFF", padding: wp(2.5), borderRadius: wp(4), marginLeft: wp(2), borderWidth: 1, borderColor: "#E0E0E0" },
-  quickActionsRow: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: wp(5) },
-  actionBox: { backgroundColor: "#FFF", width: wp(43), paddingVertical: hp(3), alignItems: "center", borderRadius: wp(5), elevation: 2 },
-  actionBoxText: { marginTop: hp(1), fontWeight: "700", color: "#003087" },
-});

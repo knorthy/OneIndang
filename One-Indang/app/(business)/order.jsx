@@ -8,11 +8,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 
 import { hp, wp } from '../../helpers/common'; 
+import styles from './styles/order.styles';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- THEME COLORS ---
-const THEME_BLUE = '#003087'; 
+const THEME_BLUE = '#003087';
 const TEXT_GRAY = '#6B7280';
 const BG_COLOR = '#FFFFFF';
 const SECONDARY_BG = '#F3F4F6';
@@ -298,83 +299,3 @@ const MenuItem = ({ name, price, img, rating, reviews, onPress }) => (
     <Text style={styles.foodPrice}>₱ {price.toFixed(2)}</Text>
   </TouchableOpacity>
 );
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: BG_COLOR },
-  fixedHeader: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1000 },
-  
-  // Header Buttons stay top (0 vertical padding)
-  headerNav: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(4), paddingVertical: 0 },
-  rightHeaderBtns: { flexDirection: 'row', gap: 10 },
-  circleBtn: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
-  
-  heroContainer: { height: hp(24) },
-  heroImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  logoBadge: { position: 'absolute', bottom: -30, alignSelf: 'center', width: 75, height: 75, backgroundColor: '#FFF', borderRadius: 15, elevation: 8, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  logoImg: { width: '85%', height: '85%', resizeMode: 'contain' },
-  
-  infoSection: { paddingHorizontal: wp(5), marginTop: 60, alignItems: 'center', marginBottom: 0 },
-  restaurantName: { fontSize: 24, fontWeight: '900', color: THEME_BLUE },
-  mainRatingRow: { flexDirection: 'row', marginTop: 4, marginBottom: 8, alignItems: 'center' },
-  ratingValue: { fontWeight: '600', color: TEXT_GRAY, fontSize: 13 },
-  
-  deliveryBox: { width: '100%', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F2F2F2', paddingVertical: 12, backgroundColor: '#FFF', marginTop: 12 },
-  deliveryContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  iconWrapper: { justifyContent: 'center', alignItems: 'center' },
-  deliveryTextContainer: { marginHorizontal: 4, alignItems: 'center' },
-  changeWrapper: { justifyContent: 'center', alignItems: 'center' },
-  deliveryTitle: { fontWeight: 'bold', fontSize: 14, color: '#333' },
-  deliverySub: { color: TEXT_GRAY, fontSize: 12 },
-  changeText: { color: THEME_BLUE, fontWeight: 'bold', fontSize: 13 },
-  
-  stickyArea: { 
-    backgroundColor: '#FFF', 
-    // UPDATED: Added paddingBottom 5 to create separation between Search and Tabs
-    paddingBottom: 5, 
-    elevation: 4, 
-    zIndex: 100,
-    shadowColor: '#000', 
-    shadowOpacity: 0.05, 
-    shadowOffset: {height: 4},
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 44, 
-  },
-  
-  // UPDATED: Increased marginBottom to 12 to create "one space" distance to tabs
-  searchBar: { 
-    flexDirection: 'row', 
-    backgroundColor: SECONDARY_BG, 
-    marginHorizontal: wp(5), 
-    borderRadius: 10, 
-    paddingHorizontal: 15, 
-    height: 46, 
-    alignItems: 'center', 
-    marginBottom: 12, 
-    marginTop: 0 
-  },
-  
-  searchInput: { flex: 1, marginLeft: 10, fontSize: 14, color: '#333' },
-  tabScroll: { paddingLeft: wp(5) },
-  tabBtn: { marginRight: 25, paddingBottom: 8, borderBottomWidth: 3, borderBottomColor: 'transparent' },
-  activeTab: { borderBottomColor: THEME_BLUE },
-  tabText: { fontWeight: '700', color: TEXT_GRAY, fontSize: 13 },
-  activeTabText: { color: THEME_BLUE },
-  
-  menuPage: { width: SCREEN_WIDTH, paddingHorizontal: wp(5), paddingTop: 20 },
-  sectionHeader: { fontSize: 22, fontWeight: '800', marginBottom: 20, color: THEME_BLUE },
-  menuGrid: { flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' },
-  foodCard: { width: wp(43), backgroundColor: '#FFF', borderRadius: 18, padding: 12, marginBottom: 20, elevation: 4 },
-  imageContainer: { height: wp(32), justifyContent: 'center', alignItems: 'center', backgroundColor: SECONDARY_BG, borderRadius: 12 },
-  foodImg: { width: '90%', height: '90%', resizeMode: 'contain' },
-  addBtn: { position: 'absolute', right: 8, bottom: 8, backgroundColor: THEME_BLUE, borderRadius: 10, width: 30, height: 30, justifyContent: 'center', alignItems: 'center' },
-  foodName: { fontWeight: '700', marginTop: 12, color: '#333' },
-  itemRatingText: { fontSize: 12, color: TEXT_GRAY, marginVertical: 4 },
-  foodPrice: { fontWeight: '800', color: '#333' },
-  
-  cartBarContainer: { position: 'absolute', bottom: Platform.OS === 'ios' ? 30 : 20, left: 0, right: 0, paddingHorizontal: wp(4) },
-  cartBar: { backgroundColor: THEME_BLUE, height: 60, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
-  cartLeft: { flexDirection: 'row', alignItems: 'center' },
-  cartBadge: { backgroundColor: 'rgba(255,255,255,0.25)', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  cartBadgeText: { color: '#FFF', fontWeight: 'bold' },
-  viewOrderText: { color: '#FFF', fontWeight: '800', marginLeft: 12, fontSize: 16 },
-  cartPriceText: { color: '#FFF', fontWeight: '800' },
-});

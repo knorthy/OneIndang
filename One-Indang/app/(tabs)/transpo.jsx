@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   StatusBar,
   Animated,
   Alert,
@@ -25,6 +24,7 @@ import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
 import { popularDestinations, searchDestinations } from '../../constants/popularDestinations';
+import { styles, autocompleteStyles } from './styles/transpo.styles';
 
 // Ignore specific warnings
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
@@ -648,136 +648,3 @@ export default function App() {
     </View>
   );
 }
-
-// --- AUTOCOMPLETE STYLES ---
-const autocompleteStyles = {
-  container: { flex: 1, overflow: 'visible' },
-  textInput: { height: hp(5.5), color: '#333', fontSize: hp(1.7), backgroundColor: 'transparent', marginTop: 2 },
-  listView: { position: 'absolute', top: 45, left: 0, right: 0, zIndex: 10000, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#EEE', elevation: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, maxHeight: 132, overflow: 'hidden' },
-  row: { backgroundColor: 'white', padding: 13, height: 44, flexDirection: 'row' },
-  separator: { height: 0.5, backgroundColor: '#c8c7cc' },
-  description: { fontSize: 14, color: '#333' },
-};
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFF' },
-  fixedHeader: { backgroundColor: '#F8FAFF', paddingTop: hp(6), paddingBottom: hp(2) },
-  scrollView: { flex: 1, backgroundColor: '#F8FAFF' },
-  scrollContent: { paddingBottom: hp(5) },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), paddingBottom: hp(2) },
-  profileSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatar: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: '#003087', justifyContent: 'center', alignItems: 'center' },
-  avatarText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
-  greeting: { fontSize: 13, color: '#003087' },
-  timeGreeting: { fontSize: 18, fontWeight: '600', color: '#003087' },
-  searchContainer: { flexDirection: 'row', paddingHorizontal: wp(5), marginBottom: hp(3), gap: 10 },
-  searchBar: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, paddingHorizontal: 15, height: 50 },
-  section: { marginBottom: hp(3) },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(5), marginBottom: hp(2) },
-  sectionTitle: { fontSize: 20, fontWeight: '600', color: '#003087' },
-  showAll: { fontSize: 14, color: '#D32F2F' },
-  transportGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 15, justifyContent: 'space-around' },
-  transportContainer: { paddingHorizontal: wp(5) },
-  transportItem: { alignItems: 'center', gap: 8 },
-  transportIconContainer: { width: 70, height: 70, borderRadius: 15, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  selectedTransportIcon: { backgroundColor: '#D32F2F' },
-  transportName: { fontSize: 12, color: '#003087', textAlign: 'center', maxWidth: 70 },
-  tricycleContainer: { marginBottom: 15 },
-  tricycleLabel: { fontSize: 14, color: '#666', marginBottom: 8, fontWeight: '500' },
-  trikeTypeRow: { flexDirection: 'row', gap: 10, marginBottom: 15 },
-  typeBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: '#D32F2F', alignItems: 'center' },
-  activeTypeBtn: { backgroundColor: '#D32F2F' },
-  typeBtnText: { color: '#D32F2F', fontWeight: '600' },
-  activeTypeBtnText: { color: 'white' },
-  passengerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  counterContainer: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  counterBtn: { backgroundColor: '#003087', width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' },
-  counterText: { fontSize: 18, fontWeight: 'bold', color: '#333', width: 20, textAlign: 'center' },
-  divider: { height: 1, backgroundColor: '#EEE', marginBottom: 15 },
-  discountRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  card: { width: 250, marginRight: wp(3), backgroundColor: '#FFF', borderRadius: 15, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
-  cardImageContainer: { position: 'relative', height: 180, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
-  cardImage: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' },
-  cardContent: { padding: 15 },
-  cardTitle: { fontSize: 16, fontWeight: '600', color: '#003087', marginBottom: 4 },
-  cardDistance: { fontSize: 13, color: '#666' },
-  recommendationsContainer: { paddingHorizontal: wp(5) },
-  blankImage: { backgroundColor: '#BBDEFB', flex: 1 },
-  fullRecommendationsContainer: { paddingHorizontal: wp(5) },
-  fullCard: { backgroundColor: 'white', borderRadius: 14, marginBottom: hp(2), overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 5, flexDirection: 'row', alignItems: 'center' },
-  fullCardImageContainer: { width: wp(35), height: hp(12) },
-  cardImagePlaceholder: { flex: 1, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
-  fullCardImage: { width: '100%', height: '100%' },
-  cardImageFill: { width: '100%', height: '100%' },
-  fullCardContent: { padding: wp(3), flex: 1, justifyContent: 'center' },
-  fullCardTitle: { fontSize: hp(2.0), fontWeight: '600', color: '#003087', marginBottom: hp(0.6) },
-  fullCardDistance: { fontSize: hp(1.6), color: '#666' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: wp(1.5) },
-  calculatorCard: { marginHorizontal: wp(5), backgroundColor: 'white', borderRadius: 20, padding: wp(5), shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5, position: 'relative' },
-  calculatorRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  leftIconsColumn: { alignItems: 'center', marginRight: wp(2), paddingTop: 5 },
-  verticalLine: { width: 0, height: hp(5.5), borderLeftWidth: 2, borderColor: '#CCC', borderStyle: 'dotted', marginVertical: 4 },
-  inputsColumn: { flex: 1, gap: hp(1.5) },
-  inputWrapperTop: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
-  inputWrapperBottom: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#DDD', borderRadius: 12, paddingHorizontal: wp(3), height: hp(6), overflow: 'visible' },
-  swapButton: { marginLeft: wp(3), padding: 8, alignSelf: 'center' },
-  distanceRow: { flexDirection: 'row', marginTop: hp(2.5), gap: wp(3) },
-  calculateBtn: { backgroundColor: '#D32F2F', borderRadius: 15, paddingHorizontal: wp(6), height: hp(5.5), justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, position: 'absolute', bottom: -35, right: 0, left: 170 },
-  calculateBtnText: { color: 'white', fontSize: hp(1.7), fontWeight: '600' },
-
-  // RECEIPT MODAL STYLES
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: wp(5) },
-  receiptContainer: { backgroundColor: 'white', borderRadius: 20, width: '100%', maxWidth: wp(90), shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 10 },
-  receiptHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: wp(5), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  receiptTitle: { fontSize: hp(2.5), fontWeight: 'bold', color: '#003087' },
-  closeButton: { padding: 5 },
-  receiptSection: { paddingHorizontal: wp(5), paddingVertical: hp(1.5) },
-  transportBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', backgroundColor: '#FFF5F5', paddingHorizontal: wp(4), paddingVertical: hp(1), borderRadius: 20, borderWidth: 1, borderColor: '#FFE5E5' },
-  transportBadgeText: { fontSize: hp(1.8), fontWeight: '600', color: '#D32F2F', marginLeft: wp(2) },
-  receiptRow: { flexDirection: 'row', alignItems: 'center', marginVertical: hp(0.5) },
-  receiptLabel: { fontSize: hp(1.6), color: '#666', marginLeft: wp(2), minWidth: wp(15) },
-  receiptValue: { fontSize: hp(1.6), color: '#333', fontWeight: '500', flex: 1, textAlign: 'right' },
-  receiptDivider: { height: 1, backgroundColor: '#F0F0F0', marginVertical: hp(1), marginLeft: wp(8) },
-  discountBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', backgroundColor: '#E8F5E8', paddingHorizontal: wp(4), paddingVertical: hp(1), borderRadius: 15, borderWidth: 1, borderColor: '#C8E6C9' },
-  discountBadgeText: { fontSize: hp(1.4), color: '#2E7D32', marginLeft: wp(2) },
-  receiptTotal: { backgroundColor: '#F8FAFF', margin: wp(5), marginBottom: hp(2), padding: wp(4), borderRadius: 15, borderWidth: 2, borderColor: '#BBDEFB', alignItems: 'center' },
-  totalLabel: { fontSize: hp(1.8), color: '#666', marginBottom: hp(0.5) },
-  totalAmount: { fontSize: hp(3), fontWeight: 'bold', color: '#003087' },
-  receiptActions: { flexDirection: 'row', padding: wp(5), paddingTop: 0, gap: wp(3) },
-  actionButtonSecondary: { flex: 1, backgroundColor: '#F5F5F5', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center', borderWidth: 1, borderColor: '#E0E0E0' },
-  actionButtonTextSecondary: { fontSize: hp(1.6), color: '#666', fontWeight: '600' },
-  actionButtonPrimary: { flex: 1, backgroundColor: '#D32F2F', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center' },
-  actionButtonTextPrimary: { fontSize: hp(1.6), color: '#FFF', fontWeight: '600' },
-
-  // CURRENT LOCATION BUTTON STYLES
-  currentLocationBtn: { 
-    position: 'absolute', 
-    right: 10, 
-    top: 10, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#F8FAFF', 
-    paddingHorizontal: 8, 
-    paddingVertical: 4, 
-    borderRadius: 12, 
-    borderWidth: 1, 
-    borderColor: '#D32F2F' 
-  },
-  currentLocationText: { 
-    fontSize: 12, 
-    color: '#D32F2F', 
-    marginLeft: 4, 
-    fontWeight: '500' 
-  },
-
-  // Location input text styles
-  locationInputText: {
-    flex: 1,
-    fontSize: hp(1.7),
-    color: '#333',
-    paddingVertical: 10,
-  },
-  placeholderText: {
-    color: '#999',
-  }
-});
