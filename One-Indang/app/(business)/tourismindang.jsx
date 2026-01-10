@@ -24,7 +24,7 @@ const wp = (p) => (p * deviceWidth) / 100;
 // BEIGE THEME
 const TOURISM_BEIGE = '#A68966'; 
 const LIGHT_BEIGE_BG = '#F5F5DC'; 
-const AGRI_HEART_RED = '#FF6B6B';
+const HEART_ORANGE = '#FF8C00'; // UPDATED: Orange Heart
 
 // --- DATA ---
 const BASE_DATA = [
@@ -174,7 +174,8 @@ export default function TourismScreen() {
                   <Ionicons name="share-social-outline" size={20} color="#000" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.circleBtn}>
-                  <Ionicons name="heart-outline" size={20} color="#000" />
+                  {/* UPDATED: Orange Heart */}
+                  <Ionicons name="heart-outline" size={20} color={HEART_ORANGE} />
                 </TouchableOpacity>
               </View>
             </SafeAreaView>
@@ -316,7 +317,8 @@ export default function TourismScreen() {
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.ratingTextSmall}>{item.rating} ★  •  {item.distance}</Text>
-                  <Ionicons name="heart-outline" size={22} color={AGRI_HEART_RED} />
+                  {/* UPDATED: Heart color to Orange */}
+                  <Ionicons name="heart-outline" size={22} color={HEART_ORANGE} />
                 </View>
               </View>
             </TouchableOpacity>

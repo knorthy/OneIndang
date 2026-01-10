@@ -24,7 +24,7 @@ const wp = (p) => (p * deviceWidth) / 100;
 // THEME COLORS
 const RETAIL_BLUE = '#3F51B5'; 
 const LIGHT_BLUE_BG = '#E8EAF6';
-const AGRI_HEART_RED = '#FF6B6B'; 
+const HEART_ORANGE = '#FF8C00'; // UPDATED: Orange for Heart
 
 // --- DATA ---
 const BASE_DATA = [
@@ -174,7 +174,8 @@ export default function RetailScreen() {
                   <Ionicons name="share-social-outline" size={20} color="#000" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.circleBtn}>
-                  <Ionicons name="heart-outline" size={20} color="#000" />
+                  {/* UPDATED: Heart color to Orange */}
+                  <Ionicons name="heart-outline" size={20} color={HEART_ORANGE} />
                 </TouchableOpacity>
               </View>
             </SafeAreaView>
@@ -205,7 +206,7 @@ export default function RetailScreen() {
               ))}
             </View>
 
-            {/* TAB CONTENT */}
+            {/* TAB CONTENT SWITCHER */}
             {activeTab === 'About' && renderAboutTab()}
             {activeTab === 'Gallery' && renderGalleryTab()}
             {activeTab === 'Review' && renderReviewTab()}
@@ -317,7 +318,8 @@ export default function RetailScreen() {
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.ratingTextSmall}>{item.rating} ★  •  {item.distance}</Text>
-                  <Ionicons name="heart-outline" size={22} color={AGRI_HEART_RED} />
+                  {/* UPDATED: Orange Heart */}
+                  <Ionicons name="heart-outline" size={22} color={HEART_ORANGE} />
                 </View>
               </View>
             </TouchableOpacity>
