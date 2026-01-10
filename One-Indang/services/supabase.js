@@ -11,7 +11,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false
+    detectSessionInUrl: false,
+    flowType: 'pkce' // Recommended for React Native
   }
 });
 
@@ -26,6 +27,20 @@ export const auth = {
         data: metadata
       }
     });
+    return { data, error };
+  },
+
+  // --- ADDED THIS: Fixes "verifyOtp is not a function" ---
+  verifyOtp: async (params) => {
+    // params = { email, token, type }
+    const { data, error } = await supabase.auth.verifyOtp(params);
+    return { data, error };
+  },
+
+  // --- ADDED THIS: Fixes "resend is not a function" ---
+  resend: async (params) => {
+    // params = { type: 'signup', email }
+    const { data, error } = await supabase.auth.resend(params);
     return { data, error };
   },
 

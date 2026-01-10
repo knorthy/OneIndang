@@ -13,7 +13,7 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router'; 
 import { hp, wp } from '../../helpers/common'; 
 import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
 import { showToast } from '../../components/Toast';
@@ -21,6 +21,7 @@ import { auth } from '../../services/supabase';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
+  const router = useRouter(); 
   const [currentStep, setCurrentStep] = useState(1); 
 
   const [showPassword, setShowPassword] = useState(false);
@@ -114,10 +115,14 @@ const AccountSetupScreen = () => {
     // Sign up with Supabase
     setIsLoading(true);
     try {
+      console.log('Attempting signup with:', { email, fullName, phone: `+63${phone}` });
+      
       const { data, error } = await auth.signUp(email, password, {
         full_name: fullName,
         phone: `+63${phone}`
       });
+
+      console.log('Signup response:', { data: data ? 'received' : 'null', error });
 
       if (error) {
         console.error('Signup error:', error);
@@ -125,19 +130,57 @@ const AccountSetupScreen = () => {
         return;
       }
 
-      if (data.user && !data.user.email_confirmed_at) {
-        // Email confirmation required
-        showToast('Please check your email for confirmation link');
-        setCurrentStep(2);
+      if (data.user) {
+        if (!data.user.email_confirmed_at) {
+          // Email confirmation required
+          showToast('Please check your email for the verification code');
+          setCurrentStep(2);
+        } else {
+          showToast('Account created successfully!');
+          router.replace('/login'); // Redirect to login immediately if no verification needed
+        }
       } else {
-        // Account created successfully
-        showToast('Account created successfully!');
-        // You might want to navigate to login or main screen here
+        showToast('Account creation failed - no user data');
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Signup exception:', error);
       showToast('An unexpected error occurred');
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- UPDATED: VERIFY OTP & REDIRECT TO LOGIN ---
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+    const token = otpCode.join(''); 
+
+    try {
+      // 1. Verify the code
+      const { data, error } = await auth.verifyOtp({
+        email: email,
+        token: token,
+        type: 'signup'
+      });
+
+      if (error) {
+        showToast(error.message || "Invalid verification code");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        showToast("Account Verified! Please log in.");
+        
+        // 2. Sign out immediately so they have to enter password on login screen
+        await auth.signOut(); 
+
+        // 3. Redirect to Login Page
+        router.replace('/login'); 
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      showToast("An error occurred during verification");
       setIsLoading(false);
     }
   };
@@ -178,15 +221,28 @@ const AccountSetupScreen = () => {
     }
   };
 
-  // RESEND HANDLER 
-  const handleResendCode = () => {
-    setTimer(60);
-    showToast("Verification code resent successfully.");
+  // --- RESEND HANDLER ---
+  const handleResendCode = async () => {
+    try {
+      const { error } = await auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) throw error;
+
+      setTimer(60);
+      showToast("Verification code resent successfully.");
+    } catch (error) {
+      showToast(error.message || "Failed to resend code");
+    }
   };
 
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1); 
+    } else {
+        router.back(); 
     }
   };
 
@@ -219,7 +275,7 @@ const AccountSetupScreen = () => {
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* SATE ONE*/}
+                {/* STEP ONE*/}
                 {currentStep === 1 && (
                     <>
                         <Text style={styles.title}>Complete your account setup</Text>
@@ -300,7 +356,7 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
-                {/* STATE TWO */}
+                {/* STEP TWO */}
                 {currentStep === 2 && (
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
@@ -361,14 +417,16 @@ const AccountSetupScreen = () => {
             ) : (
                 <TouchableOpacity 
                     activeOpacity={0.8}
-                    disabled={!isFullCode}
-                    onPress={() => showToast("Account Verified Successfully!")}
+                    disabled={!isFullCode || isLoading}
+                    onPress={handleVerifyOtp} 
                     style={[
                         styles.button, 
                         { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
                     ]}
                 >
-                    <Text style={styles.buttonText}>Continue</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Verifying...' : 'Continue'} 
+                    </Text>
                 </TouchableOpacity>
             )}
 
