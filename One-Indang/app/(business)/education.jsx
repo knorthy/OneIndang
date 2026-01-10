@@ -1,0 +1,427 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  Image, 
+  TouchableOpacity, 
+  TextInput, 
+  Dimensions, 
+  Linking, 
+  Share, 
+  Alert 
+} from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  EDUCATION_INSTITUTIONS, 
+  EDUCATION_FILTERS, 
+  EDUCATION_GALLERY_IMGS, 
+  EDUCATION_REVIEWS_DATA 
+} from '../../constants/businessData';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+// RESPONSIVE DIMENSIONS
+const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
+const hp = (p) => (p * deviceHeight) / 100;
+const wp = (p) => (p * deviceWidth) / 100;
+
+// EDUCATION THEME
+const EDU_BLUE = '#1A73E8'; 
+const LIGHT_EDU_BG = '#E8F0FE';
+const PRIMARY_BLUE = '#2D6BFF';
+const AGRI_HEART_RED = '#FF6B6B'; 
+
+export default function EducationScreen() {
+  const router = useRouter();
+  const [selectedItem, setSelectedItem] = useState(null); 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('About');
+
+  // --- ACTIONS ---
+  const handleInquiry = () => {
+    Alert.alert("Coming Soon", "This feature is not available coming soon...");
+  };
+
+  const handleShare = async (item) => {
+    if (!item) return;
+    try {
+      await Share.share({ message: `Check out ${item.name} in Indang!`, url: item.image });
+    } catch (error) { console.log(error.message); }
+  };
+
+  const handleCall = (phone) => {
+    if(phone) Linking.openURL(`tel:${phone}`);
+  };
+
+  // --- TAB RENDERERS ---
+
+  // 1. ABOUT TAB
+  const renderAboutTab = () => (
+    <View style={{ marginTop: hp(2) }}>
+      <View style={styles.amenitiesRow}>
+        <View style={styles.amenity}>
+          <Ionicons name="book-outline" size={22} color={EDU_BLUE} />
+          <Text style={styles.amenityText}>{selectedItem?.beds} Rooms</Text>
+        </View>
+        <View style={styles.amenity}>
+          <MaterialCommunityIcons name="shield-check-outline" size={22} color={EDU_BLUE} />
+          <Text style={styles.amenityText}>Accredited</Text>
+        </View>
+        <View style={styles.amenity}>
+          <MaterialCommunityIcons name="vector-square" size={22} color={EDU_BLUE} />
+          <Text style={styles.amenityText}>{selectedItem?.sqft} sqft</Text>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>About Institution</Text>
+      <Text style={styles.description}>
+        {selectedItem?.sub}. A cornerstone of the Indang community, providing quality education and fostering growth for students in the region.
+        <Text style={styles.readMore}> Read more</Text>
+      </Text>
+
+      <Text style={styles.sectionTitle}>Contact Person</Text>
+      <View style={styles.agentRow}>
+        <Image source={{ uri: 'https://i.pravatar.cc/150?u=edu' }} style={styles.agentAvatar} />
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.agentName}>{selectedItem?.agent || 'Admin'}</Text>
+          <Text style={styles.agentTitle}>Administrative Officer</Text>
+        </View>
+        <View style={styles.agentActions}>
+          <TouchableOpacity style={styles.agentActionBtn} onPress={() => handleCall(selectedItem?.phone)}>
+            <Ionicons name="call-outline" size={20} color={EDU_BLUE} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
+  // 2. GALLERY TAB
+  const renderGalleryTab = () => (
+    <View style={styles.galleryGrid}>
+      {EDUCATION_GALLERY_IMGS.map((img, index) => (
+        <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
+      ))}
+    </View>
+  );
+
+  // 3. REVIEW TAB
+  const renderReviewTab = () => (
+    <View style={{ marginTop: hp(2) }}>
+      {EDUCATION_REVIEWS_DATA.map((review) => (
+        <View key={review.id} style={styles.reviewItem}>
+          <View style={styles.reviewHeader}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+               <View style={styles.reviewAvatar}><Text style={{color: EDU_BLUE, fontWeight: 'bold'}}>{review.user[0]}</Text></View>
+               <Text style={styles.reviewUser}>{review.user}</Text>
+            </View>
+            <Text style={styles.reviewDate}>{review.date}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', marginBottom: 5, paddingLeft: 52 }}>
+            {[1,2,3,4,5].map(s => (
+              <Ionicons key={s} name="star" size={14} color={s <= review.rating ? "#FFB800" : "#DDD"} />
+            ))}
+          </View>
+          <Text style={styles.reviewComment}>{review.comment}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
+  // --- MAIN RENDERERS ---
+
+  const renderDetails = () => {
+    if (!selectedItem) return null;
+
+    return (
+      <View style={styles.detailContainer}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: hp(15) }}>
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: selectedItem?.image }} style={styles.mainImage} />
+            <SafeAreaView style={styles.headerOverlay} edges={['top']}>
+              <TouchableOpacity style={styles.circleBtn} onPress={() => setSelectedItem(null)}>
+                <Ionicons name="arrow-back" size={20} color="#000" />
+              </TouchableOpacity>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity style={[styles.circleBtn, { marginRight: 10 }]} onPress={() => handleShare(selectedItem)}>
+                  <Ionicons name="share-social-outline" size={20} color="#000" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.circleBtn}>
+                  <Ionicons name="heart-outline" size={20} color={AGRI_HEART_RED} />
+                </TouchableOpacity>
+              </View>
+            </SafeAreaView>
+          </View>
+
+          <View style={styles.contentPadding}>
+            <View style={styles.rowBetween}>
+              <View style={styles.typeBadge}><Text style={styles.typeText}>{selectedItem?.category}</Text></View>
+              <View style={styles.ratingRow}>
+                <Ionicons name="star" size={16} color="#FFB800" />
+                <Text style={styles.ratingText}> {selectedItem?.rating} (Rating)</Text>
+              </View>
+            </View>
+
+            <Text style={styles.title}>{selectedItem?.name}</Text>
+            <Text style={styles.address}>{selectedItem?.location}</Text>
+
+            {/* TABS */}
+            <View style={styles.tabContainer}>
+              {['About', 'Gallery', 'Review'].map((tab) => (
+                <TouchableOpacity 
+                  key={tab} 
+                  onPress={() => setActiveTab(tab)} 
+                  style={[styles.tabItem, activeTab === tab && styles.activeTabItem]}
+                >
+                  <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* TAB CONTENT SWITCHER */}
+            {activeTab === 'About' && renderAboutTab()}
+            {activeTab === 'Gallery' && renderGalleryTab()}
+            {activeTab === 'Review' && renderReviewTab()}
+          </View>
+        </ScrollView>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <View>
+            <Text style={styles.footerLabel}>Est. Tuition</Text>
+            <Text style={styles.priceText}>₱{selectedItem?.price} <Text style={styles.perMonth}>/sem</Text></Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.bookBtn, {backgroundColor: EDU_BLUE}]}
+            onPress={handleInquiry}
+          >
+            <Text style={styles.bookBtnText}>Inquire Now</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  // Filter Logic
+  const filteredData = useMemo(() => {
+    const category = EDUCATION_FILTERS[activeIndex];
+    return EDUCATION_INSTITUTIONS.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            item.sub.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = category === 'All' || item.category === category;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, activeIndex]);
+
+  const renderList = () => (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      {/* SCROLLVIEW WITH STICKY HEADER at Index 1 */}
+      <ScrollView 
+        stickyHeaderIndices={[1]} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: hp(5) }}
+      >
+        
+        {/* Index 0: Header (Scrolls away) */}
+        <View style={styles.headerBox}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={24} color={EDU_BLUE} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Education</Text>
+        </View>
+
+        {/* Index 1: Sticky Search & Filters */}
+        <View style={styles.stickyContainer}>
+          <View style={styles.searchContainer}>
+            <View style={styles.searchBar}>
+              <TextInput 
+                placeholder="Search schools or levels..." 
+                style={styles.searchInput}
+                placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              <Ionicons name="search" size={20} color={EDU_BLUE} />
+            </View>
+          </View>
+
+          <View style={styles.filterRowContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+              {EDUCATION_FILTERS.map((filter, index) => (
+                <TouchableOpacity 
+                  key={filter} 
+                  onPress={() => setActiveIndex(index)}
+                  style={[styles.filterPill, activeIndex === index && styles.activePill]}
+                >
+                  <Text style={[styles.filterText, activeIndex === index && styles.activeFilterText]}>{filter}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+
+        {/* Index 2: List Content */}
+        <View style={styles.listContent}>
+          {filteredData.map((item) => (
+            <TouchableOpacity key={item.id} style={styles.itemContainer} activeOpacity={0.8} onPress={() => setSelectedItem(item)}>
+              <View style={styles.imageWrapper}>
+                <Image source={{ uri: item.image }} style={styles.bizImage} />
+                {item.verified && (
+                  <View style={styles.checkBadge}>
+                    <Ionicons name="school" size={14} color={EDU_BLUE} />
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.infoWrapper}>
+                <View style={styles.titleRow}>
+                  <Text style={styles.bizName} numberOfLines={1}>{item.name}</Text>
+                  {item.tag && (
+                    <View style={styles.labelBadge}><Text style={styles.labelText}>{item.tag}</Text></View>
+                  )}
+                </View>
+                <Text style={styles.bizSub} numberOfLines={1}>{item.sub}</Text>
+                <View style={styles.locationRow}>
+                  <Ionicons name="location-sharp" size={14} color="#888" />
+                  <Text style={styles.locationText} numberOfLines={1}>{item.location}</Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <Text style={styles.ratingTextSmall}>{item.rating} ★  •  {item.distance}</Text>
+                  <Ionicons name="heart-outline" size={22} color={AGRI_HEART_RED} />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  return selectedItem ? renderDetails() : renderList();
+}
+
+const styles = StyleSheet.create({
+  // CONTAINER
+  container: { flex: 1, backgroundColor: '#FFF' },
+  
+  // HEADER
+  headerBox: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: wp(4), 
+    paddingTop: hp(1), 
+    paddingBottom: hp(1),
+    backgroundColor: '#FFF'
+  },
+  headerTitle: { fontSize: wp(6), fontWeight: 'bold', marginLeft: wp(2), color: EDU_BLUE },
+  backBtn: { padding: 4 },
+
+  // STICKY CONTAINER
+  stickyContainer: {
+    backgroundColor: '#FFF',
+    paddingBottom: hp(1),
+    paddingTop: hp(1),
+    elevation: 4, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    zIndex: 10,
+  },
+  searchContainer: { paddingHorizontal: wp(4), marginBottom: hp(1.5) },
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F9F9F9', borderRadius: 25, paddingHorizontal: 15, height: 45, borderWidth: 1, borderColor: '#EEE' },
+  searchInput: { flex: 1, fontSize: wp(3.8), color: '#333' },
+  
+  filterRowContainer: { marginBottom: 5 },
+  filterScroll: { paddingHorizontal: wp(4) },
+  filterPill: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#DDD' },
+  activePill: { backgroundColor: EDU_BLUE, borderColor: EDU_BLUE },
+  filterText: { color: '#666', fontWeight: '600', fontSize: wp(3.5) },
+  activeFilterText: { color: '#FFF' },
+
+  // LIST CONTENT
+  listContent: { paddingHorizontal: wp(4), marginTop: hp(1) },
+  itemContainer: { flexDirection: 'row', marginBottom: hp(2.5), alignItems: 'center' },
+  imageWrapper: { position: 'relative' },
+  bizImage: { width: wp(32), height: wp(28), borderRadius: 16, backgroundColor: '#EEE' },
+  checkBadge: { position: 'absolute', bottom: -5, right: -5, backgroundColor: '#FFF', borderRadius: 12, padding: 4, elevation: 2 },
+  infoWrapper: { flex: 1, marginLeft: wp(4), justifyContent: 'center' },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  bizName: { fontSize: wp(4.1), fontWeight: 'bold', color: '#111', flex: 1, marginRight: 8 },
+  labelBadge: { backgroundColor: LIGHT_EDU_BG, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  labelText: { color: EDU_BLUE, fontSize: wp(2.4), fontWeight: 'bold', textTransform: 'uppercase' },
+  bizSub: { fontSize: wp(3.3), color: '#777', marginTop: 2 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  locationText: { fontSize: wp(3), color: '#888', marginLeft: 2 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  ratingTextSmall: { fontSize: wp(3.5), color: '#666', fontWeight: '600' },
+
+  // DETAIL VIEW STYLES
+  detailContainer: { flex: 1, backgroundColor: '#FFF' },
+  imageContainer: { width: wp(100), height: hp(40) },
+  mainImage: { width: '100%', height: '100%' },
+  headerOverlay: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(5) },
+  circleBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
+  contentPadding: { paddingHorizontal: wp(5), paddingTop: hp(2) },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  typeBadge: { backgroundColor: LIGHT_EDU_BG, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
+  typeText: { color: EDU_BLUE, fontWeight: '600' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center' },
+  ratingText: { color: '#888', fontSize: 13 },
+  title: { fontSize: 24, fontWeight: 'bold', marginTop: 10 },
+  address: { color: '#7D7F88' },
+  
+  // TABS
+  tabContainer: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', marginTop: hp(2) },
+  tabItem: { paddingVertical: 12, marginRight: wp(8) },
+  activeTabItem: { borderBottomWidth: 3, borderBottomColor: EDU_BLUE },
+  tabText: { color: '#7D7F88', fontSize: 16, fontWeight: '600' },
+  activeTabText: { color: EDU_BLUE },
+  
+  // AMENITIES
+  amenitiesRow: { flexDirection: 'row', marginTop: hp(2), justifyContent: 'space-between' },
+  amenity: { flexDirection: 'row', alignItems: 'center' },
+  amenityText: { marginLeft: 6, fontWeight: '500' },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: hp(3) },
+  description: { color: '#7D7F88', lineHeight: 22 },
+  readMore: { color: EDU_BLUE, fontWeight: '600' },
+  agentRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
+  agentAvatar: { width: 50, height: 50, borderRadius: 25 },
+  agentName: { fontWeight: 'bold', fontSize: 16 },
+  agentTitle: { color: '#7D7F88' },
+  agentActions: { flexDirection: 'row' },
+  agentActionBtn: { width: 40, height: 40, borderRadius: 10, backgroundColor: LIGHT_EDU_BG, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
+  
+  // GALLERY
+  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: hp(2) },
+  galleryImg: { width: wp(43), height: wp(43), borderRadius: 15, marginBottom: 15, backgroundColor: '#EEE' },
+
+  // REVIEWS
+  reviewItem: { marginBottom: 20, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
+  reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  reviewAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: LIGHT_EDU_BG, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  reviewUser: { fontWeight: 'bold', fontSize: 15, color: '#333' },
+  reviewDate: { color: '#999', fontSize: 12 },
+  reviewComment: { color: '#555', lineHeight: 20, paddingLeft: 52 },
+
+  // FOOTER
+  footer: { 
+    position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', 
+    paddingHorizontal: wp(5), paddingBottom: hp(4), paddingTop: 15, 
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
+    borderTopLeftRadius: 30, borderTopRightRadius: 30, elevation: 20,
+    shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 10,
+  },
+  footerLabel: { color: '#7D7F88' },
+  priceText: { fontSize: 20, fontWeight: 'bold', color: EDU_BLUE },
+  perMonth: { fontSize: 14, fontWeight: 'normal' },
+  bookBtn: { paddingHorizontal: wp(10), paddingVertical: hp(2), borderRadius: 15 },
+  bookBtnText: { color: '#FFF', fontWeight: 'bold' }
+});
