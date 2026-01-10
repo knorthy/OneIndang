@@ -36,12 +36,12 @@ export default function HomeScreen() {
     {
       title: "Students",
       icon: <MaterialCommunityIcons name="school" size={40} color="#D32F2F" />,
-      route: "/studmain", 
+      route: "Students", 
     },
     {
       title: "Emergency",
       icon: <Ionicons name="warning" size={38} color="#D32F2F" />,
-      route: "/emergency",
+      route: "(emergency)/emergency", 
     },
     {
       title: "Transport",
@@ -51,7 +51,7 @@ export default function HomeScreen() {
     {
       title: "Business",
       icon: <FontAwesome name="building" size={36} color="#D32F2F" />,
-      route: "/business",
+      route: "(business)/business",
     },
   ];
 
@@ -70,7 +70,6 @@ export default function HomeScreen() {
           style={styles.mapBackground}
           resizeMode="cover"
         >
-          {/* Search & Notification */}
           <View style={styles.searchBarContainer}>
             <View style={styles.searchInput}>
               <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
@@ -94,7 +93,6 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.sectionTitle}>What would you like to do?</Text>
 
-        {/* Services Grid */}
         <View style={styles.servicesGrid}>
           {services.map((service, index) => (
             <TouchableOpacity
@@ -109,7 +107,6 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* Bottom CTA */}
         <View style={styles.bottomBanner}>
           <Text style={styles.bannerTitle}>Help us improve our city</Text>
           <Text style={styles.bannerSubtitle}>
@@ -126,24 +123,11 @@ export default function HomeScreen() {
   );
 }
 
-// All styles moved here - clean and reusable
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8FAFF",
-  },
-  mapHeader: {
-    height: hp(33),
-  },
-  mapBackground: {
-    flex: 1,
-  },
-  searchBarContainer: {
-    flexDirection: "row",
-    paddingHorizontal: wp(5),
-    paddingTop: hp(4.5),
-    alignItems: "center",
-  },
+  container: { flex: 1, backgroundColor: "#F8FAFF" },
+  mapHeader: { height: hp(35) },
+  mapBackground: { flex: 1 },
+  searchBarContainer: { flexDirection: "row", paddingHorizontal: wp(5), paddingTop: hp(6), alignItems: "center" },
   searchInput: {
     flex: 1,
     backgroundColor: "white",
@@ -158,29 +142,10 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 8,
   },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchPlaceholder: {
-    color: "#999",
-    fontSize: 16,
-  },
-  notificationButton: {
-    backgroundColor: "white",
-    padding: 12,
-    borderRadius: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    elevation: 8,
-  },
-  mainTitle: {
-    fontSize: 38,
-    fontWeight: "900",
-    color: "#003087",
-    marginLeft: wp(5),
-    marginTop: hp(4),
-    letterSpacing: 0.5,
-  },
+  searchIcon: { marginRight: 8 },
+  searchPlaceholder: { color: "#999", fontSize: 16 },
+  notificationButton: { backgroundColor: "white", padding: 12, borderRadius: 30, shadowColor: "#000", shadowOpacity: 0.15, elevation: 8 },
+  mainTitle: { fontSize: 38, fontWeight: "900", color: "#003087", marginLeft: wp(5), marginTop: hp(4), letterSpacing: 0.5 },
   createAccountButton: {
     backgroundColor: "white",
     alignSelf: "flex-start",
@@ -196,31 +161,11 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 10,
   },
-  createAccountText: {
-    color: "#D32F2F",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  arrowIcon: {
-    marginLeft: 8,
-  },
-  scrollContent: {
-    paddingBottom: hp(5),
-  },
-  sectionTitle: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#003087",
-    marginLeft: wp(5),
-    marginTop: hp(4),
-    marginBottom: hp(3),
-  },
-  servicesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: wp(5),
-  },
+  createAccountText: { color: "#D32F2F", fontWeight: "700", fontSize: 16 },
+  arrowIcon: { marginLeft: 8 },
+  scrollContent: { paddingBottom: hp(5) },
+  sectionTitle: { fontSize: 28, fontWeight: "800", color: "#003087", marginLeft: wp(5), marginTop: hp(4), marginBottom: hp(3) },
+  servicesGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", paddingHorizontal: wp(5) },
   serviceCard: {
     width: wp(42),
     backgroundColor: "white",
@@ -234,45 +179,10 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 10,
   },
-  serviceTitle: {
-    marginTop: 12,
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#003087",
-    textAlign: "center",
-  },
-  bottomBanner: {
-    marginHorizontal: wp(5),
-    marginTop: hp(5),
-    backgroundColor: "#003087",
-    borderRadius: 24,
-    paddingVertical: hp(6),
-    paddingHorizontal: wp(6),
-    alignItems: "center",
-  },
-  bannerTitle: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "white",
-    textAlign: "center",
-  },
-  bannerSubtitle: {
-    fontSize: 16,
-    color: "#BBDEFB",
-    textAlign: "center",
-    marginTop: 12,
-    lineHeight: 24,
-  },
-  signInButton: {
-    marginTop: hp(3),
-    backgroundColor: "white",
-    paddingHorizontal: wp(25),
-    paddingVertical: 16,
-    borderRadius: 30,
-  },
-  signInText: {
-    color: "#D32F2F",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
+  serviceTitle: { marginTop: 12, fontSize: 15, fontWeight: "600", color: "#003087", textAlign: "center" },
+  bottomBanner: { marginHorizontal: wp(5), marginTop: hp(5), backgroundColor: "#003087", borderRadius: 24, paddingVertical: hp(6), paddingHorizontal: wp(6), alignItems: "center" },
+  bannerTitle: { fontSize: 26, fontWeight: "bold", color: "white", textAlign: "center" },
+  bannerSubtitle: { fontSize: 16, color: "#BBDEFB", textAlign: "center", marginTop: 12, lineHeight: 24 },
+  signInButton: { marginTop: hp(3), backgroundColor: "white", paddingHorizontal: wp(25), paddingVertical: 16, borderRadius: 30 },
+  signInText: { color: "#D32F2F", fontWeight: "bold", fontSize: 18 },
 });
