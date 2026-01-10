@@ -143,7 +143,7 @@ export default function App() {
   };
 
   const decrementPassenger = () => {
-    if (passengerCount > 1) setPassengerCount(prev => prev - 1);
+    if (passengerCount > 2) setPassengerCount(prev => prev - 1);
   };
 
   const swapLocations = () => {
