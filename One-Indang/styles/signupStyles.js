@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
 
   footerContainer: {
     position: 'absolute',
-    bottom: hp(1),
+    bottom: hp(6),
     left: 0,
     right: 0,
     paddingHorizontal: wp(10),
