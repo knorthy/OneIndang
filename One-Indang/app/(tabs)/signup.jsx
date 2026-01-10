@@ -6,7 +6,6 @@ import {
   TouchableOpacity, 
   KeyboardAvoidingView, 
   Platform, 
-  Alert,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView
@@ -17,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { hp, wp } from '../../helpers/common'; 
 import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
+import { showToast } from '../../components/Toast';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
@@ -108,7 +108,8 @@ const AccountSetupScreen = () => {
       setCurrentStep(2);
       setTimer(60);
     } else {
-      console.log("Validation failed", newErrors);
+
+        console.log("Validation failed", newErrors);
     }
   };
 
@@ -118,17 +119,13 @@ const AccountSetupScreen = () => {
     return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
 
-  // --- SMART FOCUS LOGIC START ---
+  // SMART FOCUS LOGIC
   const handleInputFocus = (index) => {
-    // 1. Find the index of the first empty slot
     const firstEmptyIndex = otpCode.findIndex((digit) => digit === '');
-    
-    // 2. If the user clicked a slot LATER than the empty one, force focus back
     if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
         inputRefs.current[firstEmptyIndex]?.focus();
     }
   };
-  // --- SMART FOCUS LOGIC END ---
 
   const handleOtpChange = (text, index) => {
     if (/[^0-9]/.test(text)) return;
@@ -152,9 +149,10 @@ const AccountSetupScreen = () => {
     }
   };
 
+  // RESEND HANDLER 
   const handleResendCode = () => {
     setTimer(60);
-    Alert.alert("Code Resent", "A new verification code has been sent to your number.");
+    showToast("Verification code resent successfully.");
   };
 
   const handleBack = () => {
@@ -192,7 +190,7 @@ const AccountSetupScreen = () => {
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* ---------------- STEP 1 ---------------- */}
+                {/* SATE ONE*/}
                 {currentStep === 1 && (
                     <>
                         <Text style={styles.title}>Complete your account setup</Text>
@@ -273,7 +271,7 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
-                {/* ---------------- STEP 2 ---------------- */}
+                {/* STATE TWO */}
                 {currentStep === 2 && (
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
@@ -292,9 +290,7 @@ const AccountSetupScreen = () => {
                               ]}
                               keyboardType="number-pad"
                               maxLength={1}
-                              // Highlight text so user can easily replace it if they tap back
                               selectTextOnFocus={true} 
-                              // --- ATTACH SMART FOCUS HERE ---
                               onFocus={() => handleInputFocus(index)}
                               value={digit}
                               onChangeText={(text) => handleOtpChange(text, index)}
@@ -334,7 +330,7 @@ const AccountSetupScreen = () => {
                 <TouchableOpacity 
                     activeOpacity={0.8}
                     disabled={!isFullCode}
-                    onPress={() => Alert.alert("Success", "Account Created!")}
+                    onPress={() => showToast("Account Verified Successfully!")}
                     style={[
                         styles.button, 
                         { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
@@ -344,7 +340,6 @@ const AccountSetupScreen = () => {
                 </TouchableOpacity>
             )}
 
-            {/* Sign in link removed for OTP step */}
             {currentStep === 1 && (
                 <View style={styles.signinContainer}>
                     <Text style={styles.signinText}>Already have an account? </Text>

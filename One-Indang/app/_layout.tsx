@@ -5,6 +5,7 @@ import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import Toast from '../components/Toast';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -23,6 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="(services)" options={{ headerShown: false }} />
           <Stack.Screen name="(students)" options={{ headerShown: false }} />
         </Stack>
+        <Toast />
         <StatusBar style="auto" />
       </ThemeProvider>
     </GestureHandlerRootView>
