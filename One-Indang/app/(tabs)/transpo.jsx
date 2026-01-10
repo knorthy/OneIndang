@@ -11,15 +11,15 @@ import {
   Alert,
   Keyboard,
   LogBox,
-  Linking, // Added for Google Maps
-  Switch,   // Added for Discount Toggle
-  Modal     // Added for Receipt Modal
+  Linking, //  for Google Maps
+  Switch,   //  for Discount Toggle
+  Modal     //  for Receipt Modal
 } from 'react-native';
 import LocationPickerModal from '../../components/LocationPickerModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
-import * as Location from 'expo-location'; // Added for GPS functionality
+import * as Location from 'expo-location'; //  for GPS functionality
 import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
@@ -38,7 +38,7 @@ const TransportIcon = ({ name, icon, onPress, isSelected }) => (
 );
 
 export default function App() {
-  const [userName, setUserName] = useState('North');
+  const [userName, setUserName] = useState(null);
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
@@ -395,15 +395,27 @@ export default function App() {
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+          {userName ? (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+              </View>
+              <View>
+                <Text style={styles.greeting}>Hi {userName}</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.greeting}>Hi {userName}</Text>
-              <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+          ) : (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Icon name="person" size={24} color="#D32F2F" />
+              </View>
+              <View>
+                <Text style={styles.greeting}>Welcome to One-Indang</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Search Bar - Local search for Indang recommendations */}
@@ -518,7 +530,7 @@ export default function App() {
                     style={[styles.locationInputText, !origin && styles.placeholderText]}
                     numberOfLines={1}
                   >
-                    {origin?.desc || 'Tap to select starting point'}
+                    {origin?.desc || 'Select starting point'}
                   </Text>
                   <TouchableOpacity
                     style={styles.currentLocationBtn}
@@ -540,7 +552,7 @@ export default function App() {
                     style={[styles.locationInputText, !destination && styles.placeholderText]}
                     numberOfLines={1}
                   >
-                    {destination?.desc || 'Tap to select destination'}
+                    {destination?.desc || 'Select destination'}
                   </Text>
                   <Icon name="chevron-right" size={20} color="#999" />
                 </TouchableOpacity>
