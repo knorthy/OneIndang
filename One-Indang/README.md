@@ -20,6 +20,10 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo install react-native-maps
 
    npm install semver
+
+   npm i @gorhom/bottom-sheet
+
+   npm install @supabase/supabase-js
    ```
 
 2. Start the app
@@ -39,7 +43,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    
    2. npm install
 
-   3. install  the dependecy that is not working because of the npm token error
+   3. install  the dependecy (ex. npx expo install ract-native-maps) that is not working because of the npm token error
 
    4. npx expo start --clear 
    ```

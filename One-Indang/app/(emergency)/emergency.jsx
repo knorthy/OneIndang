@@ -255,6 +255,7 @@ const SlideToCall911 = ({ onCall }) => {
 };
 
 const styles = StyleSheet.create({
+  
   container: { flex: 1, backgroundColor: "#F8FAFF" },
   appHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: wp(5), paddingTop: hp(4), paddingBottom: hp(1) },
   headerTitle: { fontSize: wp(8), fontWeight: "900", color: "#003087" },
