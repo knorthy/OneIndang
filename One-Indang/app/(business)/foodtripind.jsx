@@ -10,7 +10,12 @@ const hp = (p) => (p * deviceHeight) / 100;
 const wp = (p) => (p * deviceWidth) / 100;
 
 // IMPORT DATA
-import styles, { VIBRANT_ORANGE } from './styles/foodtripind.styles';
+import { FOOD_DATA } from '../../constants/businessData';
+
+// THEME COLORS
+const VIBRANT_ORANGE = '#FF7043'; 
+const LIGHT_ORANGE_BG = '#FFF3E0'; 
+const PRIMARY_BLUE = '#2D6BFF'; // For spec icons
 
 const FILTERS = ['All', 'Fast Food', 'Cafes', 'Native', 'Desserts'];
 
@@ -218,3 +223,73 @@ export default function FoodScreen() {
 
   return selectedItem ? renderDetails() : renderList();
 }
+
+const styles = StyleSheet.create({
+  // LIST STYLES
+  container: { flex: 1, backgroundColor: '#FFF' },
+  header: { flexDirection: 'row', alignItems: 'center', padding: wp(4) },
+  headerTitle: { fontSize: wp(6), fontWeight: 'bold', marginLeft: wp(2), color: VIBRANT_ORANGE },
+  backBtn: { padding: 4 },
+  searchContainer: { paddingHorizontal: wp(4), marginBottom: hp(1.5) },
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F9F9F9', borderRadius: 25, paddingHorizontal: 15, height: 45, borderWidth: 1, borderColor: '#EEE' },
+  searchInput: { flex: 1, fontSize: wp(3.8), color: '#333' },
+  filterRowContainer: { marginBottom: hp(1.5) },
+  filterScroll: { paddingHorizontal: wp(4) },
+  filterPill: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#DDD' },
+  activePill: { backgroundColor: VIBRANT_ORANGE, borderColor: VIBRANT_ORANGE },
+  filterText: { color: '#666', fontWeight: '600', fontSize: wp(3.5) },
+  activeFilterText: { color: '#FFF' },
+  listContent: { paddingHorizontal: wp(4), paddingBottom: hp(5) },
+  itemContainer: { flexDirection: 'row', marginBottom: hp(2.5), alignItems: 'center' },
+  imageWrapper: { position: 'relative' },
+  bizImage: { width: wp(32), height: wp(28), borderRadius: 16, backgroundColor: '#EEE' },
+  checkBadge: { position: 'absolute', bottom: -5, right: -5, backgroundColor: '#FFF', borderRadius: 12, padding: 2 },
+  infoWrapper: { flex: 1, marginLeft: wp(4), justifyContent: 'center' },
+  nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  bizName: { fontSize: wp(4.1), fontWeight: 'bold', color: '#111', flex: 1, marginRight: 8 },
+  labelBadge: { backgroundColor: LIGHT_ORANGE_BG, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  labelText: { color: VIBRANT_ORANGE, fontSize: wp(2.4), fontWeight: 'bold', textTransform: 'uppercase' },
+  bizSub: { fontSize: wp(3.3), color: '#777', marginTop: 2 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  locationText: { fontSize: wp(3), color: '#888', marginLeft: 2 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  ratingTextSmall: { fontSize: wp(3.5), color: '#666', fontWeight: '600' },
+
+  // DETAIL VIEW STYLES
+  detailContainer: { flex: 1, backgroundColor: '#FFF' },
+  imageContainer: { width: wp(100), height: hp(40) },
+  mainImage: { width: '100%', height: '100%' },
+  headerOverlay: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(5) },
+  circleBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
+  contentPadding: { paddingHorizontal: wp(5), paddingTop: hp(2) },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  typeBadge: { backgroundColor: LIGHT_ORANGE_BG, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
+  typeText: { color: VIBRANT_ORANGE, fontWeight: '600' },
+  ratingRow: { flexDirection: 'row', alignItems: 'center' },
+  ratingText: { color: '#888', fontSize: 13 },
+  title: { fontSize: 24, fontWeight: 'bold', marginTop: 10 },
+  address: { color: '#7D7F88' },
+  tabContainer: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', marginTop: hp(2) },
+  tabItem: { paddingVertical: 12, marginRight: wp(8) },
+  activeTabItem: { borderBottomWidth: 3, borderBottomColor: VIBRANT_ORANGE },
+  tabText: { color: '#7D7F88', fontSize: 16, fontWeight: '600' },
+  activeTabText: { color: VIBRANT_ORANGE },
+  amenitiesRow: { flexDirection: 'row', marginTop: hp(2), justifyContent: 'space-between' },
+  amenity: { flexDirection: 'row', alignItems: 'center' },
+  amenityText: { marginLeft: 6, fontWeight: '500' },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: hp(3) },
+  description: { color: '#7D7F88', lineHeight: 22 },
+  readMore: { color: VIBRANT_ORANGE, fontWeight: '600' },
+  agentRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
+  agentAvatar: { width: 50, height: 50, borderRadius: 25 },
+  agentName: { fontWeight: 'bold', fontSize: 16 },
+  agentTitle: { color: '#7D7F88' },
+  agentActions: { flexDirection: 'row' },
+  agentActionBtn: { width: 40, height: 40, borderRadius: 10, backgroundColor: LIGHT_ORANGE_BG, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', paddingHorizontal: wp(5), paddingBottom: hp(4), paddingTop: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopLeftRadius: 30, borderTopRightRadius: 30, elevation: 20 },
+  footerLabel: { color: '#7D7F88' },
+  priceText: { fontSize: 20, fontWeight: 'bold', color: VIBRANT_ORANGE },
+  perMonth: { fontSize: 14, fontWeight: 'normal' },
+  bookBtn: { paddingHorizontal: wp(10), paddingVertical: hp(2), borderRadius: 15 },
+  bookBtnText: { color: '#FFF', fontWeight: 'bold' }
+});

@@ -18,7 +18,6 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 // --- HELPERS IMPORT ---
 import { hp, wp } from '../../helpers/common';
 import { BUSINESS_CATEGORIES, POPULAR_BUSINESSES, BUSINESS_SETUP_STAGES } from '../../constants/businessData'; 
-import styles from './styles/business.styles';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -274,7 +273,7 @@ const Feature = ({ icon, label }) => (
 );
 
 // --- STYLES ---
-const localStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   headerBox: { padding: wp(6), alignItems: 'center' },
   title: { fontSize: wp(7), fontWeight: '900', color: THEME_BLUE },
