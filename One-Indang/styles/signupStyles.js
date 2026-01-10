@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { hp, wp } from '../../helpers/common';
+import { hp, wp } from '../helpers/common';
 
 const BRAND_RED = '#D32F2F'; 
 const SUCCESS_COLOR = '#388E3C';
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
 
   footerContainer: {
     position: 'absolute',
-    bottom: hp(1),
+    bottom: hp(6),
     left: 0,
     right: 0,
     paddingHorizontal: wp(10),

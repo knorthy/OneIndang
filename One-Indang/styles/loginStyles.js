@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { hp, wp } from '../../helpers/common';
+import { hp, wp } from '../helpers/common';
 
 const styles = StyleSheet.create({
   container: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   footerContainer: {
     position: 'absolute',
-    bottom: hp(1),
+    bottom: hp(9),
     left: 0,
     right: 0,
     paddingHorizontal: wp(10),

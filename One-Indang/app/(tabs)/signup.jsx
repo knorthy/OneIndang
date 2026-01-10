@@ -6,7 +6,6 @@ import {
   TouchableOpacity, 
   KeyboardAvoidingView, 
   Platform, 
-  Alert,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView
@@ -14,21 +13,23 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router'; 
 import { hp, wp } from '../../helpers/common'; 
-import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../styles/signupStyles';
+import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
+import { showToast } from '../../components/Toast';
+import { auth } from '../../services/supabase';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
+  const router = useRouter(); 
   const [currentStep, setCurrentStep] = useState(1); 
 
- 
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // OTP STATE
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
@@ -39,8 +40,7 @@ const AccountSetupScreen = () => {
   const [errors, setErrors] = useState({
     phone: false,
     email: false,
-    firstName: false,
-    lastName: false,
+    fullName: false,
     password: false,
   });
 
@@ -48,7 +48,6 @@ const AccountSetupScreen = () => {
     length: false,
     format: false,
   });
-
 
   useEffect(() => {
     const isLengthValid = password.length >= 8;
@@ -60,7 +59,6 @@ const AccountSetupScreen = () => {
     });
   }, [password]);
 
-
   useEffect(() => {
     let interval;
     if (currentStep === 2 && timerCount > 0) {
@@ -70,8 +68,6 @@ const AccountSetupScreen = () => {
     }
     return () => clearInterval(interval);
   }, [currentStep, timerCount]);
-
-
 
   const handlePhoneChange = (text) => {
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -84,32 +80,110 @@ const AccountSetupScreen = () => {
     if(errors.email) setErrors({...errors, email: false});
   };
 
-  const handleNameChange = (text, setter, errorField) => {
+  const handleNameChange = (text) => {
     const alphabetValue = text.replace(/[^a-zA-Z\s]/g, '');
-    setter(alphabetValue);
-    if(errors[errorField]) setErrors({...errors, [errorField]: false});
+    setFullName(alphabetValue);
+    if(errors.fullName) setErrors({...errors, fullName: false});
   };
 
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     let valid = true;
-    let newErrors = { phone: false, email: false, firstName: false, lastName: false, password: false };
+    let newErrors = { phone: false, email: false, fullName: false, password: false };
 
     if (!phone || phone.length < 10) { newErrors.phone = true; valid = false; }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) { newErrors.email = true; valid = false; }
-    if (!firstName.trim()) { newErrors.firstName = true; valid = false; }
-    if (!lastName.trim()) { newErrors.lastName = true; valid = false; }
-    if (!passwordCriteria.length || !passwordCriteria.format) { newErrors.password = true; valid = false; }
+    
+    if (!fullName.trim()) { newErrors.fullName = true; valid = false; }
+
+    const isPassLengthValid = password.length >= 8;
+    const isPassFormatValid = /^(?=.*[a-zA-Z])(?=.*[0-9])/.test(password);
+
+    if (!isPassLengthValid || !isPassFormatValid) { 
+      newErrors.password = true; 
+      valid = false; 
+    }
 
     setErrors(newErrors);
 
-    if (valid) {
-      setCurrentStep(2);
-      setTimer(60);
+    if (!valid) {
+      console.log("Validation failed", newErrors);
+      return;
+    }
+
+    // Sign up with Supabase
+    setIsLoading(true);
+    try {
+      console.log('Attempting signup with:', { email, fullName, phone: `+63${phone}` });
+      
+      const { data, error } = await auth.signUp(email, password, {
+        full_name: fullName,
+        phone: `+63${phone}`
+      });
+
+      console.log('Signup response:', { data: data ? 'received' : 'null', error });
+
+      if (error) {
+        console.error('Signup error:', error);
+        showToast(error.message || 'Failed to create account');
+        return;
+      }
+
+      if (data.user) {
+        if (!data.user.email_confirmed_at) {
+          // Email confirmation required
+          showToast('Please check your email for the verification code');
+          setCurrentStep(2);
+        } else {
+          showToast('Account created successfully!');
+          router.replace('/login'); // Redirect to login immediately if no verification needed
+        }
+      } else {
+        showToast('Account creation failed - no user data');
+      }
+    } catch (error) {
+      console.error('Signup exception:', error);
+      showToast('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // --- UPDATED: VERIFY OTP & REDIRECT TO LOGIN ---
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+    const token = otpCode.join(''); 
 
+    try {
+      // 1. Verify the code
+      const { data, error } = await auth.verifyOtp({
+        email: email,
+        token: token,
+        type: 'signup'
+      });
+
+      if (error) {
+        showToast(error.message || "Invalid verification code");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        showToast("Account Verified! Please log in.");
+        
+        // 2. Sign out immediately so they have to enter password on login screen
+        await auth.signOut(); 
+
+        // 3. Redirect to Login Page
+        router.replace('/login'); 
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      showToast("An error occurred during verification");
+      setIsLoading(false);
+    }
+  };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -117,32 +191,58 @@ const AccountSetupScreen = () => {
     return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
 
-  const handleOtpChange = (text, index) => {
-    if (/[^0-9]/.test(text)) return;
-    const newCode = [...otpCode];
-    newCode[index] = text;
-    setOtpCode(newCode);
-    if (text && index < 5) inputRefs.current[index + 1].focus();
-  };
-
-  const handleOtpKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && !otpCode[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+  // SMART FOCUS LOGIC
+  const handleInputFocus = (index) => {
+    const firstEmptyIndex = otpCode.findIndex((digit) => digit === '');
+    if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
+        inputRefs.current[firstEmptyIndex]?.focus();
     }
   };
 
+  const handleOtpChange = (text, index) => {
+    if (/[^0-9]/.test(text)) return;
 
-  const handleResendCode = () => {
-    setTimer(60);
-    Alert.alert("Code Resent", "A new verification code has been sent to your number.");
-    // Add your actual API resend call here
+    setOtpCode((prev) => {
+      const newCode = [...prev];
+      newCode[index] = text;
+      return newCode;
+    });
+
+    if (text && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleOtpKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace') {
+        if (!otpCode[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    }
+  };
+
+  // --- RESEND HANDLER ---
+  const handleResendCode = async () => {
+    try {
+      const { error } = await auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) throw error;
+
+      setTimer(60);
+      showToast("Verification code resent successfully.");
+    } catch (error) {
+      showToast(error.message || "Failed to resend code");
+    }
   };
 
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1); 
     } else {
-      console.log("Go back from screen"); 
+        router.back(); 
     }
   };
 
@@ -155,7 +255,6 @@ const AccountSetupScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.mainWrapper}>
             
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={handleBack}>
               <Ionicons name="chevron-back" size={hp(3.5)} color="black" />
@@ -167,7 +266,6 @@ const AccountSetupScreen = () => {
             </View>
           </View>
 
-          {/* DYNAMIC CONTENT SWITCHING */}
           <KeyboardAvoidingView 
             behavior={Platform.OS === "ios" ? "padding" : "height"} 
             style={styles.keyboardContainer}
@@ -177,12 +275,11 @@ const AccountSetupScreen = () => {
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* ---------------- STEP 1: FORM ---------------- */}
+                {/* STEP ONE*/}
                 {currentStep === 1 && (
                     <>
                         <Text style={styles.title}>Complete your account setup</Text>
                         <View style={styles.formContainer}>
-                            {/* Phone */}
                             <View>
                                 <Text style={styles.label}>Enter your phone number</Text>
                                 <View style={styles.phoneRow}>
@@ -201,19 +298,17 @@ const AccountSetupScreen = () => {
                                 </View>
                             </View>
 
-
-                            {/* First Name */}
                             <View>
                                 <Text style={styles.label}>Full Name</Text>
                                 <TextInput
-                                    style={[styles.input, errors.firstName && styles.inputError]}
+                                    style={[styles.input, errors.fullName && styles.inputError]}
                                     placeholder="Enter your full name"
                                     placeholderTextColor="#9CA3AF"
-                                    value={firstName}
-                                    onChangeText={(t) => handleNameChange(t, setFirstName, 'firstName')}
+                                    value={fullName}
+                                    onChangeText={handleNameChange}
                                 />
                             </View>
-                            {/* Email */}
+
                             <View>
                                 <Text style={styles.label}>Enter your email</Text>
                                 <TextInput
@@ -226,7 +321,7 @@ const AccountSetupScreen = () => {
                                     autoCapitalize="none"
                                 />
                             </View>
-                            {/* Password */}
+
                             <View>
                                 <Text style={styles.label}>Password</Text>
                                 <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
@@ -246,7 +341,6 @@ const AccountSetupScreen = () => {
                                 </TouchableOpacity>
                                 </View>
 
-                                {/* Criteria */}
                                 <View style={styles.criteriaContainer}>
                                 <View style={styles.criteriaRow}>
                                     <Feather name={passwordCriteria.length ? "check" : "x"} size={hp(1.8)} color={passwordCriteria.length ? SUCCESS_COLOR : BRAND_RED} />
@@ -262,7 +356,7 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
-                {/* ---------------- STEP 2: OTP ---------------- */}
+                {/* STEP TWO */}
                 {currentStep === 2 && (
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
@@ -281,6 +375,8 @@ const AccountSetupScreen = () => {
                               ]}
                               keyboardType="number-pad"
                               maxLength={1}
+                              selectTextOnFocus={true} 
+                              onFocus={() => handleInputFocus(index)}
                               value={digit}
                               onChangeText={(text) => handleOtpChange(text, index)}
                               onKeyPress={(e) => handleOtpKeyPress(e, index)}
@@ -289,7 +385,6 @@ const AccountSetupScreen = () => {
                           ))}
                         </View>
 
-                
                         <View style={styles.timerContainer}>
                             {timerCount > 0 ? (
                                 <Text style={styles.timerText}>
@@ -307,35 +402,42 @@ const AccountSetupScreen = () => {
             </ScrollView>
           </KeyboardAvoidingView>
 
-          {/* Footer Button */}
           <View style={styles.footerContainer}>
             {currentStep === 1 ? (
                 <TouchableOpacity 
                     activeOpacity={0.8}
                     onPress={validateAndSubmit}
-                    style={[styles.button, { backgroundColor: BRAND_RED }]}
+                    disabled={isLoading}
+                    style={[styles.button, { backgroundColor: isLoading ? DISABLED_RED : BRAND_RED }]}
                 >
-                    <Text style={styles.buttonText}>Verify Account</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Creating Account...' : 'Create Account'}
+                    </Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity 
                     activeOpacity={0.8}
-                    disabled={!isFullCode}
-                    onPress={() => Alert.alert("Success", "Account Created!")}
+                    disabled={!isFullCode || isLoading}
+                    onPress={handleVerifyOtp} 
                     style={[
                         styles.button, 
                         { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
                     ]}
                 >
-                    <Text style={styles.buttonText}>Continue</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Verifying...' : 'Continue'} 
+                    </Text>
                 </TouchableOpacity>
             )}
-            <View style={styles.signinContainer}>
-              <Text style={styles.signinText}>Already have an account? </Text>
-              <Link href="/login">
-                <Text style={styles.signinLinkText}>Signin</Text>
-              </Link>
-            </View>
+
+            {currentStep === 1 && (
+                <View style={styles.signinContainer}>
+                    <Text style={styles.signinText}>Already have an account? </Text>
+                    <Link href="/login">
+                        <Text style={styles.signinLinkText}>Signin</Text>
+                    </Link>
+                </View>
+            )}
           </View>
 
         </View>
