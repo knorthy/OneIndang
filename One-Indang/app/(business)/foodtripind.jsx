@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, Dimensions, FlatList } from 'react-native';
+import React, { useState, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, Dimensions, FlatList, Platform, StatusBar, Animated, Alert } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useCart } from '../../context/CartContext'; // Import Cart Context
 
 // RESPONSIVE DIMENSIONS
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
@@ -12,14 +13,93 @@ const wp = (p) => (p * deviceWidth) / 100;
 // THEME COLORS
 const VIBRANT_ORANGE = '#FF7043'; 
 const LIGHT_ORANGE_BG = '#FFF3E0'; 
-const PRIMARY_BLUE = '#2D6BFF'; // For spec icons
 
 const FOOD_DATA = [
-  { id: '1', name: 'Jollibee Indang', sub: 'Fast Food • Town Plaza', rating: '4.8', distance: '0.2 km', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500', verified: true, location: 'Indang Town Plaza', tag: 'Popular', category: 'Fast Food', price: '250', capacity: '100+', time: '24/7', agent: 'Manager On Duty' },
-  { id: '2', name: 'Siglo Farm Café', sub: 'Native Coffee • Filipino Fusion', rating: '4.9', distance: '1.5 km', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500', verified: true, location: 'Brgy. Kaytapos', tag: 'Must Try', category: 'Cafes', price: '450', capacity: '40', time: '8AM-9PM', agent: 'Chef Aris' },
-  { id: '3', name: 'Celyns Inasal', sub: 'Grilled Chicken • Local Favorites', rating: '4.6', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500', verified: false, location: 'San Gregorio St.', tag: 'Trending', category: 'Native', price: '180', capacity: '60', time: '10AM-8PM', agent: 'Celyn S.' },
-  { id: '4', name: 'Indang Town Milk Tea', sub: 'Refreshments • Snacks', rating: '4.5', distance: '0.3 km', image: 'https://images.unsplash.com/photo-1572715376701-98568319fd0b?w=500', verified: false, location: 'Poblacion 1', tag: 'Best Seller', category: 'Desserts', price: '95', capacity: '15', time: '11AM-7PM', agent: 'Store Lead' },
-  { id: '5', name: 'Kusina ni Lolo', sub: 'Authentic Bulalo & Sinigang', rating: '4.7', distance: '2.1 km', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500', verified: true, location: 'Brgy. Alulod', tag: 'Top Rated', category: 'Native', price: '600', capacity: '80', time: '9AM-10PM', agent: 'Lolo Bert' },
+  { 
+    id: '1', 
+    name: 'Jollibee Indang', 
+    sub: 'Fried Chicken • Burgers • Spaghetti', 
+    rating: '4.8', 
+    distance: '0.2 km', 
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Jollibee_Indang_Cavite.jpg/1200px-Jollibee_Indang_Cavite.jpg', 
+    verified: true, 
+    location: 'Indang Town Plaza', 
+    tag: 'Bida ang Saya', 
+    category: 'Fast Food', 
+    price: '150', 
+    capacity: '100+', 
+    time: '24/7', 
+    agent: 'Store Manager',
+    desc: 'Philippines’ favorite fast food chain known for its crispylicious Chickenjoy, sweet-style Jolly Spaghetti, and savory Yumburgers. A perfect place for family bonding.'
+  },
+  { 
+    id: '2', 
+    name: 'Siglo Farm Café', 
+    sub: 'Farm-to-Table • Organic • Coffee', 
+    rating: '4.9', 
+    distance: '1.5 km', 
+    image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=500', 
+    verified: true, 
+    location: 'Brgy. Kayquit', 
+    tag: 'Relaxing', 
+    category: 'Cafes', 
+    price: '350', 
+    capacity: '40', 
+    time: '8AM-9PM', 
+    agent: 'Chef Aris',
+    desc: 'Experience fresh, organic dining right in the middle of a lush farm. Famous for their Barako coffee, herbal teas, and fresh garden salads.'
+  },
+  { 
+    id: '3', 
+    name: 'Celyns Inasal', 
+    sub: 'Grilled Chicken • Unli Rice', 
+    rating: '4.6', 
+    distance: '0.5 km', 
+    image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500', 
+    verified: false, 
+    location: 'San Gregorio St.', 
+    tag: 'Budget Meal', 
+    category: 'Native', 
+    price: '130', 
+    capacity: '60', 
+    time: '10AM-8PM', 
+    agent: 'Celyn S.',
+    desc: 'The home of the best Chicken Inasal in town. Enjoy smoky, savory grilled chicken with unlimited rice and their signature chicken oil sauce.'
+  },
+  { 
+    id: '4', 
+    name: 'Indang Town Milk Tea', 
+    sub: 'Milk Tea • Fruit Tea • Snacks', 
+    rating: '4.5', 
+    distance: '0.3 km', 
+    image: 'https://images.unsplash.com/photo-1572715376701-98568319fd0b?w=500', 
+    verified: false, 
+    location: 'Poblacion 1', 
+    tag: 'Student Choice', 
+    category: 'Desserts', 
+    price: '90', 
+    capacity: '15', 
+    time: '11AM-7PM', 
+    agent: 'Barista Jane',
+    desc: 'Your go-to spot for refreshing milk teas, fruit drinks, and quick snacks like fries and nachos. A favorite hangout spot for students.'
+  },
+  { 
+    id: '5', 
+    name: 'Kusina ni Lolo', 
+    sub: 'Bulalo • Kare-Kare • Lutong Bahay', 
+    rating: '4.7', 
+    distance: '2.1 km', 
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500', 
+    verified: true, 
+    location: 'Brgy. Alulod', 
+    tag: 'Family Feast', 
+    category: 'Native', 
+    price: '400', 
+    capacity: '80', 
+    time: '9AM-10PM', 
+    agent: 'Lolo Bert',
+    desc: 'Authentic Caviteño dishes served in a rustic setting. Famous for their steaming hot Bulalo and crispy Tawilis. Feels just like eating at home.'
+  },
 ];
 
 const FILTERS = ['All', 'Fast Food', 'Cafes', 'Native', 'Desserts'];
@@ -30,40 +110,87 @@ export default function FoodScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('About');
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Animation Refs
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   // Filter Logic
   const filteredData = useMemo(() => {
     const category = FILTERS[activeIndex];
     return FOOD_DATA.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           item.sub.toLowerCase().includes(searchQuery.toLowerCase());
+                            item.sub.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = category === 'All' || item.category === category;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeIndex]);
 
+  // Handle Navigation
+  const handleGoToCart = () => {
+    router.push('/(business)/cart');
+  };
+
+  const handleViewOrders = () => {
+    router.push('/(business)/orders');
+  };
+
   // --- VIEW 1: RESTAURANT DETAILS ---
   const renderDetails = () => {
-    if (!selectedItem) return null; // Guard against null access
+    if (!selectedItem) return null; 
+
+    // Header Background Animation
+    const headerBgOpacity = scrollY.interpolate({
+        inputRange: [0, 150],
+        outputRange: [0, 1],
+        extrapolate: 'clamp',
+    });
 
     return (
       <View style={styles.detailContainer}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: hp(15) }}>
+        {/* FIXED HEADER UI (Matches Order Screen) */}
+        <View style={styles.fixedHeaderWrapper}>
+            <Animated.View style={[styles.headerBackground, { opacity: headerBgOpacity }]} />
+            <View style={styles.headerNav}>
+                <TouchableOpacity 
+                    style={styles.circleBtn} 
+                    onPress={() => setSelectedItem(null)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                    <Ionicons name="arrow-back" size={22} color="black" />
+                </TouchableOpacity>
+                
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <TouchableOpacity 
+                        style={styles.circleBtn} 
+                        onPress={() => setIsFavorite(!isFavorite)}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? VIBRANT_ORANGE : "black"} />
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                        style={styles.circleBtn}
+                        onPress={handleGoToCart}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Ionicons name="cart-outline" size={22} color="black" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+
+        <Animated.ScrollView 
+            showsVerticalScrollIndicator={false} 
+            contentContainerStyle={{ paddingBottom: hp(15) }}
+            onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: true }
+            )}
+            scrollEventThrottle={16}
+        >
           <View style={styles.imageContainer}>
             <Image source={{ uri: selectedItem.image }} style={styles.mainImage} />
-            <SafeAreaView style={styles.headerOverlay} edges={['top']}>
-              <TouchableOpacity style={styles.circleBtn} onPress={() => setSelectedItem(null)}>
-                <Ionicons name="arrow-back" size={20} color="#000" />
-              </TouchableOpacity>
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity style={[styles.circleBtn, { marginRight: 10 }]}>
-                  <Ionicons name="share-social-outline" size={20} color="#000" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.circleBtn}>
-                  <Ionicons name="heart-outline" size={20} color="#000" />
-                </TouchableOpacity>
-              </View>
-            </SafeAreaView>
           </View>
 
           <View style={styles.contentPadding}>
@@ -103,8 +230,7 @@ export default function FoodScreen() {
 
             <Text style={styles.sectionTitle}>Description</Text>
             <Text style={styles.description}>
-              {selectedItem.sub}. Serving the community of Indang with fresh ingredients and great flavors. 
-              Perfect for family gatherings or quick snacks.
+              {selectedItem.desc} 
               <Text style={styles.readMore}> Read more</Text>
             </Text>
 
@@ -121,7 +247,7 @@ export default function FoodScreen() {
               </View>
             </View>
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
 
         <View style={styles.footer}>
           <View>
@@ -129,21 +255,19 @@ export default function FoodScreen() {
             <Text style={styles.priceText}>₱{selectedItem.price} <Text style={styles.perMonth}>/person</Text></Text>
           </View>
           <TouchableOpacity 
-  style={[styles.bookBtn, {backgroundColor: VIBRANT_ORANGE}]}
-  onPress={() => {
-    router.push({
-      pathname: '/(business)/order', 
-      params: { 
-        name: selectedItem.name, 
-        image: selectedItem.image,
-        price: selectedItem.price,
-        category: selectedItem.category
-      }
-    });
-  }}
->
-  <Text style={styles.bookBtnText}>Order Now</Text>
-</TouchableOpacity>
+            style={[styles.bookBtn, {backgroundColor: VIBRANT_ORANGE}]}
+            onPress={() => {
+              router.push({
+                pathname: '/(business)/order', 
+                params: { 
+                  name: selectedItem.name, 
+                  image: selectedItem.image,
+                }
+              });
+            }}
+          >
+            <Text style={styles.bookBtnText}>Order Now</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -151,13 +275,21 @@ export default function FoodScreen() {
 
   // --- VIEW 2: THE MAIN LIST ---
   const renderList = () => (
-    <SafeAreaView style={styles.container}>
+    // FIX: SafeAreaView automatically pads the top, preventing overlap with status bar
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <Stack.Screen options={{ headerShown: false }} />
+      
+      {/* List Header with Cart */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={VIBRANT_ORANGE} />
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} hitSlop={{top:10, bottom:10, left:10, right:10}}>
+                <Ionicons name="arrow-back" size={28} color={VIBRANT_ORANGE} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Food</Text>
+        </View>
+        <TouchableOpacity style={styles.headerCartBtn} onPress={handleGoToCart} hitSlop={{top:10, bottom:10, left:10, right:10}}>
+            <Ionicons name="cart-outline" size={26} color={VIBRANT_ORANGE} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Food</Text>
       </View>
 
       <View style={styles.searchContainer}>
@@ -223,6 +355,13 @@ export default function FoodScreen() {
           </TouchableOpacity>
         )}
       />
+
+      {/* Floating "My Orders" Button */}
+      <TouchableOpacity style={styles.fab} onPress={handleViewOrders}>
+        <MaterialCommunityIcons name="receipt-text-outline" size={24} color="#FFF" />
+        <Text style={styles.fabText}>My Orders</Text>
+      </TouchableOpacity>
+
     </SafeAreaView>
   );
 
@@ -230,11 +369,90 @@ export default function FoodScreen() {
 }
 
 const styles = StyleSheet.create({
-  // LIST STYLES
   container: { flex: 1, backgroundColor: '#FFF' },
-  header: { flexDirection: 'row', alignItems: 'center', padding: wp(4) },
-  headerTitle: { fontSize: wp(6), fontWeight: 'bold', marginLeft: wp(2), color: VIBRANT_ORANGE },
+  
+  // FIXED HEADER STYLES (Details View)
+  fixedHeaderWrapper: { 
+    position: 'absolute', 
+    top: 0, 
+    left: 0, 
+    right: 0, 
+    zIndex: 1000,
+    // Add extra top padding specifically for Android to clear the status bar
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 50, 
+    paddingHorizontal: wp(4),
+    paddingBottom: 10,
+  },
+  headerBackground: { 
+    position: 'absolute', 
+    top: 0, 
+    left: 0, 
+    right: 0, 
+    bottom: 0, 
+    backgroundColor: '#FFF', 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 3, 
+    elevation: 4 
+  },
+  headerNav: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  circleBtn: { 
+    width: 42, 
+    height: 42, 
+    borderRadius: 21, 
+    backgroundColor: '#FFF', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    elevation: 4, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, 
+    shadowRadius: 4 
+  },
+
+  // LIST HEADER
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    padding: wp(4), 
+    paddingBottom: 10
+    // Removed manual paddingTop, allowing SafeAreaView to handle it
+  },
+  headerTitle: { fontSize: wp(7), fontWeight: 'bold', marginLeft: wp(2), color: VIBRANT_ORANGE },
   backBtn: { padding: 4 },
+  headerCartBtn: { padding: 8, backgroundColor: '#FFF5F0', borderRadius: 20 },
+  
+  // FLOATING ACTION BUTTON (My Orders)
+  fab: {
+    position: 'absolute',
+    bottom: hp(4),
+    right: wp(5),
+    backgroundColor: VIBRANT_ORANGE,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  fabText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    marginLeft: 8,
+    fontSize: 16
+  },
+
+  // REST OF STYLES
   searchContainer: { paddingHorizontal: wp(4), marginBottom: hp(1.5) },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F9F9F9', borderRadius: 25, paddingHorizontal: 15, height: 45, borderWidth: 1, borderColor: '#EEE' },
   searchInput: { flex: 1, fontSize: wp(3.8), color: '#333' },
@@ -244,7 +462,7 @@ const styles = StyleSheet.create({
   activePill: { backgroundColor: VIBRANT_ORANGE, borderColor: VIBRANT_ORANGE },
   filterText: { color: '#666', fontWeight: '600', fontSize: wp(3.5) },
   activeFilterText: { color: '#FFF' },
-  listContent: { paddingHorizontal: wp(4), paddingBottom: hp(5) },
+  listContent: { paddingHorizontal: wp(4), paddingBottom: hp(10) }, 
   itemContainer: { flexDirection: 'row', marginBottom: hp(2.5), alignItems: 'center' },
   imageWrapper: { position: 'relative' },
   bizImage: { width: wp(32), height: wp(28), borderRadius: 16, backgroundColor: '#EEE' },
@@ -259,13 +477,12 @@ const styles = StyleSheet.create({
   locationText: { fontSize: wp(3), color: '#888', marginLeft: 2 },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   ratingTextSmall: { fontSize: wp(3.5), color: '#666', fontWeight: '600' },
-
-  // DETAIL VIEW STYLES
+  
+  // DETAIL VIEW
   detailContainer: { flex: 1, backgroundColor: '#FFF' },
-  imageContainer: { width: wp(100), height: hp(40) },
+  imageContainer: { width: wp(100), height: hp(40), backgroundColor: '#E5E7EB' },
   mainImage: { width: '100%', height: '100%' },
-  headerOverlay: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp(5) },
-  circleBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
+  
   contentPadding: { paddingHorizontal: wp(5), paddingTop: hp(2) },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   typeBadge: { backgroundColor: LIGHT_ORANGE_BG, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },

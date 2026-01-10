@@ -10,14 +10,12 @@ export default function ServicesLayout() {
   return (
     <Stack
       screenOptions={{
+        headerShown: false, // Hides the header globally for services
         headerTintColor: Colors[colorScheme ?? 'light'].tint,
       }}>
-      <Stack.Screen
-        name="services"
-        options={{
-          title: 'Services',
-        }}
-      />
+      <Stack.Screen name="services" />
+      <Stack.Screen name="detail" />
+      <Stack.Screen name="guide" />
     </Stack>
   );
 }
