@@ -1,5 +1,4 @@
 export const recommendations = [
-  //  POBLACION 1 (Town Proper) 
   { id: 1, title: 'St. Gregory the Great Parish Church', distance: 'Poblacion 1 • Historic Site', image: require('../assets/images/transportation/parishchrurch.png') },
   { id: 2, title: 'Tree Top Coffee Shop', distance: 'Poblacion 1 • Dining', image: require('../assets/images/transportation/treetop.png') },
   { id: 3, title: 'Jollibee Indang', distance: 'Poblacion 1 • Dining', image: require('../assets/images/transportation/jb.png') },
@@ -11,7 +10,6 @@ export const recommendations = [
   { id: 9, title: 'Mercury Drug Indang', distance: 'Poblacion 1 • Pharmacy', image: require('../assets/images/transportation/mercury.png') },
   { id: 10, title: 'Bonifacio Monument', distance: 'Poblacion 1 • Landmark', image: require('../assets/images/transportation/bonifacioshrine.png') },
 
-  //  POBLACION 2 
   { id: 11, title: 'Indang Public Market', distance: 'Poblacion 2 • Market', image: require('../assets/images/transportation/pubmark.png') },
   { id: 12, title: 'Cup of Grace', distance: 'Poblacion 2 (San Gregorio) • Cafe', image: require('../assets/images/transportation/cog.png') },
   { id: 13, title: 'Drew\'s Brew & Bake', distance: 'Poblacion 2 (San Miguel) • Bakery', image: require('../assets/images/transportation/dbb.png') },
@@ -23,7 +21,6 @@ export const recommendations = [
   { id: 19, title: 'Landbank Indang', distance: 'Poblacion 2 • Bank', image: require('../assets/images/transportation/landbank.png') },
   { id: 20, title: 'Old Water Tank', distance: 'Poblacion 2 • Landmark', image: { uri: 'https://images.unsplash.com/photo-1563283685-6187259f6c04?q=80&w=1000&auto=format&fit=crop' } },
 
-  //  POBLACION 3 
   { id: 21, title: 'Pio De Roda Cafe', distance: 'Poblacion 3 • Heritage Cafe', image: require('../assets/images/transportation/pio.png') },
   { id: 22, title: 'Coffee and Teacups', distance: 'Poblacion 3 (A. Mabini) • Cafe', image: { uri: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000&auto=format&fit=crop' } },
   { id: 23, title: 'Klamulse Hotel', distance: 'Poblacion 3 • Hotel', image: require('../assets/images/transportation/klamulse.png') },
@@ -35,7 +32,6 @@ export const recommendations = [
   { id: 29, title: 'Poblacion 3 Court', distance: 'Poblacion 3 • Sports', image: { uri: 'https://images.unsplash.com/photo-1533596775618-8d2669e4695b?q=80&w=1000&auto=format&fit=crop' } },
   { id: 30, title: 'Ancestral House View', distance: 'Poblacion 3 • Historical', image: { uri: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop' } },
 
-  //  POBLACION 4 
   { id: 31, title: 'Cafe Hermano', distance: 'Poblacion 4 (Plaridel St) • Cafe', image: require('../assets/images/transportation/cafeherm.png') },
   { id: 32, title: 'Black Owl Cafe', distance: 'Poblacion 4 (Magtanggol St) • Cafe', image: require('../assets/images/transportation/blackowl.png') },
   { id: 33, title: 'The Port St. Café', distance: 'Poblacion 4 • Cafe', image: require('../assets/images/transportation/portst.png') },
@@ -47,7 +43,6 @@ export const recommendations = [
   { id: 39, title: 'Indang Post Office', distance: 'Poblacion 4 • Service', image: { uri: 'https://images.unsplash.com/photo-1563287661-8404a558557e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 40, title: 'Poblacion 4 Food Stalls', distance: 'Poblacion 4 • Dining', image: { uri: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop' } },
 
-  //  AGUS-US 
   { id: 41, title: 'Terre Verte Farm Resort', distance: 'Brgy. Agus-us • Adventure Resort', image: require('../assets/images/transportation/terreverte.png') },
   { id: 42, title: 'La UlrichLand Farm Resort', distance: 'Brgy. Agus-us • Private Resort', image: require('../assets/images/transportation/laulrich.png') },
   { id: 43, title: 'Villa Soledad Garden Resort', distance: 'Brgy. Agus-us • Garden Resort', image: require('../assets/images/transportation/soledad.png') },
@@ -59,7 +54,6 @@ export const recommendations = [
   { id: 49, title: 'Agus-us Forest Trail', distance: 'Brgy. Agus-us • Hiking', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 50, title: 'Agus-us View Deck', distance: 'Brgy. Agus-us • Scenic', image: { uri: 'https://images.unsplash.com/photo-1465188162913-8fb5709d6d57?q=80&w=1000&auto=format&fit=crop' } },
 
-  // ALULOD
   { id: 51, title: 'Villa Feliciana Farm & Resort', distance: 'Brgy. Alulod • Hotel/Resort', image: require('../assets/images/transportation/feliciana.png') },
   { id: 52, title: 'TOPSIDE CAFE', distance: 'Brgy. Alulod • Cafe', image: require('../assets/images/transportation/topside.png') },
   { id: 53, title: 'Kape-Fied', distance: 'Brgy. Alulod • Coffee Shop', image: require('../assets/images/transportation/kapefied.png') },
@@ -71,7 +65,6 @@ export const recommendations = [
   { id: 59, title: 'Alulod Flower Garden', distance: 'Brgy. Alulod • Nature', image: { uri: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=1000&auto=format&fit=crop' } },
   { id: 60, title: 'Alulod Picnic Grounds', distance: 'Brgy. Alulod • Recreation', image: { uri: 'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=1000&auto=format&fit=crop' } },
 
-  // BANABA CERCA
   { id: 61, title: 'California Breeze Campsite', distance: 'Brgy. Banaba Cerca • Glamping', image: require('../assets/images/transportation/california.png') },
   { id: 62, title: 'CMJ Private Resort', distance: 'Brgy. Banaba Cerca • Private Villa', image: require('../assets/images/transportation/cmj.png') },
   { id: 63, title: 'Casita de Señerez Resort', distance: 'Brgy. Banaba Cerca • Family Resort', image: require('../assets/images/transportation/casita.png') },
@@ -83,7 +76,6 @@ export const recommendations = [
   { id: 69, title: 'Banaba Cerca Trail', distance: 'Brgy. Banaba Cerca • Adventure', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
   { id: 70, title: 'Banaba Cerca Arch', distance: 'Brgy. Banaba Cerca • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
 
-  // BANABA LEJOS
   { id: 71, title: 'Banaba Lejos River Stream', distance: 'Brgy. Banaba Lejos • Nature', image: { uri: 'https://images.unsplash.com/photo-1508669232496-136bca593257?q=80&w=1000&auto=format&fit=crop' } },
   { id: 72, title: 'Banaba Lejos Farm', distance: 'Brgy. Banaba Lejos • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
   { id: 73, title: 'Banaba Lejos Chapel', distance: 'Brgy. Banaba Lejos • Religious', image: { uri: 'https://images.unsplash.com/photo-1516091871239-5a507cb682df?q=80&w=1000&auto=format&fit=crop' } },
@@ -95,7 +87,6 @@ export const recommendations = [
   { id: 79, title: 'Banaba Lejos Hanging Bridge', distance: 'Brgy. Banaba Lejos • Landmark', image: { uri: 'https://images.unsplash.com/photo-1534947960324-42f0da6cb09a?q=80&w=1000&auto=format&fit=crop' } },
   { id: 80, title: 'Banaba Lejos Viewpoint', distance: 'Brgy. Banaba Lejos • Scenic', image: { uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // BANCOD
   { id: 81, title: 'Cavite State University (Main)', distance: 'Brgy. Bancod • Landmark', image: require('../assets/images/transportation/cvsu.png') },
   { id: 82, title: 'Tree Top Coffee Shop', distance: 'Brgy. Bancod • Restaurant', image: require('../assets/images/transportation/treetop.png') },
   { id: 83, title: 'Mango Tango Cafe', distance: 'Brgy. Bancod • Cafe', image: require('../assets/images/transportation/mangot.png') },
@@ -107,11 +98,10 @@ export const recommendations = [
   { id: 89, title: 'Bancod Bridge', distance: 'Brgy. Bancod • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
   { id: 90, title: 'Bancod Food Strip', distance: 'Brgy. Bancod • Dining', image: { uri: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop' } },
 
-  // BUNA CERCA
   { id: 91, title: 'Harvest Kitchen & Cafe', distance: 'Brgy. Buna Cerca • Farm Cafe', image: require('../assets/images/transportation/bountyharv.png') },
   { id: 92, title: 'The Canopy Farm PH', distance: 'Brgy. Buna Cerca • Glamping/Farm', image: require('../assets/images/transportation/canopy.png') },
   { id: 93, title: 'Precious Garden Events Place', distance: 'Brgy. Buna Cerca • Events/Resort', image: require('../assets/images/transportation/precious.png') },
-  { id: 94, title: 'Buna Cerca Waterfalls Access', distance: 'Brgy. Buna Cerca • Nature', image: { uri: 'https://images.unsplash.com/photo-1546955121-d0ba6a58f9e7?q=80&w=1000&auto=format&fit=crop' } },
+  { id: 94, title: 'Buna Cerca Waterfalls Access', distance: 'Brgy. Buna Cerca • Nature', image: { uri: 'https://images.unsplash.com/photo-1546955121-d0-ba6a58f9e7?q=80&w=1000&auto=format&fit=crop' } },
   { id: 95, title: 'Buna Cerca Chapel', distance: 'Brgy. Buna Cerca • Religious', image: { uri: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=1000&auto=format&fit=crop' } },
   { id: 96, title: 'Buna Cerca Hall', distance: 'Brgy. Buna Cerca • Community', image: { uri: 'https://images.unsplash.com/photo-1462206092226-f46025ffe607?q=80&w=1000&auto=format&fit=crop' } },
   { id: 97, title: 'Buna Cerca School', distance: 'Brgy. Buna Cerca • Education', image: { uri: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop' } },
@@ -119,7 +109,6 @@ export const recommendations = [
   { id: 99, title: 'Buna Cerca Health Center', distance: 'Brgy. Buna Cerca • Health', image: { uri: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=1000&auto=format&fit=crop' } },
   { id: 100, title: 'Buna Cerca Bridge', distance: 'Brgy. Buna Cerca • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
 
- // BUNA LEJOS I (UPDATED)
   { id: 101, title: 'Barrio Lejos Grill & Resto', distance: 'Brgy. Buna Lejos I • Dining', image: { uri: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop' } },
   { id: 102, title: 'Tazza Miha Cafe', distance: 'Brgy. Buna Lejos I • Cafe', image: require('../assets/images/transportation/tazzamiha.png') },
   { id: 103, title: 'Little HQ Cafe (Kalikhasan)', distance: 'Brgy. Buna Lejos I • Cafe', image: require('../assets/images/transportation/littlehq.png') },
@@ -131,7 +120,6 @@ export const recommendations = [
   { id: 109, title: 'Buna Lejos I Arch', distance: 'Brgy. Buna Lejos I • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 110, title: 'Buna Lejos I View Deck', distance: 'Brgy. Buna Lejos I • Scenic', image: { uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop' } },
 
-  // BUNA LEJOS II (UPDATED)
   { id: 111, title: 'Tagpuan Café', distance: 'Brgy. Buna Lejos II • Cafe', image: { uri: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1000&auto=format&fit=crop' } },
   { id: 112, title: 'Buna Lejos II Forest Patch', distance: 'Brgy. Buna Lejos II • Nature', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 113, title: 'Buna Lejos II Chapel', distance: 'Brgy. Buna Lejos II • Religious', image: { uri: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=1000&auto=format&fit=crop' } },
@@ -143,7 +131,6 @@ export const recommendations = [
   { id: 119, title: 'Buna Lejos II Bridge', distance: 'Brgy. Buna Lejos II • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
   { id: 120, title: 'Buna Lejos II Picnic Area', distance: 'Brgy. Buna Lejos II • Recreation', image: { uri: 'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=1000&auto=format&fit=crop' } },
 
-  // CALUMPANG CERCA
   { id: 121, title: 'Balay Indang', distance: 'Brgy. Calumpang Cerca • Bed & Breakfast', image: require('../assets/images/transportation/balay.png') },
   { id: 122, title: 'Calumpang Cerca Fields', distance: 'Brgy. Calumpang Cerca • Nature', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
   { id: 123, title: 'Calumpang Cerca Chapel', distance: 'Brgy. Calumpang Cerca • Religious', image: { uri: 'https://images.unsplash.com/photo-1548625361-12c8ba6b4476?q=80&w=1000&auto=format&fit=crop' } },
@@ -155,7 +142,6 @@ export const recommendations = [
   { id: 129, title: 'Calumpang Cerca Landmark', distance: 'Brgy. Calumpang Cerca • Landmark', image: { uri: 'https://images.unsplash.com/photo-1563283685-6187259f6c04?q=80&w=1000&auto=format&fit=crop' } },
   { id: 130, title: 'Calumpang Cerca View', distance: 'Brgy. Calumpang Cerca • Scenic', image: { uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // CALUMPANG LEJOS I
   { id: 131, title: 'Calumpang Lejos River', distance: 'Brgy. Calumpang Lejos • Nature', image: { uri: 'https://images.unsplash.com/photo-1508669232496-136bca593257?q=80&w=1000&auto=format&fit=crop' } },
   { id: 132, title: 'Calumpang Lejos Farm', distance: 'Brgy. Calumpang Lejos • Agri', image: { uri: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1000&auto=format&fit=crop' } },
   { id: 133, title: 'Calumpang Lejos Chapel', distance: 'Brgy. Calumpang Lejos • Religious', image: { uri: 'https://images.unsplash.com/photo-1516091871239-5a507cb682df?q=80&w=1000&auto=format&fit=crop' } },
@@ -167,7 +153,6 @@ export const recommendations = [
   { id: 139, title: 'Calumpang Lejos Spring', distance: 'Brgy. Calumpang Lejos • Nature', image: { uri: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=1000&auto=format&fit=crop' } },
   { id: 140, title: 'Calumpang Lejos View', distance: 'Brgy. Calumpang Lejos • Scenic', image: { uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // CARASUCHI (UPDATED)
   { id: 141, title: 'The Ravine by One Selah', distance: 'Brgy. Carasuchi • Resort', image: require('../assets/images/transportation/ravine.png') },
   { id: 142, title: 'Carasuchi Villa Garden', distance: 'Brgy. Carasuchi • Private Villa', image: { uri: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop' } },
   { id: 143, title: 'Milani\'s Bed & Breakfast', distance: 'Brgy. Carasuchi • B&B', image: { uri: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1000&auto=format&fit=crop' } },
@@ -179,7 +164,6 @@ export const recommendations = [
   { id: 149, title: 'Carasuchi Spring', distance: 'Brgy. Carasuchi • Nature', image: { uri: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=1000&auto=format&fit=crop' } },
   { id: 150, title: 'Carasuchi Bridge', distance: 'Brgy. Carasuchi • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
 
-  // DAINE I
   { id: 151, title: 'Kaffi Lulu', distance: 'Brgy. Daine I • Coffee Shop', image: { uri: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000&auto=format&fit=crop' } },
   { id: 152, title: 'Daine I Rice Terraces', distance: 'Brgy. Daine I • Scenic', image: { uri: 'https://images.unsplash.com/photo-1533052479530-5b121f64e268?q=80&w=1000&auto=format&fit=crop' } },
   { id: 153, title: 'Daine I Chapel', distance: 'Brgy. Daine I • Religious', image: { uri: 'https://images.unsplash.com/photo-1548625361-12c8ba6b4476?q=80&w=1000&auto=format&fit=crop' } },
@@ -191,7 +175,6 @@ export const recommendations = [
   { id: 159, title: 'Daine I Landmark Arch', distance: 'Brgy. Daine I • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 160, title: 'Daine I River Access', distance: 'Brgy. Daine I • Nature', image: { uri: 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?q=80&w=1000&auto=format&fit=crop' } },
 
-  // DAINE II
   { id: 161, title: 'Daine II Farm View', distance: 'Brgy. Daine II • Scenic', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
   { id: 162, title: 'Daine II River Stream', distance: 'Brgy. Daine II • Nature', image: { uri: 'https://images.unsplash.com/photo-1508669232496-136bca593257?q=80&w=1000&auto=format&fit=crop' } },
   { id: 163, title: 'Daine II Chapel', distance: 'Brgy. Daine II • Religious', image: { uri: 'https://images.unsplash.com/photo-1516091871239-5a507cb682df?q=80&w=1000&auto=format&fit=crop' } },
@@ -203,7 +186,6 @@ export const recommendations = [
   { id: 169, title: 'Daine II Bridge', distance: 'Brgy. Daine II • Landmark', image: { uri: 'https://images.unsplash.com/photo-1534947960324-42f0da6cb09a?q=80&w=1000&auto=format&fit=crop' } },
   { id: 170, title: 'Daine II Trails', distance: 'Brgy. Daine II • Hiking', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // GUYAM MALAKI
   { id: 171, title: 'Guyam Malaki Falls', distance: 'Brgy. Guyam Malaki • Nature', image: { uri: 'https://images.unsplash.com/photo-1546955121-d0ba6a58f9e7?q=80&w=1000&auto=format&fit=crop' } },
   { id: 172, title: 'Guyam Malaki River', distance: 'Brgy. Guyam Malaki • Scenic', image: { uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 173, title: 'Guyam Malaki Farm', distance: 'Brgy. Guyam Malaki • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
@@ -215,7 +197,6 @@ export const recommendations = [
   { id: 179, title: 'Guyam Malaki Arch', distance: 'Brgy. Guyam Malaki • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 180, title: 'Guyam Malaki View Deck', distance: 'Brgy. Guyam Malaki • Scenic', image: { uri: 'https://images.unsplash.com/photo-1465188162913-8fb5709d6d57?q=80&w=1000&auto=format&fit=crop' } },
 
-  // GUYAM MUNTI
   { id: 181, title: 'Guyam Munti Nature View', distance: 'Brgy. Guyam Munti • Nature', image: { uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 182, title: 'Guyam Munti Spring', distance: 'Brgy. Guyam Munti • Water', image: { uri: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=1000&auto=format&fit=crop' } },
   { id: 183, title: 'Guyam Munti Chapel', distance: 'Brgy. Guyam Munti • Religious', image: { uri: 'https://images.unsplash.com/photo-1548625361-12c8ba6b4476?q=80&w=1000&auto=format&fit=crop' } },
@@ -227,7 +208,6 @@ export const recommendations = [
   { id: 189, title: 'Guyam Munti Picnic Spot', distance: 'Brgy. Guyam Munti • Recreation', image: { uri: 'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=1000&auto=format&fit=crop' } },
   { id: 190, title: 'Guyam Munti Trail', distance: 'Brgy. Guyam Munti • Walk', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // HARASAN
   { id: 191, title: 'Harasan Bamboo Grove', distance: 'Brgy. Harasan • Nature', image: { uri: 'https://images.unsplash.com/photo-1574066917616-2487e413009d?q=80&w=1000&auto=format&fit=crop' } },
   { id: 192, title: 'Harasan River Crossing', distance: 'Brgy. Harasan • Adventure', image: { uri: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=1000&auto=format&fit=crop' } },
   { id: 193, title: 'Harasan Fruit Farm', distance: 'Brgy. Harasan • Agri', image: { uri: 'https://images.unsplash.com/photo-1595855709920-4e00f92d603a?q=80&w=1000&auto=format&fit=crop' } },
@@ -239,7 +219,6 @@ export const recommendations = [
   { id: 199, title: 'Harasan Landmark Arch', distance: 'Brgy. Harasan • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 200, title: 'Harasan Viewpoint', distance: 'Brgy. Harasan • Scenic', image: { uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop' } },
 
-  // KAYQUIT I (UPDATED)
   { id: 201, title: 'Kape-Fied', distance: 'Brgy. Kayquit I • Cafe', image: require('../assets/images/transportation/kapefied.png') },
   { id: 202, title: 'Bistro Gorda', distance: 'Brgy. Kayquit I • Brunch/Dining', image: { uri: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 203, title: 'Patio Buendia', distance: 'Brgy. Kayquit I • Events', image: require('../assets/images/transportation/buendia.png') },
@@ -251,7 +230,6 @@ export const recommendations = [
   { id: 209, title: 'Kayquit I Arch', distance: 'Brgy. Kayquit I • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 210, title: 'Kayquit I View', distance: 'Brgy. Kayquit I • Scenic', image: { uri: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // KAYQUIT II (UPDATED)
   { id: 211, title: 'La Casa Cita', distance: 'Brgy. Kayquit II • Homestay', image: require('../assets/images/transportation/lacasasita.png') },
   { id: 212, title: 'Kayquit II Resort', distance: 'Brgy. Kayquit II • Swimming', image: { uri: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1000&auto=format&fit=crop' } },
   { id: 213, title: 'Kayquit II Farm', distance: 'Brgy. Kayquit II • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
@@ -263,7 +241,6 @@ export const recommendations = [
   { id: 219, title: 'Kayquit II Trail', distance: 'Brgy. Kayquit II • Adventure', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 220, title: 'Kayquit II River View', distance: 'Brgy. Kayquit II • Scenic', image: { uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // KAYQUIT III (UPDATED)
   { id: 221, title: 'Siglo Farm Cafe', distance: 'Brgy. Kayquit III • Farm Cafe', image: require('../assets/images/transportation/siglo.png') },
   { id: 222, title: 'Siglo Paraiso Farm Resort', distance: 'Brgy. Kayquit III • Resort', image: require('../assets/images/transportation/paraiso.png') },
   { id: 223, title: 'Soiree Events Place', distance: 'Brgy. Kayquit III • Events', image: require('../assets/images/transportation/soiree.png') },
@@ -275,7 +252,6 @@ export const recommendations = [
   { id: 229, title: 'Kayquit III School', distance: 'Brgy. Kayquit III • Education', image: { uri: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1000&auto=format&fit=crop' } },
   { id: 230, title: 'Kayquit III Nature Park', distance: 'Brgy. Kayquit III • Nature', image: { uri: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=1000&auto=format&fit=crop' } },
 
-  // KAYTAMBOG
   { id: 231, title: 'Happy Habits Cafe', distance: 'Brgy. Kaytambog • Resort Cafe', image: require('../assets/images/transportation/happyhab.png') },
   { id: 232, title: 'Filomena Springs Nature Resort', distance: 'Brgy. Kaytambog • Resort', image: require('../assets/images/transportation/filomena.png') },
   { id: 233, title: 'Terrace Hill Resort', distance: 'Brgy. Kaytambog • Resort', image: require('../assets/images/transportation/terrace.png') },
@@ -287,7 +263,6 @@ export const recommendations = [
   { id: 239, title: 'Kaytambog Basketball Court', distance: 'Brgy. Kaytambog • Sports', image: { uri: 'https://images.unsplash.com/photo-1505666287802-931dc83948e9?q=80&w=1000&auto=format&fit=crop' } },
   { id: 240, title: 'Kaytambog Bridge', distance: 'Brgy. Kaytambog • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
 
-  // KAYTAPOS
   { id: 241, title: 'Bari Cafe', distance: 'Brgy. Kaytapos • Coffee Shop', image: require('../assets/images/transportation/baricafe.png') },
   { id: 242, title: 'Palsahingin Falls', distance: 'Brgy. Kaytapos • Waterfalls', image: require('../assets/images/transportation/palsahingin.png') },
   { id: 243, title: 'Kaytapos River Trek', distance: 'Brgy. Kaytapos • Adventure', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
@@ -298,7 +273,7 @@ export const recommendations = [
   { id: 248, title: 'Kaytapos School', distance: 'Brgy. Kaytapos • Education', image: { uri: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop' } },
   { id: 249, title: 'Kaytapos Court', distance: 'Brgy. Kaytapos • Sports', image: { uri: 'https://images.unsplash.com/photo-1518619747971-8b02cb0bb28d?q=80&w=1000&auto=format&fit=crop' } },
   { id: 250, title: 'Kaytapos Viewpoint', distance: 'Brgy. Kaytapos • Scenic', image: { uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop' } },
-  // LIMBON
+
   { id: 251, title: 'Bonifacio Shrine', distance: 'Brgy. Limbon • Historical Landmark', image: require('../assets/images/transportation/bonifacioshrine.png') },
   { id: 252, title: 'Limbon River', distance: 'Brgy. Limbon • Nature', image: { uri: 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?q=80&w=1000&auto=format&fit=crop' } },
   { id: 253, title: 'Limbon Park', distance: 'Brgy. Limbon • Recreation', image: { uri: 'https://images.unsplash.com/photo-1519331379826-f72f83915632?q=80&w=1000&auto=format&fit=crop' } },
@@ -310,7 +285,6 @@ export const recommendations = [
   { id: 259, title: 'Limbon Souvenir Shop', distance: 'Brgy. Limbon • Shopping', image: { uri: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1000&auto=format&fit=crop' } },
   { id: 260, title: 'Limbon Nature Trail', distance: 'Brgy. Limbon • Walking', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // LUMAMPONG BALAGBAG
   { id: 261, title: 'Lumampong Balagbag View', distance: 'Lumampong Balagbag • Scenic', image: { uri: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop' } },
   { id: 262, title: 'Lumampong Cave', distance: 'Lumampong Balagbag • Nature', image: require('../assets/images/transportation/lumampongcave.png') },
   { id: 263, title: 'Lumampong Balagbag Farm', distance: 'Lumampong Balagbag • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
@@ -322,7 +296,6 @@ export const recommendations = [
   { id: 269, title: 'Lumampong Balagbag Arch', distance: 'Lumampong Balagbag • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 270, title: 'Lumampong Balagbag Trail', distance: 'Lumampong Balagbag • Adventure', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // LUMAMPONG HALAYHAY
   { id: 271, title: 'Alta Rios Resort', distance: 'Lumampong Halayhay • Resort', image: require('../assets/images/transportation/altarios.png') },
   { id: 272, title: 'The Ravine by One Selah', distance: 'Lumampong Halayhay • Resort', image: require('../assets/images/transportation/ravine.png') },
   { id: 273, title: 'Lumampong Halayhay Garden', distance: 'Lumampong Halayhay • Nature', image: { uri: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=1000&auto=format&fit=crop' } },
@@ -334,7 +307,6 @@ export const recommendations = [
   { id: 279, title: 'Lumampong Halayhay Bridge', distance: 'Lumampong Halayhay • Landmark', image: { uri: 'https://images.unsplash.com/photo-1534947960324-42f0da6cb09a?q=80&w=1000&auto=format&fit=crop' } },
   { id: 280, title: 'Lumampong Halayhay Trail', distance: 'Lumampong Halayhay • Walk', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // MAHABANG KAHOY CERCA
   { id: 281, title: 'Cafe Juana', distance: 'Mahabang Kahoy Cerca • Coffee Shop', image: require('../assets/images/transportation/cafejuana.png') },
   { id: 282, title: 'Photograph Cafe', distance: 'Mahabang Kahoy Cerca • Coffee Shop', image: { uri: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000&auto=format&fit=crop' } },
   { id: 283, title: 'Driftwoods Action Park', distance: 'Mahabang Kahoy Cerca • Adventure', image: require('../assets/images/transportation/driftwoods.png') },
@@ -346,7 +318,6 @@ export const recommendations = [
   { id: 289, title: 'Mahabang Kahoy Cerca School', distance: 'Mahabang Kahoy Cerca • Education', image: { uri: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop' } },
   { id: 290, title: 'Mahabang Kahoy Cerca Court', distance: 'Mahabang Kahoy Cerca • Sports', image: { uri: 'https://images.unsplash.com/photo-1533596775618-8d2669e4695b?q=80&w=1000&auto=format&fit=crop' } },
 
-  // MAHABANG KAHOY LEJOS
   { id: 291, title: 'A&A Garden Suites', distance: 'Mahabang Kahoy Lejos • Hotel', image: { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000&auto=format&fit=crop' } },
   { id: 292, title: 'Mahabang Kahoy Lejos Nature', distance: 'Mahabang Kahoy Lejos • Nature', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 293, title: 'Mahabang Kahoy Lejos Farm', distance: 'Mahabang Kahoy Lejos • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
@@ -358,7 +329,6 @@ export const recommendations = [
   { id: 299, title: 'Mahabang Kahoy Lejos Arch', distance: 'Mahabang Kahoy Lejos • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 300, title: 'Mahabang Kahoy Lejos Trail', distance: 'Mahabang Kahoy Lejos • Hiking', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // MATAAS NA LUPA
   { id: 301, title: 'The Farm Shack Resort', distance: 'Brgy. Mataas na Lupa • Resort', image: require('../assets/images/transportation/farmsahck.png') },
   { id: 302, title: 'Mataas na Lupa Ridge View', distance: 'Brgy. Mataas na Lupa • Scenic', image: { uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1000&auto=format&fit=crop' } },
   { id: 303, title: 'Mataas na Lupa Spring', distance: 'Brgy. Mataas na Lupa • Nature', image: { uri: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=1000&auto=format&fit=crop' } },
@@ -370,7 +340,6 @@ export const recommendations = [
   { id: 309, title: 'Mataas na Lupa Bridge', distance: 'Brgy. Mataas na Lupa • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
   { id: 310, title: 'Mataas na Lupa Trails', distance: 'Brgy. Mataas na Lupa • Walk', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // PULO
   { id: 311, title: 'Pulo River Crossing', distance: 'Brgy. Pulo • Nature', image: { uri: 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?q=80&w=1000&auto=format&fit=crop' } },
   { id: 312, title: 'Pulo Agricultural Farm', distance: 'Brgy. Pulo • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
   { id: 313, title: 'Pulo View Deck', distance: 'Brgy. Pulo • Scenic', image: { uri: 'https://images.unsplash.com/photo-1465188162913-8fb5709d6d57?q=80&w=1000&auto=format&fit=crop' } },
@@ -382,7 +351,6 @@ export const recommendations = [
   { id: 319, title: 'Pulo Nature Trail', distance: 'Brgy. Pulo • Walk', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
   { id: 320, title: 'Pulo Picnic Ground', distance: 'Brgy. Pulo • Recreation', image: { uri: 'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=1000&auto=format&fit=crop' } },
 
-  // TAMBO BALAGBAG
   { id: 321, title: 'Tambo Balagbag River', distance: 'Tambo Balagbag • Nature', image: { uri: 'https://images.unsplash.com/photo-1508669232496-136bca593257?q=80&w=1000&auto=format&fit=crop' } },
   { id: 322, title: 'Tambo Balagbag Garden', distance: 'Tambo Balagbag • Nature', image: { uri: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=1000&auto=format&fit=crop' } },
   { id: 323, title: 'Tambo Balagbag Farm', distance: 'Tambo Balagbag • Agri', image: { uri: 'https://images.unsplash.com/photo-1595855709920-4e00f92d603a?q=80&w=1000&auto=format&fit=crop' } },
@@ -394,7 +362,6 @@ export const recommendations = [
   { id: 329, title: 'Tambo Balagbag Arch', distance: 'Tambo Balagbag • Landmark', image: { uri: 'https://images.unsplash.com/photo-1516937965415-0d418645e9a4?q=80&w=1000&auto=format&fit=crop' } },
   { id: 330, title: 'Tambo Balagbag Trail', distance: 'Tambo Balagbag • Adventure', image: { uri: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000&auto=format&fit=crop' } },
 
-  // TAMBO ILAYA
   { id: 331, title: 'Rmb\'s Downton Place', distance: 'Brgy. Tambo Ilaya • Cabin', image: { uri: 'https://images.unsplash.com/photo-1542718610-a1d656d1884c?q=80&w=1000&auto=format&fit=crop' } },
   { id: 332, title: 'Tambo Ilaya River', distance: 'Brgy. Tambo Ilaya • Nature', image: { uri: 'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?q=80&w=1000&auto=format&fit=crop' } },
   { id: 333, title: 'Tambo Ilaya Farm', distance: 'Brgy. Tambo Ilaya • Agri', image: { uri: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop' } },
@@ -406,7 +373,6 @@ export const recommendations = [
   { id: 339, title: 'Tambo Ilaya Bridge', distance: 'Brgy. Tambo Ilaya • Landmark', image: { uri: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1000&auto=format&fit=crop' } },
   { id: 340, title: 'Tambo Ilaya Trail', distance: 'Brgy. Tambo Ilaya • Walk', image: { uri: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop' } },
 
-  // TAMBO KULIT
   { id: 341, title: 'Rio Villa Nuevo Resort', distance: 'Brgy. Tambo Kulit • Resort', image: require('../assets/images/transportation/rio.png') },
   { id: 342, title: 'Villa Colmenar Resort', distance: 'Brgy. Tambo Kulit • Swimming', image: require('../assets/images/transportation/colmenar.png') },
   { id: 343, title: 'Tambo Kulit Spring', distance: 'Brgy. Tambo Kulit • Nature', image: { uri: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=1000&auto=format&fit=crop' } },
@@ -418,7 +384,6 @@ export const recommendations = [
   { id: 349, title: 'Tambo Kulit Court', distance: 'Brgy. Tambo Kulit • Sports', image: { uri: 'https://images.unsplash.com/photo-1533596775618-8d2669e4695b?q=80&w=1000&auto=format&fit=crop' } },
   { id: 350, title: 'Tambo Kulit Bridge', distance: 'Brgy. Tambo Kulit • Landmark', image: { uri: 'https://images.unsplash.com/photo-1534947960324-42f0da6cb09a?q=80&w=1000&auto=format&fit=crop' } },
 
-  // TAMBO MALAKI
   { id: 351, title: 'EMV Flower Farm', distance: 'Brgy. Tambo Malaki • Agri-Tourism', image: require('../assets/images/transportation/emv.png') },
   { id: 352, title: 'Leaf & Brew Café', distance: 'Brgy. Tambo Malaki • Coffee Shop', image: require('../assets/images/transportation/leafnbrew.png') },
   { id: 353, title: 'Chillax Inn', distance: 'Brgy. Tambo Malaki • Inn', image: require('../assets/images/transportation/chillax.png') },
