@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, 
-  StatusBar, Dimensions
+  StatusBar, Dimensions, Modal
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { hp, wp } from '../../helpers/common'; 
+import { hp, wp } from '../../helpers/common';
+import { auth } from '../../services/supabase';
 
 const { width } = Dimensions.get('window');
 const BRAND_RED = '#D32F2F'; 
@@ -16,8 +17,29 @@ export default function RestaurantDetailsScreen() {
   const { name = "Jollibee Indang", image, location = "Indang Town Plaza" } = params;
 
   const [activeTab, setActiveTab] = useState('About');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { user } = await auth.getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        setCurrentUser(null);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleOrderNow = () => {
+    // Check if user is authenticated
+    if (!currentUser) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     // Navigate to the Menu/Ordering page
     router.push({
         pathname: '/(business)/order',
@@ -124,6 +146,51 @@ export default function RestaurantDetailsScreen() {
             <Text style={styles.orderButtonText}>Order Now</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Auth Modal */}
+      <Modal
+        visible={showAuthModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowAuthModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.modalClose} onPress={() => setShowAuthModal(false)}>
+              <Ionicons name="close" size={24} color="#666" />
+            </TouchableOpacity>
+            
+            <View style={styles.modalIconContainer}>
+              <Ionicons name="lock-closed" size={48} color="#D32F2F" />
+            </View>
+            
+            <Text style={styles.modalTitle}>Sign In Required</Text>
+            <Text style={styles.modalMessage}>
+              Please sign in or create an account to place an order.
+            </Text>
+            
+            <TouchableOpacity 
+              style={styles.modalPrimaryBtn}
+              onPress={() => {
+                setShowAuthModal(false);
+                router.push('/(tabs)/login');
+              }}
+            >
+              <Text style={styles.modalPrimaryBtnText}>Sign In</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.modalSecondaryBtn}
+              onPress={() => {
+                setShowAuthModal(false);
+                router.push('/(tabs)/signup');
+              }}
+            >
+              <Text style={styles.modalSecondaryBtnText}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -172,4 +239,16 @@ const styles = StyleSheet.create({
   perPerson: { color: '#888', fontSize: 12, fontWeight: 'normal' },
   orderButton: { backgroundColor: '#FF7043', paddingVertical: 14, paddingHorizontal: 40, borderRadius: 12 },
   orderButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+
+  // Auth Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { backgroundColor: 'white', borderRadius: 20, padding: 24, width: '100%', maxWidth: 340, alignItems: 'center' },
+  modalClose: { position: 'absolute', top: 12, right: 12, padding: 4 },
+  modalIconContainer: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#FFEBEE', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#111', marginBottom: 8 },
+  modalMessage: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 20 },
+  modalPrimaryBtn: { backgroundColor: '#D32F2F', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12, width: '100%', alignItems: 'center', marginBottom: 12 },
+  modalPrimaryBtnText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  modalSecondaryBtn: { backgroundColor: '#F5F5F5', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12, width: '100%', alignItems: 'center' },
+  modalSecondaryBtnText: { color: '#333', fontWeight: '600', fontSize: 16 },
 });
