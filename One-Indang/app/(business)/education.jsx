@@ -13,6 +13,14 @@ import {
   Alert 
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  EDUCATION_INSTITUTIONS, 
+  EDUCATION_FILTERS, 
+  EDUCATION_GALLERY_IMGS, 
+  EDUCATION_REVIEWS_DATA 
+} from '../../constants/businessData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -26,37 +34,6 @@ const EDU_BLUE = '#1A73E8';
 const LIGHT_EDU_BG = '#E8F0FE';
 const PRIMARY_BLUE = '#2D6BFF';
 const AGRI_HEART_RED = '#FF6B6B'; 
-
-// --- DATA ---
-const BASE_DATA = [
-  { id: '1', name: 'Cavite State University', sub: 'Main Campus • Public University', rating: '4.9', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe1?w=400', tag: 'Govt Accredited', verified: true, category: 'University', location: 'Indang-Mendez Rd', price: '0', beds: '50+', baths: '20+', sqft: '15,000+', agent: 'Registrar Office', phone: '0461234567' },
-  { id: '2', name: 'Indang Central School', sub: 'Elementary • Public Education', rating: '4.6', distance: '0.3 km', image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400', tag: 'Historical', verified: false, category: 'Primary', location: 'Poblacion', price: '0', beds: '24', baths: '8', sqft: '2,500', agent: 'Principal Office', phone: '0467654321' },
-  { id: '3', name: 'St. Gregory Academy', sub: 'Private • K-12 School', rating: '4.7', distance: '0.4 km', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400', tag: 'Top Rated', verified: true, category: 'Secondary', location: 'Poblacion 2', price: '15,000', beds: '30', baths: '12', sqft: '4,000', agent: 'Admissions', phone: '09112223333' },
-  { id: '4', name: 'Indang National High School', sub: 'Public • Secondary Education', rating: '4.5', distance: '1.2 km', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400', tag: 'Public', verified: false, category: 'Secondary', location: 'Brgy. Alulod', price: '0', beds: '40', baths: '10', sqft: '6,000', agent: 'Admin Sec', phone: '09998887777' },
-];
-
-// Expanded Data for Scrolling
-const EDU_INSTITUTIONS = [
-  ...BASE_DATA,
-  { ...BASE_DATA[0], id: '5', name: 'Cavite East Campus', location: 'Brgy. Bancod' },
-  { ...BASE_DATA[2], id: '6', name: 'Saint Thomas School', location: 'Brgy. Mataas na Lupa' },
-  { ...BASE_DATA[3], id: '7', name: 'Lumampong High', location: 'Brgy. Lumampong' },
-  { ...BASE_DATA[1], id: '8', name: 'Buna Elem. School', location: 'Brgy. Buna' },
-];
-
-const FILTERS = ['All', 'University', 'Secondary', 'Primary', 'Vocational'];
-
-const GALLERY_IMGS = [
-  'https://images.unsplash.com/photo-1562774053-701939374585?w=400',
-  'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400',
-  'https://images.unsplash.com/photo-1541339907198-e08756ebafe1?w=400',
-  'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400',
-];
-
-const REVIEWS_DATA = [
-  { id: 1, user: 'Juan Dela Cruz', rating: 5, comment: 'Best university in Cavite! Very spacious campus.', date: '1 month ago' },
-  { id: 2, user: 'Sarah L.', rating: 4, comment: 'Great teachers but traffic during rush hour.', date: '3 weeks ago' },
-];
 
 export default function EducationScreen() {
   const router = useRouter();
@@ -126,7 +103,7 @@ export default function EducationScreen() {
   // 2. GALLERY TAB
   const renderGalleryTab = () => (
     <View style={styles.galleryGrid}>
-      {GALLERY_IMGS.map((img, index) => (
+      {EDUCATION_GALLERY_IMGS.map((img, index) => (
         <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
       ))}
     </View>
@@ -135,7 +112,7 @@ export default function EducationScreen() {
   // 3. REVIEW TAB
   const renderReviewTab = () => (
     <View style={{ marginTop: hp(2) }}>
-      {REVIEWS_DATA.map((review) => (
+      {EDUCATION_REVIEWS_DATA.map((review) => (
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -231,8 +208,8 @@ export default function EducationScreen() {
 
   // Filter Logic
   const filteredData = useMemo(() => {
-    const category = FILTERS[activeIndex];
-    return EDU_INSTITUTIONS.filter(item => {
+    const category = EDUCATION_FILTERS[activeIndex];
+    return EDUCATION_INSTITUTIONS.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.sub.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = category === 'All' || item.category === category;
@@ -276,7 +253,7 @@ export default function EducationScreen() {
 
           <View style={styles.filterRowContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-              {FILTERS.map((filter, index) => (
+              {EDUCATION_FILTERS.map((filter, index) => (
                 <TouchableOpacity 
                   key={filter} 
                   onPress={() => setActiveIndex(index)}

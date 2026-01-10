@@ -13,6 +13,14 @@ import {
   Alert 
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  TOURISM_DATA, 
+  TOURISM_FILTERS, 
+  TOURISM_GALLERY_IMGS, 
+  TOURISM_REVIEWS_DATA 
+} from '../../constants/businessData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -25,37 +33,6 @@ const wp = (p) => (p * deviceWidth) / 100;
 const TOURISM_BEIGE = '#A68966'; 
 const LIGHT_BEIGE_BG = '#F5F5DC'; 
 const HEART_ORANGE = '#FF8C00'; // UPDATED: Orange Heart
-
-// --- DATA ---
-const BASE_DATA = [
-  { id: '1', name: 'Balite Falls', sub: 'Natural Springs & Waterfalls', rating: '4.8', distance: '2.4 km', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400', tag: 'Nature', verified: true, location: 'Brgy. Banaba Lejos', category: 'Nature', price: '100', guests: 'Unlimited', time: '8AM-5PM', agent: 'LGU Tourism', phone: '0464151234' },
-  { id: '2', name: 'Indang Town Plaza', sub: 'Historical Landmark & Park', rating: '4.5', distance: '0.1 km', image: 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=400', tag: 'Historic', verified: true, location: 'Poblacion', category: 'Parks', price: '0', guests: 'Public', time: '24/7', agent: 'Town Admin', phone: '0464150000' },
-  { id: '3', name: 'Villa Filomena', sub: 'Resort & Events Venue', rating: '4.6', distance: '1.2 km', image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=400', tag: 'Resort', verified: false, location: 'Brgy. Calumpang', category: 'Resorts', price: '350', guests: '150 Max', time: '8AM-9PM', agent: 'Front Desk', phone: '09123456789' },
-  { id: '4', name: 'St. Gregory Parish', sub: '17th Century Church', rating: '4.9', distance: '0.2 km', image: 'https://images.unsplash.com/photo-1548625361-195feee1048e?w=400', tag: 'Historic', verified: true, location: 'Poblacion 1', category: 'Historic', price: '0', guests: 'Public', time: '6AM-7PM', agent: 'Parish Office', phone: '0464151111' },
-];
-
-// Expanded Data for Scrolling
-const TOURISM_DATA = [
-  ...BASE_DATA,
-  { ...BASE_DATA[0], id: '5', name: 'Rio Villa Nuevo', location: 'Brgy. Tambo Malaki' },
-  { ...BASE_DATA[2], id: '6', name: 'Alta Rios Resort', location: 'Brgy. Lumampong' },
-  { ...BASE_DATA[1], id: '7', name: 'Bonifacio Shrine', location: 'Brgy. Limbon' },
-  { ...BASE_DATA[0], id: '8', name: 'Hidden Garden', location: 'Brgy. Alulod' },
-];
-
-const FILTERS = ['All', 'Nature', 'Resorts', 'Historic', 'Parks'];
-
-const GALLERY_IMGS = [
-  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
-  'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=400',
-  'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=400',
-  'https://images.unsplash.com/photo-1548625361-195feee1048e?w=400',
-];
-
-const REVIEWS_DATA = [
-  { id: 1, user: 'Traveler Joe', rating: 5, comment: 'Very peaceful and clean. Great for family picnics.', date: '3 days ago' },
-  { id: 2, user: 'History Buff', rating: 4, comment: 'Rich history but needs more tour guides.', date: '2 weeks ago' },
-];
 
 export default function TourismScreen() {
   const router = useRouter();
@@ -126,7 +103,7 @@ export default function TourismScreen() {
   // 2. GALLERY TAB
   const renderGalleryTab = () => (
     <View style={styles.galleryGrid}>
-      {GALLERY_IMGS.map((img, index) => (
+      {TOURISM_GALLERY_IMGS.map((img, index) => (
         <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
       ))}
     </View>
@@ -135,7 +112,7 @@ export default function TourismScreen() {
   // 3. REVIEW TAB
   const renderReviewTab = () => (
     <View style={{ marginTop: hp(2) }}>
-      {REVIEWS_DATA.map((review) => (
+      {TOURISM_REVIEWS_DATA.map((review) => (
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -232,7 +209,7 @@ export default function TourismScreen() {
 
   // Filter Logic
   const filteredData = useMemo(() => {
-    const category = FILTERS[activeIndex];
+    const category = TOURISM_FILTERS[activeIndex];
     return TOURISM_DATA.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.sub.toLowerCase().includes(searchQuery.toLowerCase());
@@ -277,7 +254,7 @@ export default function TourismScreen() {
 
           <View style={styles.filterRowContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-              {FILTERS.map((filter, index) => (
+              {TOURISM_FILTERS.map((filter, index) => (
                 <TouchableOpacity 
                   key={filter} 
                   onPress={() => setActiveIndex(index)}

@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { wp, hp } from '../helpers/common';
 import Ionicons from "react-native-vector-icons/Ionicons";
 
@@ -17,8 +19,8 @@ const FireProtectionContent = ({ onCall, onClose }) => {
     }
   ];
 
-  const copyToClipboard = (num) => {
-    Clipboard.setString(num);
+  const copyToClipboard = async (num) => {
+    await Clipboard.setStringAsync(num);
     Alert.alert("Copied", "Number copied to clipboard");
   };
 
@@ -30,7 +32,7 @@ const FireProtectionContent = ({ onCall, onClose }) => {
           <Ionicons name="close" size={wp(7)} color="#333" />
         </TouchableOpacity>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <BottomSheetScrollView showsVerticalScrollIndicator={false}>
         {data.map((item, idx) => (
           <View key={idx} style={styles.section}>
             <Text style={styles.stationName}>{item.title}</Text>
@@ -50,7 +52,8 @@ const FireProtectionContent = ({ onCall, onClose }) => {
             ))}
           </View>
         ))}
-      </ScrollView>
+        <View style={{ height: 40 }} />
+      </BottomSheetScrollView>
     </View>
   );
 };

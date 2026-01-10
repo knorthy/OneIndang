@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { 
   View, 
   Text, 
@@ -12,13 +12,12 @@ import {
   UIManager 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter } from 'expo-router'; 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Stack, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 
 // --- HELPERS IMPORT ---
 import { hp, wp } from '../../helpers/common';
-import SubscribeModal from '../../components/subscribe'; 
+import { BUSINESS_CATEGORIES, POPULAR_BUSINESSES, BUSINESS_SETUP_STAGES } from '../../constants/businessData'; 
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -34,38 +33,15 @@ const SUCCESS_GREEN = '#22C55E';
 const TEXT_GRAY = '#6B7280';
 
 // --- DATA ---
-const categories = [
-  { id: '1', name: 'Agriculture', img: 'https://cdn-icons-png.flaticon.com/512/2610/2610368.png', route: '/agri' },
-  { id: '2', name: 'Food', img: 'https://cdn-icons-png.flaticon.com/512/732/732217.png', route: '/foodtripind' },
-  { id: '3', name: 'Tourism', img: 'https://cdn-icons-png.flaticon.com/512/2560/2560421.png', route: '/tourismindang' },
-  { id: '4', name: 'Retail', img: 'https://cdn-icons-png.flaticon.com/512/3081/3081559.png', route: '/retailindang' },
-  { id: '5', name: 'Transport', img: 'https://cdn-icons-png.flaticon.com/512/1048/1048314.png', route: '/transport' },
-  { id: '6', name: 'Education', img: 'https://cdn-icons-png.flaticon.com/512/3976/3976625.png', route: '/education' },
-  { id: '7', name: 'Construction', img: 'https://cdn-icons-png.flaticon.com/512/4327/4327376.png', route: '/construction' },
-  { id: '8', name: 'Services', img: 'https://cdn-icons-png.flaticon.com/512/1067/1067561.png', route: '/serviceindang' },
-];
 
-const businessesData = [
-  { id: '1', name: 'Jollibee Indang', category: 'Food', address: 'Town Plaza', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400', isOpen: true, price: '$1,200', beds: 'N/A', baths: '2', sqft: '1,200' },
-  { id: '2', name: 'Siglo Farm Café', category: 'Food / Agri', address: 'Kayquit 3', image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400', isOpen: false, price: '$800', beds: 'N/A', baths: '1', sqft: '800' },
-  { id: '3', name: 'Woodland Apartment', category: 'Apartment', address: 'Poblacion', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800', isOpen: true, price: '$1,500', beds: '3', baths: '1', sqft: '1,848' },
-];
-
-const timelineStages = [
-  { id: '1', title: 'BUSINESS REGISTRATION', description: 'Apply for DTI/SEC registration online.' },
-  { id: '2', title: 'LAND DEVELOPMENT', description: 'Verify zoning and obtain Planning Office clearance.' },
-  { id: '3', title: 'FACILITY CONSTRUCTION', description: 'Secure building permits and comply with safety codes.' },
-  { id: '4', title: 'FINAL OPERATION', description: 'Register with BIR and secure Mayor’s Permit.' },
-];
 
 const BusinessListScreen = () => {
   const router = useRouter(); 
-  const subscribeSheetRef = useRef(null);
   const [favorites, setFavorites] = useState([]); 
   const [showAll, setShowAll] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-  const displayedBusinesses = showAll ? businessesData : businessesData.slice(0, 3);
+  const displayedBusinesses = showAll ? POPULAR_BUSINESSES : POPULAR_BUSINESSES.slice(0, 3);
 
   const toggleFavorite = useCallback((item) => {
     setFavorites(prev => {
@@ -92,7 +68,6 @@ const BusinessListScreen = () => {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container} edges={['top']}>
         <Stack.Screen options={{ headerShown: false }} />
 
@@ -108,7 +83,7 @@ const BusinessListScreen = () => {
               <Text style={styles.sectionLabel}>TOP CATEGORIES</Text>
             </View>
             <View style={styles.gridContainer}>
-              {categories.map((cat) => (
+              {BUSINESS_CATEGORIES.map((cat) => (
                 <TouchableOpacity style={styles.catItem} key={cat.id} onPress={() => router.push(cat.route)}>
                   <View style={styles.catCircle}>
                     <Image source={{ uri: cat.img }} style={styles.catImage} />
@@ -183,7 +158,7 @@ const BusinessListScreen = () => {
             </View>
             <View style={styles.timelineWrapper}>
               <View style={styles.centeredLine} />
-              {timelineStages.map((item, index) => {
+              {BUSINESS_SETUP_STAGES.map((item, index) => {
                 const isLeft = index % 2 === 0;
                 return (
                   <View key={item.id} style={styles.stepRow}>
@@ -214,13 +189,7 @@ const BusinessListScreen = () => {
             </View>
           </View>
         </ScrollView>
-
-        <TouchableOpacity style={styles.floatingBtn} onPress={() => subscribeSheetRef.current?.expand()}>
-          <Text style={styles.subscribeText}>Subscribe</Text>
-        </TouchableOpacity>
-        <SubscribeModal ref={subscribeSheetRef} />
       </SafeAreaView>
-    </GestureHandlerRootView>
   );
 };
 
@@ -376,8 +345,6 @@ const styles = StyleSheet.create({
   bookBtn: { backgroundColor: '#3B82F6', paddingVertical: 15, paddingHorizontal: 35, borderRadius: 15 },
   bookBtnText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
   
-  floatingBtn: { position: 'absolute', bottom: hp(4), right: wp(6), backgroundColor: THEME_BLUE, paddingVertical: hp(1.5), paddingHorizontal: wp(6), borderRadius: 30 },
-  subscribeText: { color: '#FFF', fontWeight: 'bold' },
   row: { flexDirection: 'row', alignItems: 'center' },
   moreText: { fontSize: wp(3.5), fontWeight: 'bold', color: THEME_BLUE, marginRight: 4 },
   toggleBtn: { flexDirection: 'row', alignItems: 'center' },
