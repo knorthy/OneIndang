@@ -24,7 +24,7 @@ import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
 import { popularDestinations, searchDestinations } from '../../constants/popularDestinations';
-import { styles, autocompleteStyles } from './styles/transpo.styles';
+import { styles, autocompleteStyles } from '../styles/transpoStyles';
 
 // Ignore specific warnings
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']);

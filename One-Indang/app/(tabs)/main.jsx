@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { hp, wp } from "../../helpers/common";
-import styles from './styles/main.styles';
+import styles from '../styles/mainStyles';
 
 // Icons
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";

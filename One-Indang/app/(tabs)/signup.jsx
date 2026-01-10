@@ -16,7 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { hp, wp } from '../../helpers/common'; 
-import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from './styles/signup.styles';
+import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../styles/signupStyles';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();

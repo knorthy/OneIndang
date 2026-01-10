@@ -17,7 +17,7 @@ import { hp, wp } from "../../helpers/common";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import styles from './styles/emergency.styles';
+import styles from '../styles/emergencyStyles';
 
 // GORHOM BOTTOM SHEET IMPORTS
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";

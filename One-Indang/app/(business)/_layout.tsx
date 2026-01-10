@@ -14,7 +14,7 @@ export default function BusinessLayout() {
         headerTintColor: Colors[colorScheme ?? 'light'].tint,
       }}>
       <Stack.Screen name="business" options={{ title: 'Business' }} />
-      <Stack.Screen name="[agri]" options={{ title: 'Agriculture' }} />
+      <Stack.Screen name="agri" options={{ title: 'Agriculture' }} />
       <Stack.Screen name="construction" options={{ title: 'Construction' }} />
       <Stack.Screen name="education" options={{ title: 'Education' }} />
       <Stack.Screen name="foodtripind" options={{ title: 'Food Trip' }} />

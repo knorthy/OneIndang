@@ -11,7 +11,7 @@ import {
 import { router } from 'expo-router'; 
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
-import { styles, COLORS } from './styles/services.styles';
+import { styles, COLORS } from '../styles/servicesStyles';
 
 // --- DATA CONSTANTS ---
 const E_SERVICES = [

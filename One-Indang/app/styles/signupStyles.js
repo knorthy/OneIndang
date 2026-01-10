@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { hp, wp } from '../../../helpers/common';
+import { hp, wp } from '../../helpers/common';
 
 const BRAND_RED = '#D32F2F'; 
 const SUCCESS_COLOR = '#388E3C';

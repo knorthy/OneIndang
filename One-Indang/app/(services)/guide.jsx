@@ -13,7 +13,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
-import styles from './styles/guide.styles';
+import styles from '../styles/guideStyles';
 
 // --- DATA FOR INDANG GUIDE (COMPLETE) ---
 const GUIDE_DATA = {

@@ -1,5 +1,5 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
-import { hp, wp } from '../../../helpers/common';
+import { hp, wp } from '../../helpers/common';
 
 // --- THEME COLORS ---
 const COLORS = {

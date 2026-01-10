@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import styles from './styles/citizen.styles';
+import styles from '../styles/citizenStyles';
 
 // --- INDANG CITIZEN GUIDE DATA ---
 const CITIZEN_GUIDE_DATA = [

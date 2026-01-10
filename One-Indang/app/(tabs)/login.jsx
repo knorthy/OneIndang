@@ -14,7 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'; // Using Expo icons
 import { hp, wp } from "../../helpers/common";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import styles from './styles/login.styles';
+import styles from '../styles/loginStyles';
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
