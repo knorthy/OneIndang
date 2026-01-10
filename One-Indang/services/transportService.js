@@ -112,10 +112,10 @@ export const calculateFare = async (selectedTransport, tricycleType, passengerCo
     if (isNaN(inputCount)) inputCount = 2; 
     validPassengerCount = Math.max(2, Math.min(6, inputCount));
   } else {
-    // OTHER MODES: Standard 1 to 6
+    // OTHER MODES: Standard 2  to 6
     let inputCount = parseInt(passengerCount, 10);
-    if (isNaN(inputCount)) inputCount = 1;
-    validPassengerCount = Math.max(1, Math.min(6, inputCount));
+    if (isNaN(inputCount)) inputCount = 2;
+    validPassengerCount = Math.max(2, Math.min(6, inputCount));
   }
 
   // 2. Get Distance from API

@@ -18,6 +18,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
+import * as Location from 'expo-location'; // Added for GPS functionality
 import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
@@ -65,6 +66,9 @@ export default function App() {
   // RECEIPT MODAL STATE
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+
+  // LOCATION PERMISSION STATE
+  const [locationPermission, setLocationPermission] = useState(null);
 
   useEffect(() => {
     const now = new Date();
@@ -153,6 +157,38 @@ export default function App() {
     
     originRef.current?.setAddressText(destination?.desc || '');
     destRef.current?.setAddressText(origin?.desc || '');
+  };
+
+  // --- GET CURRENT LOCATION FUNCTION ---
+  const getCurrentLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationPermission(status);
+
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Location permission is required to use current location');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      // Reverse geocode to get address
+      const address = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const addressString = address[0] ?
+        `${address[0].name || ''}, ${address[0].city || ''}, ${address[0].region || ''}`.replace(/^, |, $/g, '') :
+        `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+      setOrigin({
+        lat: latitude,
+        lng: longitude,
+        desc: addressString
+      });
+
+      originRef.current?.setAddressText(addressString);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to get current location. Please check your GPS settings.');
+    }
   };
 
   const handleRecommendationPress = (item) => {
@@ -442,6 +478,12 @@ export default function App() {
                     styles={autocompleteStyles}
                     enablePoweredByContainer={false}
                   />
+                  <TouchableOpacity
+                    style={styles.currentLocationBtn}
+                    onPress={getCurrentLocation}
+                  >
+                    <Icon name="my-location" size={16} color="#D32F2F" />
+                  </TouchableOpacity>
                 </View>
 
                 <View style={[styles.inputWrapperBottom, { zIndex: 900 }]}>
@@ -644,4 +686,25 @@ const styles = StyleSheet.create({
   actionButtonTextSecondary: { fontSize: hp(1.6), color: '#666', fontWeight: '600' },
   actionButtonPrimary: { flex: 1, backgroundColor: '#D32F2F', paddingVertical: hp(1.5), borderRadius: 10, alignItems: 'center' },
   actionButtonTextPrimary: { fontSize: hp(1.6), color: '#FFF', fontWeight: '600' },
+
+  // CURRENT LOCATION BUTTON STYLES
+  currentLocationBtn: { 
+    position: 'absolute', 
+    right: 10, 
+    top: 10, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#F8FAFF', 
+    paddingHorizontal: 8, 
+    paddingVertical: 4, 
+    borderRadius: 12, 
+    borderWidth: 1, 
+    borderColor: '#D32F2F' 
+  },
+  currentLocationText: { 
+    fontSize: 12, 
+    color: '#D32F2F', 
+    marginLeft: 4, 
+    fontWeight: '500' 
+  }
 });
