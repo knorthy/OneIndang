@@ -13,6 +13,14 @@ import {
   Alert 
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
+
+// IMPORT DATA
+import { 
+  CONSTRUCTION_BUSINESSES, 
+  CONSTRUCTION_FILTERS, 
+  CONSTRUCTION_GALLERY_IMGS, 
+  CONSTRUCTION_REVIEWS_DATA 
+} from '../../constants/businessData';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -25,37 +33,6 @@ const wp = (p) => (p * deviceWidth) / 100;
 const CONSTRUCT_GREY = '#455A64'; 
 const LIGHT_GREY_BG = '#ECEFF1';
 const AGRI_HEART_RED = '#FF6B6B'; 
-
-// --- DATA ---
-const BASE_DATA = [
-  { id: '1', name: 'Indang Mega Hardware', sub: 'Steel, Cement & Power Tools', rating: '4.8', distance: '0.5 km', image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400', tag: 'Complete Stocks', verified: true, category: 'Hardware', location: 'Poblacion 4', price: '2,500', beds: '0', baths: '2', sqft: '4,500', agent: 'Engr. Santos', phone: '09123456789' },
-  { id: '2', name: 'Cavite Concrete Master', sub: 'Ready-mix & Aggregates', rating: '4.7', distance: '2.1 km', image: 'https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=400', tag: 'Contractor', verified: true, category: 'Contractors', location: 'Brgy. Alulod', price: '15,000', beds: '0', baths: '1', sqft: '10,000', agent: 'Lando Cal', phone: '09987654321' },
-  { id: '3', name: 'J.M. De Villa Engineering', sub: 'Structural Design & Permits', rating: '4.9', distance: '1.2 km', image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400', tag: 'Licensed', verified: true, category: 'Engineering', location: 'Poblacion 1', price: '5,000', beds: '4', baths: '2', sqft: '1,800', agent: 'Joey De Villa', phone: '09112223333' },
-  { id: '4', name: 'Poblacion Paint Center', sub: 'Mixing & Finishing Supplies', rating: '4.6', distance: '0.3 km', image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400', tag: 'Premium', verified: false, category: 'Paints', location: 'Poblacion 3', price: '800', beds: '0', baths: '0', sqft: '120', agent: 'Tina Tints', phone: '09223334444' },
-];
-
-// Expanded Data for Scrolling
-const BUILD_BUSINESSES = [
-  ...BASE_DATA,
-  { ...BASE_DATA[0], id: '5', name: 'Indang Glass & Aluminum', location: 'Brgy. Kayquit' },
-  { ...BASE_DATA[1], id: '6', name: 'Solid Rock Aggregates', location: 'Brgy. Banaba' },
-  { ...BASE_DATA[2], id: '7', name: 'ArkiTeck Design', location: 'Brgy. Bancod' },
-  { ...BASE_DATA[3], id: '8', name: 'Color World Paints', location: 'Poblacion 2' },
-];
-
-const FILTERS = ['All', 'Hardware', 'Contractors', 'Engineering', 'Equipment', 'Paints'];
-
-const GALLERY_IMGS = [
-  'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400',
-  'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400',
-  'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400',
-  'https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?w=400',
-];
-
-const REVIEWS_DATA = [
-  { id: 1, user: 'Engr. Michael', rating: 5, comment: 'Complete stocks and very fast delivery.', date: '2 days ago' },
-  { id: 2, user: 'Home Builder 101', rating: 4, comment: 'Good quality sand and gravel, but parking is tight.', date: '1 week ago' },
-];
 
 export default function ConstructionScreen() {
   const router = useRouter();
@@ -125,7 +102,7 @@ export default function ConstructionScreen() {
   // 2. GALLERY TAB
   const renderGalleryTab = () => (
     <View style={styles.galleryGrid}>
-      {GALLERY_IMGS.map((img, index) => (
+      {CONSTRUCTION_GALLERY_IMGS.map((img, index) => (
         <Image key={index} source={{ uri: img }} style={styles.galleryImg} />
       ))}
     </View>
@@ -134,7 +111,7 @@ export default function ConstructionScreen() {
   // 3. REVIEW TAB
   const renderReviewTab = () => (
     <View style={{ marginTop: hp(2) }}>
-      {REVIEWS_DATA.map((review) => (
+      {CONSTRUCTION_REVIEWS_DATA.map((review) => (
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -230,8 +207,8 @@ export default function ConstructionScreen() {
 
   // Filter Logic
   const filteredData = useMemo(() => {
-    const category = FILTERS[activeIndex];
-    return BUILD_BUSINESSES.filter(item => {
+    const category = CONSTRUCTION_FILTERS[activeIndex];
+    return CONSTRUCTION_BUSINESSES.filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             item.sub.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = category === 'All' || item.category === category;
@@ -275,7 +252,7 @@ export default function ConstructionScreen() {
 
           <View style={styles.filterRowContainer}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-              {FILTERS.map((filter, index) => (
+              {CONSTRUCTION_FILTERS.map((filter, index) => (
                 <TouchableOpacity 
                   key={filter} 
                   onPress={() => setActiveIndex(index)}

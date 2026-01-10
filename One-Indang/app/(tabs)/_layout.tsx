@@ -12,6 +12,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         headerTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarStyle: { display: 'none' },
       }}>
       <Tabs.Screen
         name="main"
@@ -47,7 +48,6 @@ export default function TabLayout() {
         name="transpo"
         options={{
           title: 'Transpo',
-          tabBarStyle: { display: 'none' },
         }}
       />
     </Tabs>

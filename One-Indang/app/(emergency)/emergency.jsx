@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { Stack } from "expo-router";
 import { hp, wp } from "../../helpers/common";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 
@@ -34,6 +33,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 export default function EmergencyScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [contentType, setContentType] = useState("hospitals");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const bottomSheetRef = useRef(null);
 
   const snapPoints = useMemo(() => ["80%"], []);
@@ -66,18 +66,19 @@ export default function EmergencyScreen() {
 
   const renderBackdrop = useCallback(
     (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
+      isSheetOpen ? (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          opacity={0.5}
+        />
+      ) : null
     ),
-    []
+    [isSheetOpen]
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ headerShown: false }} />
 
@@ -141,7 +142,7 @@ export default function EmergencyScreen() {
           <View style={styles.quickActionsRow}>
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("hospitals"); bottomSheetRef.current?.expand(); }}
+              onPress={() => { setContentType("hospitals"); setIsSheetOpen(true); }}
             >
               <MaterialCommunityIcons name="hospital-building" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Hospitals</Text>
@@ -149,7 +150,7 @@ export default function EmergencyScreen() {
 
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("fire"); bottomSheetRef.current?.expand(); }}
+              onPress={() => { setContentType("fire"); setIsSheetOpen(true); }}
             >
               <MaterialIcons name="local-fire-department" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Fire Protection</Text>
@@ -159,23 +160,23 @@ export default function EmergencyScreen() {
 
         <BottomSheet
           ref={bottomSheetRef}
-          index={-1}
+          index={isSheetOpen ? 0 : -1}
           snapPoints={snapPoints}
           enablePanDownToClose
+          onClose={() => setIsSheetOpen(false)}
           backdropComponent={renderBackdrop}
           handleIndicatorStyle={{ backgroundColor: "#333", width: wp(12) }}
           backgroundStyle={{ borderRadius: wp(10) }}
         >
           <View style={{ flex: 1 }}>
             {contentType === "hospitals" ? (
-              <HospitalsContent onCall={dialNumber} onClose={() => bottomSheetRef.current?.close()} />
+              <HospitalsContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
             ) : (
-              <FireProtectionContent onCall={dialNumber} onClose={() => bottomSheetRef.current?.close()} />
+              <FireProtectionContent onCall={dialNumber} onClose={() => { bottomSheetRef.current?.close(); setIsSheetOpen(false); }} />
             )}
           </View>
         </BottomSheet>
       </SafeAreaView>
-    </GestureHandlerRootView>
   );
 }
 
@@ -254,6 +255,7 @@ const SlideToCall911 = ({ onCall }) => {
 };
 
 const styles = StyleSheet.create({
+  
   container: { flex: 1, backgroundColor: "#F8FAFF" },
   appHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: wp(5), paddingTop: hp(4), paddingBottom: hp(1) },
   headerTitle: { fontSize: wp(8), fontWeight: "900", color: "#003087" },

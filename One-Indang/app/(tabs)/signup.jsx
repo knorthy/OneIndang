@@ -4,10 +4,8 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
   KeyboardAvoidingView, 
   Platform, 
-  Alert,
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView
@@ -15,22 +13,23 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
-
-
+import { Link, useRouter } from 'expo-router'; 
 import { hp, wp } from '../../helpers/common'; 
+import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
+import { showToast } from '../../components/Toast';
+import { auth } from '../../services/supabase';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
+  const router = useRouter(); 
   const [currentStep, setCurrentStep] = useState(1); 
 
- 
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // OTP STATE
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
@@ -41,8 +40,7 @@ const AccountSetupScreen = () => {
   const [errors, setErrors] = useState({
     phone: false,
     email: false,
-    firstName: false,
-    lastName: false,
+    fullName: false,
     password: false,
   });
 
@@ -50,11 +48,6 @@ const AccountSetupScreen = () => {
     length: false,
     format: false,
   });
-
-  const BRAND_RED = '#D32F2F'; 
-  const SUCCESS_COLOR = '#388E3C';
-  const DISABLED_RED = '#FFB4A9'; 
-
 
   useEffect(() => {
     const isLengthValid = password.length >= 8;
@@ -66,7 +59,6 @@ const AccountSetupScreen = () => {
     });
   }, [password]);
 
-
   useEffect(() => {
     let interval;
     if (currentStep === 2 && timerCount > 0) {
@@ -76,8 +68,6 @@ const AccountSetupScreen = () => {
     }
     return () => clearInterval(interval);
   }, [currentStep, timerCount]);
-
-
 
   const handlePhoneChange = (text) => {
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -90,32 +80,110 @@ const AccountSetupScreen = () => {
     if(errors.email) setErrors({...errors, email: false});
   };
 
-  const handleNameChange = (text, setter, errorField) => {
+  const handleNameChange = (text) => {
     const alphabetValue = text.replace(/[^a-zA-Z\s]/g, '');
-    setter(alphabetValue);
-    if(errors[errorField]) setErrors({...errors, [errorField]: false});
+    setFullName(alphabetValue);
+    if(errors.fullName) setErrors({...errors, fullName: false});
   };
 
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     let valid = true;
-    let newErrors = { phone: false, email: false, firstName: false, lastName: false, password: false };
+    let newErrors = { phone: false, email: false, fullName: false, password: false };
 
     if (!phone || phone.length < 10) { newErrors.phone = true; valid = false; }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) { newErrors.email = true; valid = false; }
-    if (!firstName.trim()) { newErrors.firstName = true; valid = false; }
-    if (!lastName.trim()) { newErrors.lastName = true; valid = false; }
-    if (!passwordCriteria.length || !passwordCriteria.format) { newErrors.password = true; valid = false; }
+    
+    if (!fullName.trim()) { newErrors.fullName = true; valid = false; }
+
+    const isPassLengthValid = password.length >= 8;
+    const isPassFormatValid = /^(?=.*[a-zA-Z])(?=.*[0-9])/.test(password);
+
+    if (!isPassLengthValid || !isPassFormatValid) { 
+      newErrors.password = true; 
+      valid = false; 
+    }
 
     setErrors(newErrors);
 
-    if (valid) {
-      setCurrentStep(2);
-      setTimer(60);
+    if (!valid) {
+      console.log("Validation failed", newErrors);
+      return;
+    }
+
+    // Sign up with Supabase
+    setIsLoading(true);
+    try {
+      console.log('Attempting signup with:', { email, fullName, phone: `+63${phone}` });
+      
+      const { data, error } = await auth.signUp(email, password, {
+        full_name: fullName,
+        phone: `+63${phone}`
+      });
+
+      console.log('Signup response:', { data: data ? 'received' : 'null', error });
+
+      if (error) {
+        console.error('Signup error:', error);
+        showToast(error.message || 'Failed to create account');
+        return;
+      }
+
+      if (data.user) {
+        if (!data.user.email_confirmed_at) {
+          // Email confirmation required
+          showToast('Please check your email for the verification code');
+          setCurrentStep(2);
+        } else {
+          showToast('Account created successfully!');
+          router.replace('/login'); // Redirect to login immediately if no verification needed
+        }
+      } else {
+        showToast('Account creation failed - no user data');
+      }
+    } catch (error) {
+      console.error('Signup exception:', error);
+      showToast('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // --- UPDATED: VERIFY OTP & REDIRECT TO LOGIN ---
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+    const token = otpCode.join(''); 
 
+    try {
+      // 1. Verify the code
+      const { data, error } = await auth.verifyOtp({
+        email: email,
+        token: token,
+        type: 'signup'
+      });
+
+      if (error) {
+        showToast(error.message || "Invalid verification code");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        showToast("Account Verified! Please log in.");
+        
+        // 2. Sign out immediately so they have to enter password on login screen
+        await auth.signOut(); 
+
+        // 3. Redirect to Login Page
+        router.replace('/login'); 
+      }
+    } catch (error) {
+      console.error("Verification error:", error);
+      showToast("An error occurred during verification");
+      setIsLoading(false);
+    }
+  };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -123,32 +191,58 @@ const AccountSetupScreen = () => {
     return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
 
-  const handleOtpChange = (text, index) => {
-    if (/[^0-9]/.test(text)) return;
-    const newCode = [...otpCode];
-    newCode[index] = text;
-    setOtpCode(newCode);
-    if (text && index < 5) inputRefs.current[index + 1].focus();
-  };
-
-  const handleOtpKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && !otpCode[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+  // SMART FOCUS LOGIC
+  const handleInputFocus = (index) => {
+    const firstEmptyIndex = otpCode.findIndex((digit) => digit === '');
+    if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
+        inputRefs.current[firstEmptyIndex]?.focus();
     }
   };
 
+  const handleOtpChange = (text, index) => {
+    if (/[^0-9]/.test(text)) return;
 
-  const handleResendCode = () => {
-    setTimer(60);
-    Alert.alert("Code Resent", "A new verification code has been sent to your number.");
-    // Add your actual API resend call here
+    setOtpCode((prev) => {
+      const newCode = [...prev];
+      newCode[index] = text;
+      return newCode;
+    });
+
+    if (text && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleOtpKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace') {
+        if (!otpCode[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    }
+  };
+
+  // --- RESEND HANDLER ---
+  const handleResendCode = async () => {
+    try {
+      const { error } = await auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) throw error;
+
+      setTimer(60);
+      showToast("Verification code resent successfully.");
+    } catch (error) {
+      showToast(error.message || "Failed to resend code");
+    }
   };
 
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1); 
     } else {
-      console.log("Go back from screen"); 
+        router.back(); 
     }
   };
 
@@ -161,7 +255,6 @@ const AccountSetupScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.mainWrapper}>
             
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={handleBack}>
               <Ionicons name="chevron-back" size={hp(3.5)} color="black" />
@@ -173,7 +266,6 @@ const AccountSetupScreen = () => {
             </View>
           </View>
 
-          {/* DYNAMIC CONTENT SWITCHING */}
           <KeyboardAvoidingView 
             behavior={Platform.OS === "ios" ? "padding" : "height"} 
             style={styles.keyboardContainer}
@@ -183,12 +275,11 @@ const AccountSetupScreen = () => {
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* ---------------- STEP 1: FORM ---------------- */}
+                {/* STEP ONE*/}
                 {currentStep === 1 && (
                     <>
                         <Text style={styles.title}>Complete your account setup</Text>
                         <View style={styles.formContainer}>
-                            {/* Phone */}
                             <View>
                                 <Text style={styles.label}>Enter your phone number</Text>
                                 <View style={styles.phoneRow}>
@@ -207,19 +298,17 @@ const AccountSetupScreen = () => {
                                 </View>
                             </View>
 
-
-                            {/* First Name */}
                             <View>
                                 <Text style={styles.label}>Full Name</Text>
                                 <TextInput
-                                    style={[styles.input, errors.firstName && styles.inputError]}
+                                    style={[styles.input, errors.fullName && styles.inputError]}
                                     placeholder="Enter your full name"
                                     placeholderTextColor="#9CA3AF"
-                                    value={firstName}
-                                    onChangeText={(t) => handleNameChange(t, setFirstName, 'firstName')}
+                                    value={fullName}
+                                    onChangeText={handleNameChange}
                                 />
                             </View>
-                            {/* Email */}
+
                             <View>
                                 <Text style={styles.label}>Enter your email</Text>
                                 <TextInput
@@ -232,7 +321,7 @@ const AccountSetupScreen = () => {
                                     autoCapitalize="none"
                                 />
                             </View>
-                            {/* Password */}
+
                             <View>
                                 <Text style={styles.label}>Password</Text>
                                 <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
@@ -252,7 +341,6 @@ const AccountSetupScreen = () => {
                                 </TouchableOpacity>
                                 </View>
 
-                                {/* Criteria */}
                                 <View style={styles.criteriaContainer}>
                                 <View style={styles.criteriaRow}>
                                     <Feather name={passwordCriteria.length ? "check" : "x"} size={hp(1.8)} color={passwordCriteria.length ? SUCCESS_COLOR : BRAND_RED} />
@@ -268,7 +356,7 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
-                {/* ---------------- STEP 2: OTP ---------------- */}
+                {/* STEP TWO */}
                 {currentStep === 2 && (
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
@@ -287,6 +375,8 @@ const AccountSetupScreen = () => {
                               ]}
                               keyboardType="number-pad"
                               maxLength={1}
+                              selectTextOnFocus={true} 
+                              onFocus={() => handleInputFocus(index)}
                               value={digit}
                               onChangeText={(text) => handleOtpChange(text, index)}
                               onKeyPress={(e) => handleOtpKeyPress(e, index)}
@@ -295,7 +385,6 @@ const AccountSetupScreen = () => {
                           ))}
                         </View>
 
-                
                         <View style={styles.timerContainer}>
                             {timerCount > 0 ? (
                                 <Text style={styles.timerText}>
@@ -313,35 +402,42 @@ const AccountSetupScreen = () => {
             </ScrollView>
           </KeyboardAvoidingView>
 
-          {/* Footer Button */}
           <View style={styles.footerContainer}>
             {currentStep === 1 ? (
                 <TouchableOpacity 
                     activeOpacity={0.8}
                     onPress={validateAndSubmit}
-                    style={[styles.button, { backgroundColor: BRAND_RED }]}
+                    disabled={isLoading}
+                    style={[styles.button, { backgroundColor: isLoading ? DISABLED_RED : BRAND_RED }]}
                 >
-                    <Text style={styles.buttonText}>Verify Account</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Creating Account...' : 'Create Account'}
+                    </Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity 
                     activeOpacity={0.8}
-                    disabled={!isFullCode}
-                    onPress={() => Alert.alert("Success", "Account Created!")}
+                    disabled={!isFullCode || isLoading}
+                    onPress={handleVerifyOtp} 
                     style={[
                         styles.button, 
                         { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
                     ]}
                 >
-                    <Text style={styles.buttonText}>Continue</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Verifying...' : 'Continue'} 
+                    </Text>
                 </TouchableOpacity>
             )}
-            <View style={styles.signinContainer}>
-              <Text style={styles.signinText}>Already have an account? </Text>
-              <Link href="/login">
-                <Text style={styles.signinLinkText}>Signin</Text>
-              </Link>
-            </View>
+
+            {currentStep === 1 && (
+                <View style={styles.signinContainer}>
+                    <Text style={styles.signinText}>Already have an account? </Text>
+                    <Link href="/login">
+                        <Text style={styles.signinLinkText}>Signin</Text>
+                    </Link>
+                </View>
+            )}
           </View>
 
         </View>
@@ -349,224 +445,5 @@ const AccountSetupScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFF',
-  },
-  mainWrapper: {
-    flex: 1,
-    position: 'relative',
-  },
-
-  header: {
-    marginTop: hp(3), 
-    marginBottom: hp(1),
-    paddingHorizontal: wp(10),
-  },
-  backButton: {
-    marginBottom: hp(2),
-    alignSelf: 'flex-start',
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    height: hp(0.6),
-    width: '100%',
-  },
-  progressSegment: {
-    flex: 1,
-    borderRadius: 5,
-    marginRight: wp(2),
-  },
-
-  keyboardContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: wp(10), 
-    paddingBottom: hp(15), 
-  },
-  
-  title: {
-    fontSize: hp(3), 
-    fontWeight: '800',
-    color: '#003087',
-    marginBottom: hp(3), 
-    marginTop: hp(2),   
-  },
-  subtitle: {
-    fontSize: hp(1.9),
-    color: '#333',
-    lineHeight: hp(3),
-    marginBottom: hp(4),
-  },
-
-  formContainer: {
-    gap: hp(3),
-  },
-  label: {
-    fontSize: hp(1.8),
-    fontWeight: '600',
-    color: '#111',
-    marginBottom: hp(0.8),
-  },
-  phoneRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  countryCodeContainer: {
-    width: wp(17),
-    height: hp(5.8),
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: wp(3),
-  },
-  countryCodeText: {
-    fontSize: hp(2),
-    color: '#111',
-    fontWeight: '500',
-  },
-  phoneInput: {
-    flex: 1,
-    height: hp(5.8),
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: wp(4),
-    fontSize: hp(2),
-    color: '#111',
-  },
-  input: {
-    width: '100%',
-    height: hp(5.8),
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: wp(4),
-    fontSize: hp(1.9),
-    color: '#111',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    height: hp(5.8),
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: wp(4),
-  },
-  passwordInput: {
-    flex: 1,
-    fontSize: hp(1.9),
-    color: '#111',
-    height: '100%',
-  },
-  eyeIcon: {
-    padding: wp(1),
-  },
-  inputError: {
-    borderColor: '#FF4D32',
-    borderWidth: 1.5,
-  },
-
-  criteriaContainer: {
-    marginTop: hp(1),
-  },
-  criteriaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: hp(0.3),
-  },
-  criteriaText: {
-    marginLeft: wp(2),
-    fontSize: hp(1.6),
-    color: '#555',
-  },
-  criteriaTextSuccess: {
-    color: '#388E3C',
-  },
-
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: hp(3),
-  },
-  otpBox: {
-    width: wp(11),
-    height: wp(11), 
-    borderRadius: 12,
-    borderWidth: 1.5,
-    textAlign: 'center',
-    textAlignVertical: 'center', 
-    padding: 0, 
-    fontSize: hp(3),
-    fontWeight: '600',
-    color: '#111',
-    backgroundColor: '#fff',
-  },
-  
-  timerContainer: {
-    marginBottom: hp(5),
-  },
-  timerText: {
-    fontSize: hp(1.8),
-    color: '#111',
-  },
-  resendLinkText: {
-    fontSize: hp(1.9),
-    color: '#D32F2F',
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-
-  footerContainer: {
-    position: 'absolute',
-    bottom: hp(1),
-    left: 0,
-    right: 0,
-    paddingHorizontal: wp(10),
-    backgroundColor: 'transparent',
-  },
-  button: {
-    width: '100%',
-    height: hp(6),
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#D32F2F',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: hp(2),
-    fontWeight: '700',
-  },
-  signinContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: hp(2),
-  },
-  signinText: {
-    color: '#111',
-    fontSize: hp(1.8),
-  },
-  signinLinkText: {
-    color: '#D32F2F',
-    fontSize: hp(1.8),
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
-});
 
 export default AccountSetupScreen;

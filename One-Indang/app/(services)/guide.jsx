@@ -1,31 +1,19 @@
 import React, { useState } from 'react';
 import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  ScrollView, 
-  TouchableOpacity, 
   SafeAreaView, 
+  ScrollView, 
   StatusBar,
-  Platform,
-  Alert,
+  Text,
+  TouchableOpacity,
+  View,
   TextInput,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087', // Indang Blue
-  secondary: '#D32F2F', // Indang Red
-  background: '#fff',
-  text: '#333',
-  gray: '#999',
-  lightGray: '#f9f9f9',
-  border: '#e0e0e0',
-};
+import styles from '../../styles/guideStyles';
 
 // --- DATA FOR INDANG GUIDE (COMPLETE) ---
 const GUIDE_DATA = {
@@ -253,7 +241,7 @@ export default function GuideScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={hp(3.5)} color={COLORS.text} />
+          <Ionicons name="chevron-back" size={hp(3.5)} color="#003087" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{data.title}</Text>
         <View style={{ width: wp(8) }} /> 
@@ -266,18 +254,18 @@ export default function GuideScreen() {
       >
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={hp(2.5)} color={COLORS.gray} style={styles.searchIcon} />
+          <Ionicons name="search" size={hp(2.5)} color="#999" style={styles.searchIcon} />
           <TextInput 
             style={styles.searchInput} 
             placeholder="Search Services..." 
-            placeholderTextColor={COLORS.gray}
+            placeholderTextColor="#999"
             value={searchText}
             onChangeText={setSearchText}
             autoCorrect={false}
           />
           {searchText.length > 0 && (
             <TouchableOpacity onPress={() => { setSearchText(''); Keyboard.dismiss(); }}>
-               <Ionicons name="close-circle" size={hp(2.5)} color={COLORS.gray} />
+               <Ionicons name="close-circle" size={hp(2.5)} color="#999" />
             </TouchableOpacity>
           )}
         </View>
@@ -301,7 +289,7 @@ export default function GuideScreen() {
                     <Ionicons 
                       name={isExpanded ? "remove" : "add"} 
                       size={hp(3)} 
-                      color={COLORS.text} 
+                      color="#333" 
                     />
                   )}
                 </TouchableOpacity>
@@ -315,10 +303,10 @@ export default function GuideScreen() {
                         onPress={() => openPdf(item)}
                       >
                         <View style={styles.pdfIcon}>
-                          <MaterialCommunityIcons name="file-document-outline" size={hp(3)} color={COLORS.secondary} />
+                          <MaterialCommunityIcons name="file-document-outline" size={hp(3)} color="#D32F2F" />
                         </View>
                         <Text style={styles.itemText}>{item}</Text>
-                        <Ionicons name="arrow-forward-outline" size={hp(2)} color={COLORS.gray} style={{marginLeft: 'auto'}} />
+                        <Ionicons name="arrow-forward-outline" size={hp(2)} color="#999" style={{marginLeft: 'auto'}} />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -338,107 +326,3 @@ export default function GuideScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: wp(5),
-    paddingVertical: hp(2),
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  headerTitle: {
-    fontSize: hp(2.2),
-    fontWeight: 'bold',
-    color: COLORS.primary,
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: wp(2),
-  },
-  scrollContent: {
-    padding: wp(5),
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: wp(4),
-    height: hp(6.5),
-    marginBottom: hp(3),
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-  },
-  searchIcon: {
-    marginRight: wp(2),
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: hp(2),
-    color: COLORS.text,
-  },
-  officeContainer: {
-    marginBottom: hp(1.5),
-    backgroundColor: COLORS.lightGray,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  officeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: wp(5),
-    backgroundColor: COLORS.lightGray,
-  },
-  officeHeaderExpanded: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  officeTitle: {
-    fontSize: hp(1.9),
-    fontWeight: '600',
-    color: COLORS.text,
-    width: '90%',
-  },
-  itemsContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: wp(5),
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: hp(2),
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  pdfIcon: {
-    marginRight: wp(3),
-  },
-  itemText: {
-    fontSize: hp(1.8),
-    color: COLORS.primary,
-    flex: 1,
-    lineHeight: hp(2.5),
-    marginRight: wp(2),
-  },
-  emptyState: {
-    alignItems: 'center',
-    marginTop: hp(5),
-  },
-  emptyText: {
-    color: COLORS.gray,
-    marginTop: 10,
-    fontSize: hp(1.8),
-  }
-});
