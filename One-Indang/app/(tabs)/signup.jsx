@@ -17,6 +17,7 @@ import { Link } from 'expo-router';
 import { hp, wp } from '../../helpers/common'; 
 import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
 import { showToast } from '../../components/Toast';
+import { auth } from '../../services/supabase';
 
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
@@ -27,6 +28,7 @@ const AccountSetupScreen = () => {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // OTP STATE
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
@@ -83,7 +85,7 @@ const AccountSetupScreen = () => {
     if(errors.fullName) setErrors({...errors, fullName: false});
   };
 
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     let valid = true;
     let newErrors = { phone: false, email: false, fullName: false, password: false };
 
@@ -104,12 +106,39 @@ const AccountSetupScreen = () => {
 
     setErrors(newErrors);
 
-    if (valid) {
-      setCurrentStep(2);
-      setTimer(60);
-    } else {
+    if (!valid) {
+      console.log("Validation failed", newErrors);
+      return;
+    }
 
-        console.log("Validation failed", newErrors);
+    // Sign up with Supabase
+    setIsLoading(true);
+    try {
+      const { data, error } = await auth.signUp(email, password, {
+        full_name: fullName,
+        phone: `+63${phone}`
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
+        showToast(error.message || 'Failed to create account');
+        return;
+      }
+
+      if (data.user && !data.user.email_confirmed_at) {
+        // Email confirmation required
+        showToast('Please check your email for confirmation link');
+        setCurrentStep(2);
+      } else {
+        // Account created successfully
+        showToast('Account created successfully!');
+        // You might want to navigate to login or main screen here
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      showToast('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -322,9 +351,12 @@ const AccountSetupScreen = () => {
                 <TouchableOpacity 
                     activeOpacity={0.8}
                     onPress={validateAndSubmit}
-                    style={[styles.button, { backgroundColor: BRAND_RED }]}
+                    disabled={isLoading}
+                    style={[styles.button, { backgroundColor: isLoading ? DISABLED_RED : BRAND_RED }]}
                 >
-                    <Text style={styles.buttonText}>Verify Account</Text>
+                    <Text style={styles.buttonText}>
+                        {isLoading ? 'Creating Account...' : 'Create Account'}
+                    </Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity 

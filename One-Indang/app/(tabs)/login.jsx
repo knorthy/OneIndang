@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons'; // Using Expo icons
 import { hp, wp } from "../../helpers/common";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from '../../styles/loginStyles';
+import { auth } from '../../services/supabase';
+import { showToast } from '../../components/Toast';
 
 export default function LoginScreen({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -22,6 +24,36 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      showToast('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await auth.signIn(email, password);
+
+      if (error) {
+        console.error('Login error:', error);
+        showToast(error.message || 'Login failed');
+        return;
+      }
+
+      if (data.user) {
+        showToast('Login successful!');
+        // Navigate to main screen or handle successful login
+        // navigation.navigate('Main'); // Adjust based on your navigation setup
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      showToast('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -119,8 +151,14 @@ export default function LoginScreen({ navigation }) {
 
           {/* Bottom Button */}
           <View style={styles.footerContainer}>
-            <TouchableOpacity style={styles.continueButton}>
-              <Text style={styles.continueButtonText}>Continue</Text>
+            <TouchableOpacity 
+              style={[styles.continueButton, isLoading && { opacity: 0.6 }]} 
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              <Text style={styles.continueButtonText}>
+                {isLoading ? 'Signing In...' : 'Continue'}
+              </Text>
             </TouchableOpacity>
           </View>
 
