@@ -22,12 +22,10 @@ const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
   const [currentStep, setCurrentStep] = useState(1); 
 
- 
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
 
   // OTP STATE
@@ -39,8 +37,7 @@ const AccountSetupScreen = () => {
   const [errors, setErrors] = useState({
     phone: false,
     email: false,
-    firstName: false,
-    lastName: false,
+    fullName: false,
     password: false,
   });
 
@@ -48,7 +45,6 @@ const AccountSetupScreen = () => {
     length: false,
     format: false,
   });
-
 
   useEffect(() => {
     const isLengthValid = password.length >= 8;
@@ -60,7 +56,6 @@ const AccountSetupScreen = () => {
     });
   }, [password]);
 
-
   useEffect(() => {
     let interval;
     if (currentStep === 2 && timerCount > 0) {
@@ -70,8 +65,6 @@ const AccountSetupScreen = () => {
     }
     return () => clearInterval(interval);
   }, [currentStep, timerCount]);
-
-
 
   const handlePhoneChange = (text) => {
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -84,32 +77,40 @@ const AccountSetupScreen = () => {
     if(errors.email) setErrors({...errors, email: false});
   };
 
-  const handleNameChange = (text, setter, errorField) => {
+  const handleNameChange = (text) => {
     const alphabetValue = text.replace(/[^a-zA-Z\s]/g, '');
-    setter(alphabetValue);
-    if(errors[errorField]) setErrors({...errors, [errorField]: false});
+    setFullName(alphabetValue);
+    if(errors.fullName) setErrors({...errors, fullName: false});
   };
 
   const validateAndSubmit = () => {
     let valid = true;
-    let newErrors = { phone: false, email: false, firstName: false, lastName: false, password: false };
+    let newErrors = { phone: false, email: false, fullName: false, password: false };
 
     if (!phone || phone.length < 10) { newErrors.phone = true; valid = false; }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) { newErrors.email = true; valid = false; }
-    if (!firstName.trim()) { newErrors.firstName = true; valid = false; }
-    if (!lastName.trim()) { newErrors.lastName = true; valid = false; }
-    if (!passwordCriteria.length || !passwordCriteria.format) { newErrors.password = true; valid = false; }
+    
+    if (!fullName.trim()) { newErrors.fullName = true; valid = false; }
+
+    const isPassLengthValid = password.length >= 8;
+    const isPassFormatValid = /^(?=.*[a-zA-Z])(?=.*[0-9])/.test(password);
+
+    if (!isPassLengthValid || !isPassFormatValid) { 
+      newErrors.password = true; 
+      valid = false; 
+    }
 
     setErrors(newErrors);
 
     if (valid) {
       setCurrentStep(2);
       setTimer(60);
+    } else {
+      console.log("Validation failed", newErrors);
     }
   };
-
-
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -117,32 +118,48 @@ const AccountSetupScreen = () => {
     return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
 
+  // --- SMART FOCUS LOGIC START ---
+  const handleInputFocus = (index) => {
+    // 1. Find the index of the first empty slot
+    const firstEmptyIndex = otpCode.findIndex((digit) => digit === '');
+    
+    // 2. If the user clicked a slot LATER than the empty one, force focus back
+    if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
+        inputRefs.current[firstEmptyIndex]?.focus();
+    }
+  };
+  // --- SMART FOCUS LOGIC END ---
+
   const handleOtpChange = (text, index) => {
     if (/[^0-9]/.test(text)) return;
-    const newCode = [...otpCode];
-    newCode[index] = text;
-    setOtpCode(newCode);
-    if (text && index < 5) inputRefs.current[index + 1].focus();
-  };
 
-  const handleOtpKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && !otpCode[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+    setOtpCode((prev) => {
+      const newCode = [...prev];
+      newCode[index] = text;
+      return newCode;
+    });
+
+    if (text && index < 5) {
+      inputRefs.current[index + 1].focus();
     }
   };
 
+  const handleOtpKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace') {
+        if (!otpCode[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    }
+  };
 
   const handleResendCode = () => {
     setTimer(60);
     Alert.alert("Code Resent", "A new verification code has been sent to your number.");
-    // Add your actual API resend call here
   };
 
   const handleBack = () => {
     if (currentStep === 2) {
       setCurrentStep(1); 
-    } else {
-      console.log("Go back from screen"); 
     }
   };
 
@@ -155,7 +172,6 @@ const AccountSetupScreen = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.mainWrapper}>
             
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={handleBack}>
               <Ionicons name="chevron-back" size={hp(3.5)} color="black" />
@@ -167,7 +183,6 @@ const AccountSetupScreen = () => {
             </View>
           </View>
 
-          {/* DYNAMIC CONTENT SWITCHING */}
           <KeyboardAvoidingView 
             behavior={Platform.OS === "ios" ? "padding" : "height"} 
             style={styles.keyboardContainer}
@@ -177,12 +192,11 @@ const AccountSetupScreen = () => {
               contentContainerStyle={styles.scrollContent}
               showsVerticalScrollIndicator={false}
             >
-                {/* ---------------- STEP 1: FORM ---------------- */}
+                {/* ---------------- STEP 1 ---------------- */}
                 {currentStep === 1 && (
                     <>
                         <Text style={styles.title}>Complete your account setup</Text>
                         <View style={styles.formContainer}>
-                            {/* Phone */}
                             <View>
                                 <Text style={styles.label}>Enter your phone number</Text>
                                 <View style={styles.phoneRow}>
@@ -201,19 +215,17 @@ const AccountSetupScreen = () => {
                                 </View>
                             </View>
 
-
-                            {/* First Name */}
                             <View>
                                 <Text style={styles.label}>Full Name</Text>
                                 <TextInput
-                                    style={[styles.input, errors.firstName && styles.inputError]}
+                                    style={[styles.input, errors.fullName && styles.inputError]}
                                     placeholder="Enter your full name"
                                     placeholderTextColor="#9CA3AF"
-                                    value={firstName}
-                                    onChangeText={(t) => handleNameChange(t, setFirstName, 'firstName')}
+                                    value={fullName}
+                                    onChangeText={handleNameChange}
                                 />
                             </View>
-                            {/* Email */}
+
                             <View>
                                 <Text style={styles.label}>Enter your email</Text>
                                 <TextInput
@@ -226,7 +238,7 @@ const AccountSetupScreen = () => {
                                     autoCapitalize="none"
                                 />
                             </View>
-                            {/* Password */}
+
                             <View>
                                 <Text style={styles.label}>Password</Text>
                                 <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
@@ -246,7 +258,6 @@ const AccountSetupScreen = () => {
                                 </TouchableOpacity>
                                 </View>
 
-                                {/* Criteria */}
                                 <View style={styles.criteriaContainer}>
                                 <View style={styles.criteriaRow}>
                                     <Feather name={passwordCriteria.length ? "check" : "x"} size={hp(1.8)} color={passwordCriteria.length ? SUCCESS_COLOR : BRAND_RED} />
@@ -262,7 +273,7 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
-                {/* ---------------- STEP 2: OTP ---------------- */}
+                {/* ---------------- STEP 2 ---------------- */}
                 {currentStep === 2 && (
                     <>
                         <Text style={styles.title}>Input the 6-digit code</Text>
@@ -281,6 +292,10 @@ const AccountSetupScreen = () => {
                               ]}
                               keyboardType="number-pad"
                               maxLength={1}
+                              // Highlight text so user can easily replace it if they tap back
+                              selectTextOnFocus={true} 
+                              // --- ATTACH SMART FOCUS HERE ---
+                              onFocus={() => handleInputFocus(index)}
                               value={digit}
                               onChangeText={(text) => handleOtpChange(text, index)}
                               onKeyPress={(e) => handleOtpKeyPress(e, index)}
@@ -289,7 +304,6 @@ const AccountSetupScreen = () => {
                           ))}
                         </View>
 
-                
                         <View style={styles.timerContainer}>
                             {timerCount > 0 ? (
                                 <Text style={styles.timerText}>
@@ -307,7 +321,6 @@ const AccountSetupScreen = () => {
             </ScrollView>
           </KeyboardAvoidingView>
 
-          {/* Footer Button */}
           <View style={styles.footerContainer}>
             {currentStep === 1 ? (
                 <TouchableOpacity 
@@ -330,12 +343,16 @@ const AccountSetupScreen = () => {
                     <Text style={styles.buttonText}>Continue</Text>
                 </TouchableOpacity>
             )}
-            <View style={styles.signinContainer}>
-              <Text style={styles.signinText}>Already have an account? </Text>
-              <Link href="/login">
-                <Text style={styles.signinLinkText}>Signin</Text>
-              </Link>
-            </View>
+
+            {/* Sign in link removed for OTP step */}
+            {currentStep === 1 && (
+                <View style={styles.signinContainer}>
+                    <Text style={styles.signinText}>Already have an account? </Text>
+                    <Link href="/login">
+                        <Text style={styles.signinLinkText}>Signin</Text>
+                    </Link>
+                </View>
+            )}
           </View>
 
         </View>
