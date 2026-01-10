@@ -11,9 +11,10 @@ import {
   Alert,
   Keyboard,
   LogBox,
-  Linking, // Added for Google Maps
-  Switch,   // Added for Discount Toggle
-  Modal     // Added for Receipt Modal
+  Linking, //  for Google Maps
+  Switch,   //  for Discount Toggle
+  Modal,    //  for Receipt Modal
+  Image     //  for displaying recommendation images
 } from 'react-native';
 import LocationPickerModal from '../../components/LocationPickerModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -38,7 +39,7 @@ const TransportIcon = ({ name, icon, onPress, isSelected }) => (
 );
 
 export default function App() {
-  const [userName, setUserName] = useState('North');
+  const [userName, setUserName] = useState(null);
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
@@ -395,15 +396,27 @@ export default function App() {
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+          {userName ? (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
+              </View>
+              <View>
+                <Text style={styles.greeting}>Hi {userName}</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.greeting}>Hi {userName}</Text>
-              <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+          ) : (
+            <View style={styles.profileSection}>
+              <View style={styles.avatar}>
+                <Icon name="person" size={24} color="#D32F2F" />
+              </View>
+              <View>
+                <Text style={styles.greeting}>Welcome to One-Indang</Text>
+                <Text style={styles.timeGreeting}>{timeGreeting}</Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Search Bar - Local search for Indang recommendations */}
@@ -518,7 +531,7 @@ export default function App() {
                     style={[styles.locationInputText, !origin && styles.placeholderText]}
                     numberOfLines={1}
                   >
-                    {origin?.desc || 'Tap to select starting point'}
+                    {origin?.desc || 'Select starting point'}
                   </Text>
                   <TouchableOpacity
                     style={styles.currentLocationBtn}
@@ -540,7 +553,7 @@ export default function App() {
                     style={[styles.locationInputText, !destination && styles.placeholderText]}
                     numberOfLines={1}
                   >
-                    {destination?.desc || 'Tap to select destination'}
+                    {destination?.desc || 'Select destination'}
                   </Text>
                   <Icon name="chevron-right" size={20} color="#999" />
                 </TouchableOpacity>
@@ -589,9 +602,13 @@ export default function App() {
               {filteredRecommendations.map((item) => (
                 <TouchableOpacity key={item.id} style={styles.fullCard} activeOpacity={0.9} onPress={() => handleRecommendationPress(item)}>
                   <View style={styles.fullCardImageContainer}>
-                    <View style={styles.cardImagePlaceholder}>
-                      <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
-                    </View>
+                    {item.image ? (
+                      <Image source={item.image} style={styles.fullCardImage} resizeMode="cover" />
+                    ) : (
+                      <View style={styles.cardImagePlaceholder}>
+                        <Icon name="photo" size={Math.round(hp(3))} color="#BDBDBD" />
+                      </View>
+                    )}
                   </View>
                   <View style={styles.fullCardContent}>
                     <Text style={styles.fullCardTitle}>{item.title}</Text>
@@ -610,7 +627,11 @@ export default function App() {
                   <View key={index} style={styles.card}>
                     <View style={styles.cardImageContainer}>
                       <View style={styles.cardImage}>
-                        <View style={styles.blankImage} />
+                        {item.image ? (
+                          <Image source={item.image} style={styles.cardImageFill} resizeMode="cover" />
+                        ) : (
+                          <View style={styles.blankImage} />
+                        )}
                       </View>
                     </View>
                     <View style={styles.cardContent}>
@@ -686,6 +707,8 @@ const styles = StyleSheet.create({
   fullCard: { backgroundColor: 'white', borderRadius: 14, marginBottom: hp(2), overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 5, flexDirection: 'row', alignItems: 'center' },
   fullCardImageContainer: { width: wp(35), height: hp(12) },
   cardImagePlaceholder: { flex: 1, backgroundColor: '#BBDEFB', justifyContent: 'center', alignItems: 'center' },
+  fullCardImage: { width: '100%', height: '100%' },
+  cardImageFill: { width: '100%', height: '100%' },
   fullCardContent: { padding: wp(3), flex: 1, justifyContent: 'center' },
   fullCardTitle: { fontSize: hp(2.0), fontWeight: '600', color: '#003087', marginBottom: hp(0.6) },
   fullCardDistance: { fontSize: hp(1.6), color: '#666' },
