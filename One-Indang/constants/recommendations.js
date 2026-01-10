@@ -1,46 +1,46 @@
 export const recommendations = [
   // --- POBLACION 1 (Town Proper) ---
-  { id: 1, title: 'St. Gregory the Great Parish Church', distance: 'Poblacion 1 • Historic Site' },
-  { id: 2, title: 'Tree Top Coffee Shop', distance: 'Poblacion 1 • Dining' },
-  { id: 3, title: 'Jollibee Indang', distance: 'Poblacion 1 • Dining' },
-  { id: 4, title: '7-Eleven Indang', distance: 'Poblacion 1 • Convenience' },
-  { id: 5, title: 'Indang Municipal Hall', distance: 'Poblacion 1 • Government' },
+  { id: 1, title: 'St. Gregory the Great Parish Church', distance: 'Poblacion 1 • Historic Site', image: require('../assets/images/transportation/parishchrurch.png') },
+  { id: 2, title: 'Tree Top Coffee Shop', distance: 'Poblacion 1 • Dining', image: require('../assets/images/transportation/treetop.png') },
+  { id: 3, title: 'Jollibee Indang', distance: 'Poblacion 1 • Dining', image: require('../assets/images/transportation/jb.png') },
+  { id: 4, title: '7-Eleven Indang', distance: 'Poblacion 1 • Convenience', image: require('../assets/images/transportation/711.png') },
+  { id: 5, title: 'Indang Municipal Hall', distance: 'Poblacion 1 • Government', image: require('../assets/images/transportation/municipal.png') },
   { id: 6, title: 'Indang Town Plaza', distance: 'Poblacion 1 • Park' },
-  { id: 7, title: 'PNP Indang Station', distance: 'Poblacion 1 • Service' },
+  { id: 7, title: 'PNP Indang Station', distance: 'Poblacion 1 • Service', image: require('../assets/images/transportation/pnp.png') },
   { id: 8, title: 'Indang Central Elem. School', distance: 'Poblacion 1 • Education' },
-  { id: 9, title: 'Mercury Drug Indang', distance: 'Poblacion 1 • Pharmacy' },
-  { id: 10, title: 'Bonifacio Monument', distance: 'Poblacion 1 • Landmark' },
+  { id: 9, title: 'Mercury Drug Indang', distance: 'Poblacion 1 • Pharmacy', image: require('../assets/images/transportation/mercury.png') },
+  { id: 10, title: 'Bonifacio Monument', distance: 'Poblacion 1 • Landmark', image: require('../assets/images/transportation/bonifacioshrine.png') },
 
   // --- POBLACION 2 ---
-  { id: 11, title: 'Indang Public Market', distance: 'Poblacion 2 • Market' },
-  { id: 12, title: 'Cup of Grace', distance: 'Poblacion 2 (San Gregorio) • Cafe' },
-  { id: 13, title: 'Drew\'s Brew & Bake', distance: 'Poblacion 2 (San Miguel) • Bakery' },
+  { id: 11, title: 'Indang Public Market', distance: 'Poblacion 2 • Market', image: require('../assets/images/transportation/pubmark.png') },
+  { id: 12, title: 'Cup of Grace', distance: 'Poblacion 2 (San Gregorio) • Cafe', image: require('../assets/images/transportation/cog.png') },
+  { id: 13, title: 'Drew\'s Brew & Bake', distance: 'Poblacion 2 (San Miguel) • Bakery', image: require('../assets/images/transportation/dbb.png') },
   { id: 14, title: 'Poblacion 2 Hall', distance: 'Poblacion 2 • Community' },
   { id: 15, title: 'Savemore Market', distance: 'Poblacion 2 • Grocery' },
   { id: 16, title: 'Indang Rural Health Unit', distance: 'Poblacion 2 • Health' },
-  { id: 17, title: 'Alfamart Indang', distance: 'Poblacion 2 • Convenience' },
+  { id: 17, title: 'Alfamart Indang', distance: 'Poblacion 2 • Convenience', image: require('../assets/images/transportation/alfa.png') },
   { id: 18, title: 'Poblacion 2 Chapel', distance: 'Poblacion 2 • Religious' },
-  { id: 19, title: 'Landbank Indang', distance: 'Poblacion 2 • Bank' },
+  { id: 19, title: 'Landbank Indang', distance: 'Poblacion 2 • Bank', image: require('../assets/images/transportation/landbank.png') },
   { id: 20, title: 'Old Water Tank', distance: 'Poblacion 2 • Landmark' },
 
   // --- POBLACION 3 ---
-  { id: 21, title: 'Pio De Roda Cafe', distance: 'Poblacion 3 • Heritage Cafe' },
+  { id: 21, title: 'Pio De Roda Cafe', distance: 'Poblacion 3 • Heritage Cafe', image: require('../assets/images/transportation/pio.png') },
   { id: 22, title: 'Coffee and Teacups', distance: 'Poblacion 3 (A. Mabini) • Cafe' },
-  { id: 23, title: 'Klamulse Hotel', distance: 'Poblacion 3 • Hotel' },
+  { id: 23, title: 'Klamulse Hotel', distance: 'Poblacion 3 • Hotel', image: require('../assets/images/transportation/klamulse.png') },
   { id: 24, title: 'Poblacion 3 Hall', distance: 'Poblacion 3 • Community' },
   { id: 25, title: 'St. Vincent Ferrer Chapel', distance: 'Poblacion 3 • Religious' },
   { id: 26, title: 'Bangko Mabuhay', distance: 'Poblacion 3 • Bank' },
   { id: 27, title: 'Poblacion 3 Bakery', distance: 'Poblacion 3 • Food' },
-  { id: 28, title: 'Mhavis Clinic', distance: 'Poblacion 3 • Health' },
+  { id: 28, title: 'Mhavis Clinic', distance: 'Poblacion 3 • Health', image: require('../assets/images/transportation/mhavis.png') },
   { id: 29, title: 'Poblacion 3 Court', distance: 'Poblacion 3 • Sports' },
   { id: 30, title: 'Ancestral House View', distance: 'Poblacion 3 • Historical' },
 
   // --- POBLACION 4 ---
-  { id: 31, title: 'Cafe Hermano', distance: 'Poblacion 4 (Plaridel St) • Cafe' },
-  { id: 32, title: 'Black Owl Cafe', distance: 'Poblacion 4 (Magtanggol St) • Cafe' },
-  { id: 33, title: 'The Port St. Café', distance: 'Poblacion 4 • Cafe' },
+  { id: 31, title: 'Cafe Hermano', distance: 'Poblacion 4 (Plaridel St) • Cafe', image: require('../assets/images/transportation/cafeherm.png') },
+  { id: 32, title: 'Black Owl Cafe', distance: 'Poblacion 4 (Magtanggol St) • Cafe', image: require('../assets/images/transportation/blackowl.png') },
+  { id: 33, title: 'The Port St. Café', distance: 'Poblacion 4 • Cafe', image: require('../assets/images/transportation/portst.png') },
   { id: 34, title: 'Poblacion 4 Hall', distance: 'Poblacion 4 • Community' },
-  { id: 35, title: 'National High School', distance: 'Poblacion 4 • Education' },
+  { id: 35, title: 'National High School', distance: 'Poblacion 4 • Education', image: require('../assets/images/transportation/inhs.png') },
   { id: 36, title: 'Poblacion 4 Chapel', distance: 'Poblacion 4 • Religious' },
   { id: 37, title: 'Indang Fire Station', distance: 'Poblacion 4 • Government' },
   { id: 38, title: 'Poblacion 4 Sports Complex', distance: 'Poblacion 4 • Sports' },
@@ -48,9 +48,9 @@ export const recommendations = [
   { id: 40, title: 'Poblacion 4 Food Stalls', distance: 'Poblacion 4 • Dining' },
 
   // --- AGUS-US ---
-  { id: 41, title: 'Terre Verte Farm Resort', distance: 'Brgy. Agus-us • Adventure Resort' },
-  { id: 42, title: 'La UlrichLand Farm Resort', distance: 'Brgy. Agus-us • Private Resort' },
-  { id: 43, title: 'Villa Soledad Garden Resort', distance: 'Brgy. Agus-us • Garden Resort' },
+  { id: 41, title: 'Terre Verte Farm Resort', distance: 'Brgy. Agus-us • Adventure Resort', image: require('../assets/images/transportation/terreverte.png') },
+  { id: 42, title: 'La UlrichLand Farm Resort', distance: 'Brgy. Agus-us • Private Resort', image: require('../assets/images/transportation/laulrich.png') },
+  { id: 43, title: 'Villa Soledad Garden Resort', distance: 'Brgy. Agus-us • Garden Resort', image: require('../assets/images/transportation/soledad.png') },
   { id: 44, title: 'Agus-us River Rapids', distance: 'Brgy. Agus-us • Nature' },
   { id: 45, title: 'Agus-us Hanging Bridge', distance: 'Brgy. Agus-us • Landmark' },
   { id: 46, title: 'Agus-us Barangay Hall', distance: 'Brgy. Agus-us • Community' },
@@ -60,9 +60,9 @@ export const recommendations = [
   { id: 50, title: 'Agus-us View Deck', distance: 'Brgy. Agus-us • Scenic' },
 
   // --- ALULOD ---
-  { id: 51, title: 'Villa Feliciana Farm & Resort', distance: 'Brgy. Alulod • Hotel/Resort' },
-  { id: 52, title: 'TOPSIDE CAFE', distance: 'Brgy. Alulod • Cafe' },
-  { id: 53, title: 'Kape-Fied', distance: 'Brgy. Alulod • Coffee Shop' },
+  { id: 51, title: 'Villa Feliciana Farm & Resort', distance: 'Brgy. Alulod • Hotel/Resort', image: require('../assets/images/transportation/feliciana.png') },
+  { id: 52, title: 'TOPSIDE CAFE', distance: 'Brgy. Alulod • Cafe', image: require('../assets/images/transportation/topside.png') },
+  { id: 53, title: 'Kape-Fied', distance: 'Brgy. Alulod • Coffee Shop', image: require('../assets/images/transportation/kapefied.png') },
   { id: 54, title: 'Alulod River Crossing', distance: 'Brgy. Alulod • Nature' },
   { id: 55, title: 'San Isidro Labrador Chapel', distance: 'Brgy. Alulod • Religious' },
   { id: 56, title: 'Alulod Barangay Hall', distance: 'Brgy. Alulod • Community' },
@@ -72,9 +72,9 @@ export const recommendations = [
   { id: 60, title: 'Alulod Picnic Grounds', distance: 'Brgy. Alulod • Recreation' },
 
   // --- BANABA CERCA ---
-  { id: 61, title: 'California Breeze Campsite', distance: 'Brgy. Banaba Cerca • Glamping' },
-  { id: 62, title: 'CMJ Private Resort', distance: 'Brgy. Banaba Cerca • Private Villa' },
-  { id: 63, title: 'Casita de Señerez Resort', distance: 'Brgy. Banaba Cerca • Family Resort' },
+  { id: 61, title: 'California Breeze Campsite', distance: 'Brgy. Banaba Cerca • Glamping', image: require('../assets/images/transportation/california.png') },
+  { id: 62, title: 'CMJ Private Resort', distance: 'Brgy. Banaba Cerca • Private Villa', image: require('../assets/images/transportation/cmj.png') },
+  { id: 63, title: 'Casita de Señerez Resort', distance: 'Brgy. Banaba Cerca • Family Resort', image: require('../assets/images/transportation/casita.png') },
   { id: 64, title: '143 Private Resort', distance: 'Brgy. Banaba Cerca • Resort' },
   { id: 65, title: 'Banaba Cerca Hall', distance: 'Brgy. Banaba Cerca • Community' },
   { id: 66, title: 'Banaba Cerca Chapel', distance: 'Brgy. Banaba Cerca • Religious' },
@@ -96,9 +96,9 @@ export const recommendations = [
   { id: 80, title: 'Banaba Lejos Viewpoint', distance: 'Brgy. Banaba Lejos • Scenic' },
 
   // --- BANCOD ---
-  { id: 81, title: 'Cavite State University (Main)', distance: 'Brgy. Bancod • Landmark' },
-  { id: 82, title: 'Tree Top Coffee Shop', distance: 'Brgy. Bancod • Restaurant' },
-  { id: 83, title: 'Mango Tango Cafe', distance: 'Brgy. Bancod • Cafe' },
+  { id: 81, title: 'Cavite State University (Main)', distance: 'Brgy. Bancod • Landmark', image: require('../assets/images/transportation/cvsu.png') },
+  { id: 82, title: 'Tree Top Coffee Shop', distance: 'Brgy. Bancod • Restaurant', image: require('../assets/images/transportation/treetop.png') },
+  { id: 83, title: 'Mango Tango Cafe', distance: 'Brgy. Bancod • Cafe', image: require('../assets/images/transportation/mangot.png') },
   { id: 84, title: 'Bancod River Resort', distance: 'Brgy. Bancod • Swimming' },
   { id: 85, title: 'CvSU Oval & Park', distance: 'Brgy. Bancod • Recreation' },
   { id: 86, title: 'Bancod Chapel', distance: 'Brgy. Bancod • Religious' },
@@ -108,9 +108,9 @@ export const recommendations = [
   { id: 90, title: 'Bancod Food Strip', distance: 'Brgy. Bancod • Dining' },
 
   // --- BUNA CERCA ---
-  { id: 91, title: 'Harvest Kitchen & Cafe', distance: 'Brgy. Buna Cerca • Farm Cafe' },
-  { id: 92, title: 'The Canopy Farm PH', distance: 'Brgy. Buna Cerca • Glamping/Farm' },
-  { id: 93, title: 'Precious Garden Events Place', distance: 'Brgy. Buna Cerca • Events/Resort' },
+  { id: 91, title: 'Harvest Kitchen & Cafe', distance: 'Brgy. Buna Cerca • Farm Cafe', image: require('../assets/images/transportation/bountyharv.png') },
+  { id: 92, title: 'The Canopy Farm PH', distance: 'Brgy. Buna Cerca • Glamping/Farm', image: require('../assets/images/transportation/canopy.png') },
+  { id: 93, title: 'Precious Garden Events Place', distance: 'Brgy. Buna Cerca • Events/Resort', image: require('../assets/images/transportation/precious.png') },
   { id: 94, title: 'Buna Cerca Waterfalls Access', distance: 'Brgy. Buna Cerca • Nature' },
   { id: 95, title: 'Buna Cerca Chapel', distance: 'Brgy. Buna Cerca • Religious' },
   { id: 96, title: 'Buna Cerca Hall', distance: 'Brgy. Buna Cerca • Community' },
@@ -121,8 +121,8 @@ export const recommendations = [
 
   // --- BUNA LEJOS I (UPDATED) ---
   { id: 101, title: 'Barrio Lejos Grill & Resto', distance: 'Brgy. Buna Lejos I • Dining' },
-  { id: 102, title: 'Tazza Miha Cafe', distance: 'Brgy. Buna Lejos I • Cafe' },
-  { id: 103, title: 'Little HQ Cafe (Kalikhasan)', distance: 'Brgy. Buna Lejos I • Cafe' },
+  { id: 102, title: 'Tazza Miha Cafe', distance: 'Brgy. Buna Lejos I • Cafe', image: require('../assets/images/transportation/tazzamiha.png') },
+  { id: 103, title: 'Little HQ Cafe (Kalikhasan)', distance: 'Brgy. Buna Lejos I • Cafe', image: require('../assets/images/transportation/littlehq.png') },
   { id: 104, title: 'Buna Lejos I River', distance: 'Brgy. Buna Lejos I • Nature' },
   { id: 105, title: 'Buna Lejos I Chapel', distance: 'Brgy. Buna Lejos I • Religious' },
   { id: 106, title: 'Buna Lejos I Hall', distance: 'Brgy. Buna Lejos I • Community' },
@@ -144,7 +144,7 @@ export const recommendations = [
   { id: 120, title: 'Buna Lejos II Picnic Area', distance: 'Brgy. Buna Lejos II • Recreation' },
 
   // --- CALUMPANG CERCA ---
-  { id: 121, title: 'Balay Indang', distance: 'Brgy. Calumpang Cerca • Bed & Breakfast' },
+  { id: 121, title: 'Balay Indang', distance: 'Brgy. Calumpang Cerca • Bed & Breakfast', image: require('../assets/images/transportation/balay.png') },
   { id: 122, title: 'Calumpang Cerca Fields', distance: 'Brgy. Calumpang Cerca • Nature' },
   { id: 123, title: 'Calumpang Cerca Chapel', distance: 'Brgy. Calumpang Cerca • Religious' },
   { id: 124, title: 'Calumpang Cerca Hall', distance: 'Brgy. Calumpang Cerca • Community' },
@@ -168,10 +168,10 @@ export const recommendations = [
   { id: 140, title: 'Calumpang Lejos View', distance: 'Brgy. Calumpang Lejos • Scenic' },
 
   // --- CARASUCHI (UPDATED) ---
-  { id: 141, title: 'The Ravine by One Selah', distance: 'Brgy. Carasuchi • Resort' },
+  { id: 141, title: 'The Ravine by One Selah', distance: 'Brgy. Carasuchi • Resort', image: require('../assets/images/transportation/ravine.png') },
   { id: 142, title: 'Carasuchi Villa Garden', distance: 'Brgy. Carasuchi • Private Villa' },
-  { id: 143, title: 'Milani’s Bed & Breakfast', distance: 'Brgy. Carasuchi • B&B' },
-  { id: 144, title: 'Casita Anahaw', distance: 'Brgy. Carasuchi • Vacation Rental' },
+  { id: 143, title: 'Milani\'s Bed & Breakfast', distance: 'Brgy. Carasuchi • B&B' },
+  { id: 144, title: 'Casita Anahaw', distance: 'Brgy. Carasuchi • Vacation Rental', image: require('../assets/images/transportation/anahaw.png') },
   { id: 145, title: 'Carasuchi Villa Resort', distance: 'Brgy. Carasuchi • Swimming' },
   { id: 146, title: 'Carasuchi Chapel', distance: 'Brgy. Carasuchi • Religious' },
   { id: 147, title: 'Carasuchi Hall', distance: 'Brgy. Carasuchi • Community' },
@@ -240,9 +240,9 @@ export const recommendations = [
   { id: 200, title: 'Harasan Viewpoint', distance: 'Brgy. Harasan • Scenic' },
 
   // --- KAYQUIT I (UPDATED) ---
-  { id: 201, title: 'Kape-Fied', distance: 'Brgy. Kayquit I • Cafe' },
+  { id: 201, title: 'Kape-Fied', distance: 'Brgy. Kayquit I • Cafe', image: require('../assets/images/transportation/kapefied.png') },
   { id: 202, title: 'Bistro Gorda', distance: 'Brgy. Kayquit I • Brunch/Dining' },
-  { id: 203, title: 'Patio Buendia', distance: 'Brgy. Kayquit I • Events' },
+  { id: 203, title: 'Patio Buendia', distance: 'Brgy. Kayquit I • Events', image: require('../assets/images/transportation/buendia.png') },
   { id: 204, title: 'Kayquit I Sports Complex', distance: 'Brgy. Kayquit I • Sports' },
   { id: 205, title: 'Kayquit I Chapel', distance: 'Brgy. Kayquit I • Religious' },
   { id: 206, title: 'Kayquit I Hall', distance: 'Brgy. Kayquit I • Community' },
@@ -252,7 +252,7 @@ export const recommendations = [
   { id: 210, title: 'Kayquit I View', distance: 'Brgy. Kayquit I • Scenic' },
 
   // --- KAYQUIT II (UPDATED) ---
-  { id: 211, title: 'La Casa Cita', distance: 'Brgy. Kayquit II • Homestay' },
+  { id: 211, title: 'La Casa Cita', distance: 'Brgy. Kayquit II • Homestay', image: require('../assets/images/transportation/lacasasita.png') },
   { id: 212, title: 'Kayquit II Resort', distance: 'Brgy. Kayquit II • Swimming' },
   { id: 213, title: 'Kayquit II Farm', distance: 'Brgy. Kayquit II • Agri' },
   { id: 214, title: 'Kayquit II Chapel', distance: 'Brgy. Kayquit II • Religious' },
@@ -264,11 +264,11 @@ export const recommendations = [
   { id: 220, title: 'Kayquit II River View', distance: 'Brgy. Kayquit II • Scenic' },
 
   // --- KAYQUIT III (UPDATED) ---
-  { id: 221, title: 'Siglo Farm Cafe', distance: 'Brgy. Kayquit III • Farm Cafe' },
-  { id: 222, title: 'Siglo Paraiso Farm Resort', distance: 'Brgy. Kayquit III • Resort' },
-  { id: 223, title: 'Soiree Events Place', distance: 'Brgy. Kayquit III • Events' },
-  { id: 224, title: 'Paraiso Farm Resort', distance: 'Brgy. Kayquit III • Resort' },
-  { id: 225, title: 'Lopez Private Resort', distance: 'Brgy. Kayquit III • Resort' },
+  { id: 221, title: 'Siglo Farm Cafe', distance: 'Brgy. Kayquit III • Farm Cafe', image: require('../assets/images/transportation/siglo.png') },
+  { id: 222, title: 'Siglo Paraiso Farm Resort', distance: 'Brgy. Kayquit III • Resort', image: require('../assets/images/transportation/paraiso.png') },
+  { id: 223, title: 'Soiree Events Place', distance: 'Brgy. Kayquit III • Events', image: require('../assets/images/transportation/soiree.png') },
+  { id: 224, title: 'Paraiso Farm Resort', distance: 'Brgy. Kayquit III • Resort', image: require('../assets/images/transportation/paraiso.png') },
+  { id: 225, title: 'Lopez Private Resort', distance: 'Brgy. Kayquit III • Resort', image: require('../assets/images/transportation/lopez.png') },
   { id: 226, title: 'Kayquit III Organic Farm', distance: 'Brgy. Kayquit III • Agri' },
   { id: 227, title: 'Kayquit III Chapel', distance: 'Brgy. Kayquit III • Religious' },
   { id: 228, title: 'Kayquit III Hall', distance: 'Brgy. Kayquit III • Community' },
@@ -276,9 +276,9 @@ export const recommendations = [
   { id: 230, title: 'Kayquit III Nature Park', distance: 'Brgy. Kayquit III • Nature' },
 
   // --- KAYTAMBOG ---
-  { id: 231, title: 'Happy Habits Cafe', distance: 'Brgy. Kaytambog • Resort Cafe' },
-  { id: 232, title: 'Filomena Springs Nature Resort', distance: 'Brgy. Kaytambog • Resort' },
-  { id: 233, title: 'Terrace Hill Resort', distance: 'Brgy. Kaytambog • Resort' },
+  { id: 231, title: 'Happy Habits Cafe', distance: 'Brgy. Kaytambog • Resort Cafe', image: require('../assets/images/transportation/happyhab.png') },
+  { id: 232, title: 'Filomena Springs Nature Resort', distance: 'Brgy. Kaytambog • Resort', image: require('../assets/images/transportation/filomena.png') },
+  { id: 233, title: 'Terrace Hill Resort', distance: 'Brgy. Kaytambog • Resort', image: require('../assets/images/transportation/terrace.png') },
   { id: 234, title: 'Kaytambog River', distance: 'Brgy. Kaytambog • Nature' },
   { id: 235, title: 'Kaytambog Picnic Area', distance: 'Brgy. Kaytambog • Recreation' },
   { id: 236, title: 'Kaytambog Chapel', distance: 'Brgy. Kaytambog • Religious' },
@@ -288,8 +288,8 @@ export const recommendations = [
   { id: 240, title: 'Kaytambog Bridge', distance: 'Brgy. Kaytambog • Landmark' },
 
   // --- KAYTAPOS ---
-  { id: 241, title: 'Bari Cafe', distance: 'Brgy. Kaytapos • Coffee Shop' },
-  { id: 242, title: 'Palsahingin Falls', distance: 'Brgy. Kaytapos • Waterfalls' },
+  { id: 241, title: 'Bari Cafe', distance: 'Brgy. Kaytapos • Coffee Shop', image: require('../assets/images/transportation/baricafe.png') },
+  { id: 242, title: 'Palsahingin Falls', distance: 'Brgy. Kaytapos • Waterfalls', image: require('../assets/images/transportation/palsahingin.png') },
   { id: 243, title: 'Kaytapos River Trek', distance: 'Brgy. Kaytapos • Adventure' },
   { id: 244, title: 'Kaytapos Hanging Bridge', distance: 'Brgy. Kaytapos • Landmark' },
   { id: 245, title: 'Kaytapos Garden', distance: 'Brgy. Kaytapos • Nature' },
@@ -300,7 +300,7 @@ export const recommendations = [
   { id: 250, title: 'Kaytapos Viewpoint', distance: 'Brgy. Kaytapos • Scenic' },
 
   // --- LIMBON ---
-  { id: 251, title: 'Bonifacio Shrine', distance: 'Brgy. Limbon • Historical Landmark' },
+  { id: 251, title: 'Bonifacio Shrine', distance: 'Brgy. Limbon • Historical Landmark', image: require('../assets/images/transportation/bonifacioshrine.png') },
   { id: 252, title: 'Limbon River', distance: 'Brgy. Limbon • Nature' },
   { id: 253, title: 'Limbon Park', distance: 'Brgy. Limbon • Recreation' },
   { id: 254, title: 'Limbon Historical Marker', distance: 'Brgy. Limbon • Landmark' },
@@ -313,7 +313,7 @@ export const recommendations = [
 
   // --- LUMAMPONG BALAGBAG ---
   { id: 261, title: 'Lumampong Balagbag View', distance: 'Lumampong Balagbag • Scenic' },
-  { id: 262, title: 'Lumampong Cave', distance: 'Lumampong Balagbag • Nature' },
+  { id: 262, title: 'Lumampong Cave', distance: 'Lumampong Balagbag • Nature', image: require('../assets/images/transportation/lumampongcave.png') },
   { id: 263, title: 'Lumampong Balagbag Farm', distance: 'Lumampong Balagbag • Agri' },
   { id: 264, title: 'Lumampong Balagbag River', distance: 'Lumampong Balagbag • Nature' },
   { id: 265, title: 'Lumampong Balagbag Chapel', distance: 'Lumampong Balagbag • Religious' },
@@ -324,8 +324,8 @@ export const recommendations = [
   { id: 270, title: 'Lumampong Balagbag Trail', distance: 'Lumampong Balagbag • Adventure' },
 
   // --- LUMAMPONG HALAYHAY ---
-  { id: 271, title: 'Alta Rios Resort', distance: 'Lumampong Halayhay • Resort' },
-  { id: 272, title: 'The Ravine by One Selah', distance: 'Lumampong Halayhay • Resort' },
+  { id: 271, title: 'Alta Rios Resort', distance: 'Lumampong Halayhay • Resort', image: require('../assets/images/transportation/altarios.png') },
+  { id: 272, title: 'The Ravine by One Selah', distance: 'Lumampong Halayhay • Resort', image: require('../assets/images/transportation/ravine.png') },
   { id: 273, title: 'Lumampong Halayhay Garden', distance: 'Lumampong Halayhay • Nature' },
   { id: 274, title: 'Lumampong Halayhay Farm', distance: 'Lumampong Halayhay • Agri' },
   { id: 275, title: 'Lumampong Halayhay Chapel', distance: 'Lumampong Halayhay • Religious' },
@@ -336,9 +336,9 @@ export const recommendations = [
   { id: 280, title: 'Lumampong Halayhay Trail', distance: 'Lumampong Halayhay • Walk' },
 
   // --- MAHABANG KAHOY CERCA ---
-  { id: 281, title: 'Cafe Juana', distance: 'Mahabang Kahoy Cerca • Coffee Shop' },
+  { id: 281, title: 'Cafe Juana', distance: 'Mahabang Kahoy Cerca • Coffee Shop', image: require('../assets/images/transportation/cafejuana.png') },
   { id: 282, title: 'Photograph Cafe', distance: 'Mahabang Kahoy Cerca • Coffee Shop' },
-  { id: 283, title: 'Driftwoods Action Park', distance: 'Mahabang Kahoy Cerca • Adventure' },
+  { id: 283, title: 'Driftwoods Action Park', distance: 'Mahabang Kahoy Cerca • Adventure', image: require('../assets/images/transportation/driftwoods.png') },
   { id: 284, title: 'Mahabang Kahoy Cerca River', distance: 'Mahabang Kahoy Cerca • Nature' },
   { id: 285, title: 'Mahabang Kahoy Cerca View', distance: 'Mahabang Kahoy Cerca • Scenic' },
   { id: 286, title: 'Mahabang Kahoy Cerca Farm', distance: 'Mahabang Kahoy Cerca • Agri' },
@@ -360,7 +360,7 @@ export const recommendations = [
   { id: 300, title: 'Mahabang Kahoy Lejos Trail', distance: 'Mahabang Kahoy Lejos • Hiking' },
 
   // --- MATAAS NA LUPA ---
-  { id: 301, title: 'The Farm Shack Resort', distance: 'Brgy. Mataas na Lupa • Resort' },
+  { id: 301, title: 'The Farm Shack Resort', distance: 'Brgy. Mataas na Lupa • Resort', image: require('../assets/images/transportation/farmsahck.png') },
   { id: 302, title: 'Mataas na Lupa Ridge View', distance: 'Brgy. Mataas na Lupa • Scenic' },
   { id: 303, title: 'Mataas na Lupa Spring', distance: 'Brgy. Mataas na Lupa • Nature' },
   { id: 304, title: 'Mataas na Lupa Farm', distance: 'Brgy. Mataas na Lupa • Agri' },
@@ -408,8 +408,8 @@ export const recommendations = [
   { id: 340, title: 'Tambo Ilaya Trail', distance: 'Brgy. Tambo Ilaya • Walk' },
 
   // --- TAMBO KULIT ---
-  { id: 341, title: 'Rio Villa Nuevo Resort', distance: 'Brgy. Tambo Kulit • Resort' },
-  { id: 342, title: 'Villa Colmenar Resort', distance: 'Brgy. Tambo Kulit • Swimming' },
+  { id: 341, title: 'Rio Villa Nuevo Resort', distance: 'Brgy. Tambo Kulit • Resort', image: require('../assets/images/transportation/rio.png') },
+  { id: 342, title: 'Villa Colmenar Resort', distance: 'Brgy. Tambo Kulit • Swimming', image: require('../assets/images/transportation/colmenar.png') },
   { id: 343, title: 'Tambo Kulit Spring', distance: 'Brgy. Tambo Kulit • Nature' },
   { id: 344, title: 'Tambo Kulit Farm', distance: 'Brgy. Tambo Kulit • Agri' },
   { id: 345, title: 'Tambo Kulit View', distance: 'Brgy. Tambo Kulit • Scenic' },
@@ -420,9 +420,9 @@ export const recommendations = [
   { id: 350, title: 'Tambo Kulit Bridge', distance: 'Brgy. Tambo Kulit • Landmark' },
 
   // --- TAMBO MALAKI ---
-  { id: 351, title: 'EMV Flower Farm', distance: 'Brgy. Tambo Malaki • Agri-Tourism' },
-  { id: 352, title: 'Leaf & Brew Café', distance: 'Brgy. Tambo Malaki • Coffee Shop' },
-  { id: 353, title: 'Chillax Inn', distance: 'Brgy. Tambo Malaki • Inn' },
+  { id: 351, title: 'EMV Flower Farm', distance: 'Brgy. Tambo Malaki • Agri-Tourism', image: require('../assets/images/transportation/emv.png') },
+  { id: 352, title: 'Leaf & Brew Café', distance: 'Brgy. Tambo Malaki • Coffee Shop', image: require('../assets/images/transportation/leafnbrew.png') },
+  { id: 353, title: 'Chillax Inn', distance: 'Brgy. Tambo Malaki • Inn', image: require('../assets/images/transportation/chillax.png') },
   { id: 354, title: 'Tambo Malaki River', distance: 'Brgy. Tambo Malaki • Nature' },
   { id: 355, title: 'Tambo Malaki View', distance: 'Brgy. Tambo Malaki • Scenic' },
   { id: 356, title: 'Tambo Malaki Chapel', distance: 'Brgy. Tambo Malaki • Religious' },
