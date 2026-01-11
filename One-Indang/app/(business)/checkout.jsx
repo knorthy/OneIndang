@@ -23,18 +23,34 @@ const INITIAL_REGION = {
 export default function CheckoutScreen() {
   const router = useRouter();
   
-  const { cartTotal, clearCart, placeOrder, cartItems } = useCart();
-  const restaurantName = cartItems.length > 0 ? cartItems[0].restaurant : "Restaurant";
+  const { cartTotal, placeOrder, cartItems } = useCart();
+  
+  // Use a fallback name if cart is empty (prevent crash after clearing)
+  const [restaurantName, setRestaurantName] = useState("Restaurant");
+
+  useEffect(() => {
+     if (cartItems.length > 0) {
+         setRestaurantName(cartItems[0].restaurant);
+     }
+  }, [cartItems]);
 
   const DELIVERY_FEE = 59.00;
   const SERVICE_FEE = 5.00;
-  const totalAmount = (parseFloat(cartTotal || 0) + DELIVERY_FEE + SERVICE_FEE).toFixed(2);
+  
+  // This value updates live. It becomes 64.00 when cart is cleared.
+  const currentTotal = (parseFloat(cartTotal || 0) + DELIVERY_FEE + SERVICE_FEE).toFixed(2);
 
   const [address, setAddress] = useState("Poblacion 1, Indang, Cavite");
   const [note, setNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); 
+  const [orderSuccessVisible, setOrderSuccessVisible] = useState(false); 
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // --- FIX: STORE THE TOTAL HERE BEFORE CLEARING CART ---
+  const [frozenTotal, setFrozenTotal] = useState("0.00");
+
   const [mapRegion, setMapRegion] = useState(INITIAL_REGION);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
@@ -82,34 +98,44 @@ export default function CheckoutScreen() {
     }
   };
 
-  const handlePlaceOrder = () => {
+  // --- UPDATED ORDER LOGIC ---
+  const handlePlaceOrder = async () => {
     if (!address.trim()) {
       Alert.alert("Missing Address", "Please enter a delivery address.");
       return;
     }
 
-    Alert.alert(
-      "Order Placed Successfully!",
-      `Your order from ${restaurantName} is being prepared.\n\nTotal: ₱${totalAmount}\nPayment: ${paymentMethod}`,
-      [
-        { 
-          text: "OK", 
-          onPress: () => {
-             placeOrder({
-                restaurantName,
-                total: totalAmount,
-                address,
-                paymentMethod
-             });
+    setIsProcessing(true);
 
-             if (router.canDismiss()) {
-               router.dismiss(2); 
-             }
-             router.push('/(business)/orders');
-          }
-        }
-      ]
-    );
+    try {
+        // 1. SAVE the total BEFORE clearing the cart
+        setFrozenTotal(currentTotal);
+
+        // 2. Place Order (This clears the cart context)
+        await placeOrder({
+            restaurantName,
+            total: currentTotal,
+            address,
+            paymentMethod,
+            note
+        });
+
+        // 3. Show Success Modal
+        setIsProcessing(false);
+        setOrderSuccessVisible(true);
+
+    } catch (error) {
+        setIsProcessing(false);
+        Alert.alert("Order Failed", "Something went wrong. Please try again.");
+    }
+  };
+
+  const handleSuccessDismiss = () => {
+      setOrderSuccessVisible(false);
+      if (router.canDismiss()) {
+        router.dismiss(2); 
+      }
+      router.push('/(business)/orders');
   };
 
   const handleSelectPayment = (method) => {
@@ -160,6 +186,44 @@ export default function CheckoutScreen() {
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
+      {/* --- SUCCESS MODAL --- */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={orderSuccessVisible}
+        onRequestClose={handleSuccessDismiss}
+      >
+        <View style={styles.modalOverlay}>
+            <View style={styles.successCard}>
+                <View style={styles.successIconContainer}>
+                    <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
+                </View>
+                
+                <Text style={styles.successTitle}>Order Placed!</Text>
+                <Text style={styles.successSubtitle}>
+                    Your order from <Text style={{fontWeight: 'bold', color: COLORS.primary}}>{restaurantName}</Text> has been received and is being prepared.
+                </Text>
+
+                <View style={styles.orderSummaryBox}>
+                    <View style={styles.summaryRowSimple}>
+                        <Text style={styles.summaryLabelSimple}>Total Amount:</Text>
+                        {/* USE FROZEN TOTAL HERE */}
+                        <Text style={styles.summaryValueSimple}>₱{frozenTotal}</Text>
+                    </View>
+                    <View style={styles.summaryRowSimple}>
+                        <Text style={styles.summaryLabelSimple}>Payment:</Text>
+                        <Text style={styles.summaryValueSimple}>{paymentMethod}</Text>
+                    </View>
+                </View>
+
+                <TouchableOpacity style={styles.trackOrderBtn} onPress={handleSuccessDismiss}>
+                    <Text style={styles.trackOrderText}>Track My Order</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+      </Modal>
+
+      {/* --- MAP MODAL --- */}
       <Modal
         animationType="slide"
         transparent={false}
@@ -269,7 +333,8 @@ export default function CheckoutScreen() {
               <Text style={styles.sectionTitle}>Summary</Text>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Total Amount</Text>
-                <Text style={styles.summaryTotal}>₱ {totalAmount}</Text>
+                {/* USE CURRENT TOTAL HERE (LIVE) */}
+                <Text style={styles.summaryTotal}>₱ {currentTotal}</Text>
               </View>
             </View>
 
@@ -278,10 +343,18 @@ export default function CheckoutScreen() {
           <View style={styles.footer}>
             <View style={styles.footerTextContainer}>
               <Text style={styles.footerTotalLabel}>Total to Pay</Text>
-              <Text style={styles.footerTotalValue}>₱ {totalAmount}</Text>
+              <Text style={styles.footerTotalValue}>₱ {currentTotal}</Text>
             </View>
-            <TouchableOpacity style={styles.placeOrderBtn} onPress={handlePlaceOrder}>
-              <Text style={styles.placeOrderText}>Place Order</Text>
+            <TouchableOpacity 
+                style={[styles.placeOrderBtn, isProcessing && { opacity: 0.7 }]} 
+                onPress={handlePlaceOrder}
+                disabled={isProcessing}
+            >
+              {isProcessing ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                  <Text style={styles.placeOrderText}>Place Order</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -336,5 +409,76 @@ const styles = StyleSheet.create({
   mapFooter: { position: 'absolute', bottom: 30, left: 20, right: 20, backgroundColor: '#FFF', padding: 20, borderRadius: 15, elevation: 10, alignItems: 'center' },
   mapInstruction: { fontSize: 14, color: '#666', marginBottom: 15 },
   confirmLocationBtn: { backgroundColor: COLORS.secondary, width: '100%', paddingVertical: 15, borderRadius: 10, alignItems: 'center' },
-  confirmLocationText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 }
+  confirmLocationText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+
+  // --- MODAL STYLES ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  successCard: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  successIconContainer: {
+    marginBottom: 15,
+  },
+  successTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#333',
+    marginBottom: 8,
+  },
+  successSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20
+  },
+  orderSummaryBox: {
+    width: '100%',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20
+  },
+  summaryRowSimple: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8
+  },
+  summaryLabelSimple: {
+    fontSize: 14,
+    color: '#666'
+  },
+  summaryValueSimple: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#333'
+  },
+  trackOrderBtn: {
+    width: '100%',
+    backgroundColor: COLORS.secondary,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 2
+  },
+  trackOrderText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700'
+  }
 });

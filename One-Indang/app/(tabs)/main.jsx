@@ -6,6 +6,10 @@ import {
   ScrollView,
   StatusBar,
   TextInput,
+  Image, 
+  Alert,
+  Modal, 
+  StyleSheet
 } from "react-native";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +20,7 @@ import { auth } from '../../services/supabase';
 import { E_SERVICES, FEATURED_SERVICES, POPULAR_SERVICES, SERVICE_GUIDES, MAIN_SERVICES } from '../../constants/mainData';
 import { COLORS } from '../../constants/theme';
 import UserProfileSheet from '../../components/UserProfileSheet';
+import * as ImagePicker from 'expo-image-picker'; 
 
 // Icons
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -32,18 +37,25 @@ export default function HomeScreen() {
   const [session, setSession] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); 
+  
+  // Profile Image State
+  const [profileImage, setProfileImage] = useState(null);
+  
+  // Modals State
+  const [isPickerVisible, setPickerVisible] = useState(false); // For Profile Pic
+  const [isGuestModalVisible, setGuestModalVisible] = useState(false); // For Guest Login/Signup
 
   // Bottom Sheet ref
   const bottomSheetRef = useRef(null);
 
-  // Handle avatar press - open bottom sheet if logged in, otherwise go to login
+  // --- UPDATED: Handle Avatar Press ---
   const handleAvatarPress = useCallback(() => {
     if (isLoggedIn) {
-      bottomSheetRef.current?.expand();
+      bottomSheetRef.current?.expand(); // Show menu if logged in
     } else {
-      router.push('/login');
+      setGuestModalVisible(true); // Show choice modal if guest
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn]);
 
   // Handle logout
   const handleLogout = async () => {
@@ -51,18 +63,67 @@ export default function HomeScreen() {
       await auth.signOut();
       setSession(null);
       setIsLoggedIn(false);
+      setProfileImage(null);
       bottomSheetRef.current?.close();
-      // Stay on main page as unregistered user
     } catch (error) {
       console.log('Logout error:', error);
     }
   };
 
-  // Handle edit profile
+  // Open Custom Image Picker
   const handleEditProfile = () => {
     bottomSheetRef.current?.close();
-    // Navigate to edit profile screen
-    router.push('/profile');
+    setPickerVisible(true); 
+  };
+
+  const openGallery = async () => {
+    setPickerVisible(false); 
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your photos.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const openCamera = async () => {
+    setPickerVisible(false); 
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your camera.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  // Navigation Helpers for Guest Modal
+  const handleGuestLogin = () => {
+    setGuestModalVisible(false);
+    router.push('/login');
+  };
+
+  const handleGuestSignup = () => {
+    setGuestModalVisible(false);
+    router.push('/signup');
   };
 
   useEffect(() => {
@@ -86,7 +147,6 @@ export default function HomeScreen() {
     checkUser();
     if (isUserLoggedIn === 'true') setIsLoggedIn(true);
 
-    // Listen for auth state changes (login/logout)
     const { data: authListener } = auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         setSession(session);
@@ -94,6 +154,7 @@ export default function HomeScreen() {
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setIsLoggedIn(false);
+        setProfileImage(null);
       }
     });
 
@@ -134,7 +195,95 @@ export default function HomeScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
 
-      {/* Hweader */}
+      {/* --- MODAL 1: IMAGE PICKER (For Logged In Users) --- */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isPickerVisible}
+        onRequestClose={() => setPickerVisible(false)}
+      >
+        <TouchableOpacity 
+            style={localStyles.modalOverlay} 
+            activeOpacity={1} 
+            onPress={() => setPickerVisible(false)}
+        >
+            <View style={localStyles.modalContent}>
+                <View style={localStyles.modalHeader}>
+                    <Text style={localStyles.modalTitle}>Update Profile Photo</Text>
+                    <Text style={localStyles.modalSubtitle}>Select an option to proceed</Text>
+                </View>
+
+                <View style={localStyles.optionsContainer}>
+                    <TouchableOpacity style={localStyles.optionCard} onPress={openCamera}>
+                        <View style={[localStyles.iconCircle, { backgroundColor: '#E3F2FD' }]}>
+                            <Ionicons name="camera" size={28} color="#003087" />
+                        </View>
+                        <Text style={localStyles.optionText}>Take Photo</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={localStyles.optionCard} onPress={openGallery}>
+                        <View style={[localStyles.iconCircle, { backgroundColor: '#FFEBEE' }]}>
+                            <Ionicons name="images" size={28} color="#D32F2F" />
+                        </View>
+                        <Text style={localStyles.optionText}>Gallery</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity 
+                    style={localStyles.cancelButton} 
+                    onPress={() => setPickerVisible(false)}
+                >
+                    <Text style={localStyles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* --- MODAL 2: GUEST WELCOME (For Guests) --- */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isGuestModalVisible}
+        onRequestClose={() => setGuestModalVisible(false)}
+      >
+        <TouchableOpacity 
+            style={localStyles.modalOverlay} 
+            activeOpacity={1} 
+            onPress={() => setGuestModalVisible(false)}
+        >
+            <View style={localStyles.modalContent}>
+                <View style={localStyles.modalHeader}>
+                    <Text style={localStyles.modalTitle}>Welcome to One Indang</Text>
+                    <Text style={localStyles.modalSubtitle}>Log in to manage your profile or create an account to get started.</Text>
+                </View>
+
+                <View style={localStyles.optionsContainer}>
+                    <TouchableOpacity style={localStyles.optionCard} onPress={handleGuestLogin}>
+                        <View style={[localStyles.iconCircle, { backgroundColor: '#E3F2FD' }]}>
+                            <Ionicons name="log-in" size={28} color="#003087" />
+                        </View>
+                        <Text style={localStyles.optionText}>Log In</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={localStyles.optionCard} onPress={handleGuestSignup}>
+                        <View style={[localStyles.iconCircle, { backgroundColor: '#FFEBEE' }]}>
+                            <Ionicons name="person-add" size={28} color="#D32F2F" />
+                        </View>
+                        <Text style={localStyles.optionText}>Sign Up</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity 
+                    style={localStyles.cancelButton} 
+                    onPress={() => setGuestModalVisible(false)}
+                >
+                    <Text style={localStyles.cancelText}>Maybe Later</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Header */}
       <View style={{
         paddingHorizontal: wp(5),
         paddingVertical: 15,
@@ -142,8 +291,16 @@ export default function HomeScreen() {
         zIndex: 10,
       }}>
         <View style={styles.searchBarContainer}>
+          
           <TouchableOpacity style={styles.avatarButton} onPress={handleAvatarPress}>
-            <Ionicons name="person-circle-outline" size={32} color="#003087" />
+            {profileImage && isLoggedIn ? (
+              <Image 
+                source={{ uri: profileImage }} 
+                style={{ width: 32, height: 32, borderRadius: 16 }} 
+              />
+            ) : (
+              <Ionicons name="person-circle-outline" size={32} color="#003087" />
+            )}
           </TouchableOpacity>
 
           <View style={styles.searchInput}>
@@ -187,7 +344,7 @@ export default function HomeScreen() {
             </View>
         )}
 
-        {/* --- MAIN GRID (3 COLUMNS) --- */}
+        {/* --- MAIN GRID --- */}
         {searchQuery === '' && (
             <>
                 <Text style={styles.sectionTitle}>What would you like to do?</Text>
@@ -206,7 +363,6 @@ export default function HomeScreen() {
                             style={[
                                 styles.serviceCard, 
                                 { 
-                                   
                                     width: '30%', 
                                     aspectRatio: 1, 
                                     marginBottom: 15, 
@@ -241,8 +397,6 @@ export default function HomeScreen() {
         {/* Divider */}
         <View style={{ height: 1, backgroundColor: '#E0E0E0', marginVertical: 20 }} />
 
-        {/* EMBEDDED SERVICES CONTENT  */}
-        
         {/* 1. Popular Services */}
         {filteredPopular.length > 0 && (
           <View style={serviceStyles.section}>
@@ -280,7 +434,6 @@ export default function HomeScreen() {
                   <Text style={[serviceStyles.gridLabel, { color: COLORS.textGray }]}>{item.title}</Text>
                 </TouchableOpacity>
               ))}
-              {/* Spacers */}
               {filteredEServices.length === 1 && <View style={{width: '30%'}} />} 
               {filteredEServices.length === 1 && <View style={{width: '30%'}} />} 
             </View>
@@ -331,7 +484,7 @@ export default function HomeScreen() {
         <View style={{ height: hp(10) }} />
       </ScrollView>
 
-      {/* User Profile Bottom Sheet - Only render when logged in */}
+      {/* User Profile Bottom Sheet */}
       {isLoggedIn && (
         <UserProfileSheet
           ref={bottomSheetRef}
@@ -342,3 +495,80 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+// --- MODAL STYLES ---
+const localStyles = StyleSheet.create({
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        width: '85%',
+        backgroundColor: 'white',
+        borderRadius: 24,
+        padding: 24,
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+    },
+    modalHeader: {
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1F2937',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    modalSubtitle: {
+        fontSize: 14,
+        color: '#6B7280',
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+    optionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 24,
+    },
+    optionCard: {
+        width: '47%',
+        backgroundColor: '#F9FAFB',
+        borderRadius: 16,
+        padding: 16,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+    },
+    iconCircle: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    optionText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
+        textAlign: 'center',
+    },
+    cancelButton: {
+        width: '100%',
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    cancelText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#6B7280',
+    }
+});

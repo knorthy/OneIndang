@@ -77,10 +77,10 @@ export const auth = {
   },
 
   // Reset password
-  resetPassword: async (email) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+  resetPassword: async (email, options = {}) => { 
+    const { error } = await supabase.auth.resetPasswordForEmail(email, options);
     return { error };
-  },
+},
 
   // Update password
   updatePassword: async (password) => {
