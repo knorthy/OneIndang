@@ -14,7 +14,7 @@ app.use(helmet());
 
 // CORS configuration - Allow requests from Expo app
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*', // Allow all origins for development
+  origin: process.env.FRONTEND_URL || '*', 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
