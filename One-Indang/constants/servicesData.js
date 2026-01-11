@@ -1,13 +1,4 @@
-
-const COLORS = {
-  primary: '#003087', 
-  secondary: '#D32F2F', 
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE',
-  lightBlueBg: '#E3F2FD',
-};
+import { COLORS } from './theme';
 
 export const E_SERVICES = [
   { id: 1, title: 'Business Permit', icon: 'briefcase-outline', color: COLORS.secondary },

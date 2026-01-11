@@ -14,6 +14,7 @@ import styles from '../../styles/mainStyles';
 import { styles as serviceStyles } from '../../styles/servicesStyles';
 import { auth } from '../../services/supabase';
 import { E_SERVICES, FEATURED_SERVICES, POPULAR_SERVICES, SERVICE_GUIDES, MAIN_SERVICES } from '../../constants/mainData';
+import { COLORS } from '../../constants/theme';
 
 // Icons
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -21,17 +22,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-
-
-const COLORS = {
-  primary: '#003087',
-  secondary: '#D32F2F',
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE',
-  lightBlueBg: '#E3F2FD',
-};
 
 export default function HomeScreen() {
   const router = useRouter();

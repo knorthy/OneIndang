@@ -30,16 +30,7 @@ const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
 const hp = (p) => (p * deviceHeight) / 100;
 const wp = (p) => (p * deviceWidth) / 100;
 
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087', // Deep Blue
-  secondary: '#D32F2F', // Bright Red
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE', 
-  lightBlueBg: '#E3F2FD', 
-};
+import { COLORS } from '../../constants/theme';
 
 export default function EducationScreen() {
   const router = useRouter();

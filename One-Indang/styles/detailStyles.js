@@ -1,12 +1,6 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 import { hp, wp } from '../helpers/common';
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087',
-  secondary: '#D32F2F',
-  lightBlueBg: '#E3F2FD',
-};
+import { COLORS } from '../constants/theme';
 
 export default StyleSheet.create({
   container: {

@@ -9,18 +9,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 import { hp, wp } from '../../helpers/common';
-import { useCart } from '../../context/CartContext'; 
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087', // Deep Blue
-  secondary: '#D32F2F', // Bright Red
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE', 
-  lightBlueBg: '#E3F2FD', 
-};
+import { useCart } from '../../context/CartContext';
+import { COLORS } from '../../constants/theme';
 
 // Default Map Region (Indang, Cavite)
 const INITIAL_REGION = {

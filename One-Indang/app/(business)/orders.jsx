@@ -5,17 +5,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { hp, wp } from '../../helpers/common';
 import { useCart } from '../../context/CartContext';
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087', // Deep Blue
-  secondary: '#D32F2F', // Bright Red
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE', 
-  lightBlueBg: '#E3F2FD', 
-};
+import { COLORS } from '../../constants/theme';
 
 export default function OrdersScreen() {
   const router = useRouter();

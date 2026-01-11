@@ -1,16 +1,4 @@
-// Main Page Data Constants
-// This file contains all data sets used in the main page
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087',
-  secondary: '#D32F2F',
-  background: '#ffffff',
-  text: '#003087',
-  textGray: '#666666',
-  lightRedBg: '#FFEBEE',
-  lightBlueBg: '#E3F2FD',
-};
+import { COLORS } from './theme';
 
 // --- SERVICE DATA ---
 export const E_SERVICES = [

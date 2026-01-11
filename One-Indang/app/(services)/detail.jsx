@@ -12,13 +12,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { hp, wp } from '../../helpers/common';
 import styles from '../../styles/detailStyles';
 import { SERVICES_DB } from '../../constants/detailData';
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087',
-  secondary: '#D32F2F',
-  lightBlueBg: '#E3F2FD',
-};
+import { COLORS } from '../../constants/theme';
 
 export default function ServiceDetailScreen() {
   const { id } = useLocalSearchParams();

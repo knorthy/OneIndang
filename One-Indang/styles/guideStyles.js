@@ -1,16 +1,6 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 import { hp, wp } from '../helpers/common';
-
-// --- THEME COLORS ---
-const COLORS = {
-  primary: '#003087', // Indang Blue
-  secondary: '#D32F2F', // Indang Red
-  background: '#fff',
-  text: '#333',
-  gray: '#999',
-  lightGray: '#f9f9f9',
-  border: '#e0e0e0',
-};
+import { COLORS } from '../constants/theme';
 
 export default StyleSheet.create({
   container: {
