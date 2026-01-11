@@ -13,7 +13,7 @@ import {
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link, useRouter } from 'expo-router'; 
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
 import { hp, wp } from '../../helpers/common'; 
 import { styles, BRAND_RED, SUCCESS_COLOR, DISABLED_RED } from '../../styles/signupStyles';
 import { showToast } from '../../components/Toast';
@@ -22,6 +22,10 @@ import { auth } from '../../services/supabase';
 const AccountSetupScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter(); 
+  
+  // CAPTURE PARAMS (to pass to login if needed)
+  const params = useLocalSearchParams();
+
   const [currentStep, setCurrentStep] = useState(1); 
 
   const [showPassword, setShowPassword] = useState(false);
@@ -89,74 +93,85 @@ const AccountSetupScreen = () => {
   const validateAndSubmit = async () => {
     let valid = true;
     let newErrors = { phone: false, email: false, fullName: false, password: false };
+    let firstErrorMessage = ''; 
 
-    if (!phone || phone.length < 10) { newErrors.phone = true; valid = false; }
+    if (!phone || phone.length < 10) { 
+        newErrors.phone = true; 
+        valid = false; 
+        if (!firstErrorMessage) firstErrorMessage = "Please enter a valid 10-digit phone number.";
+    }
     
+    if (!fullName.trim()) { 
+        newErrors.fullName = true; 
+        valid = false; 
+        if (!firstErrorMessage) firstErrorMessage = "Please enter your full name.";
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) { newErrors.email = true; valid = false; }
+    if (!email || !emailRegex.test(email)) { 
+        newErrors.email = true; 
+        valid = false; 
+        if (!firstErrorMessage) firstErrorMessage = "Please enter a valid email address.";
+    }
     
-    if (!fullName.trim()) { newErrors.fullName = true; valid = false; }
-
     const isPassLengthValid = password.length >= 8;
     const isPassFormatValid = /^(?=.*[a-zA-Z])(?=.*[0-9])/.test(password);
 
     if (!isPassLengthValid || !isPassFormatValid) { 
       newErrors.password = true; 
       valid = false; 
+      if (!firstErrorMessage) firstErrorMessage = "Password must be at least 8 characters with letters & numbers.";
     }
 
     setErrors(newErrors);
 
     if (!valid) {
-      console.log("Validation failed", newErrors);
+      showToast(firstErrorMessage || "Please fix the highlighted errors.");
       return;
     }
 
-    // Sign up with Supabase
     setIsLoading(true);
     try {
-      console.log('Attempting signup with:', { email, fullName, phone: `+63${phone}` });
-      
       const { data, error } = await auth.signUp(email, password, {
         full_name: fullName,
         phone: `+63${phone}`
       });
 
-      console.log('Signup response:', { data: data ? 'received' : 'null', error });
-
       if (error) {
-        console.error('Signup error:', error);
-        showToast(error.message || 'Failed to create account');
+        console.log('Signup error:', error);
+        if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('unique constraint')) {
+            showToast('This email or phone number is already registered. Please login.');
+        } else {
+            showToast(error.message || 'Failed to create account');
+        }
         return;
       }
 
       if (data.user) {
         if (!data.user.email_confirmed_at) {
-          // Email confirmation required
           showToast('Please check your email for the verification code');
           setCurrentStep(2);
         } else {
           showToast('Account created successfully!');
-          router.replace('/login'); // Redirect to login immediately if no verification needed
+          // Pass Params to Login
+          router.replace({ pathname: '/login', params: params }); 
         }
       } else {
         showToast('Account creation failed - no user data');
       }
     } catch (error) {
-      console.error('Signup exception:', error);
-      showToast('An unexpected error occurred');
+      console.log('Signup exception:', error);
+      showToast('An unexpected error occurred. Please check your connection.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- UPDATED: VERIFY OTP & REDIRECT TO LOGIN ---
   const handleVerifyOtp = async () => {
     setIsLoading(true);
     const token = otpCode.join(''); 
 
     try {
-      // 1. Verify the code
       const { data, error } = await auth.verifyOtp({
         email: email,
         token: token,
@@ -171,15 +186,12 @@ const AccountSetupScreen = () => {
 
       if (data.session) {
         showToast("Account Verified! Please log in.");
-        
-        // 2. Sign out immediately so they have to enter password on login screen
         await auth.signOut(); 
-
-        // 3. Redirect to Login Page
-        router.replace('/login'); 
+        // Pass Params to Login
+        router.replace({ pathname: '/login', params: params }); 
       }
     } catch (error) {
-      console.error("Verification error:", error);
+      console.log("Verification error:", error);
       showToast("An error occurred during verification");
       setIsLoading(false);
     }
@@ -191,7 +203,6 @@ const AccountSetupScreen = () => {
     return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
   };
 
-  // SMART FOCUS LOGIC
   const handleInputFocus = (index) => {
     const firstEmptyIndex = otpCode.findIndex((digit) => digit === '');
     if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
@@ -221,7 +232,6 @@ const AccountSetupScreen = () => {
     }
   };
 
-  // --- RESEND HANDLER ---
   const handleResendCode = async () => {
     try {
       const { error } = await auth.resend({
@@ -242,7 +252,7 @@ const AccountSetupScreen = () => {
     if (currentStep === 2) {
       setCurrentStep(1); 
     } else {
-        router.back(); 
+      router.back(); 
     }
   };
 
@@ -268,12 +278,13 @@ const AccountSetupScreen = () => {
 
           <KeyboardAvoidingView 
             behavior={Platform.OS === "ios" ? "padding" : "height"} 
-            style={styles.keyboardContainer}
+            style={{ flex: 1 }} 
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
           >
             <ScrollView 
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[styles.scrollContent, { flexGrow: 1, paddingBottom: 150 }]} 
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
                 {/* STEP ONE*/}
                 {currentStep === 1 && (
@@ -399,46 +410,48 @@ const AccountSetupScreen = () => {
                     </>
                 )}
 
+                {/* FOOTER */}
+                <View style={[styles.footerContainer, { marginTop: 40 }]}>
+                    {currentStep === 1 ? (
+                        <TouchableOpacity 
+                            activeOpacity={0.8}
+                            onPress={validateAndSubmit}
+                            disabled={isLoading}
+                            style={[styles.button, { backgroundColor: isLoading ? DISABLED_RED : BRAND_RED }]}
+                        >
+                            <Text style={styles.buttonText}>
+                                {isLoading ? 'Creating Account...' : 'Create Account'}
+                            </Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity 
+                            activeOpacity={0.8}
+                            disabled={!isFullCode || isLoading}
+                            onPress={handleVerifyOtp} 
+                            style={[
+                                styles.button, 
+                                { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
+                            ]}
+                        >
+                            <Text style={styles.buttonText}>
+                                {isLoading ? 'Verifying...' : 'Continue'} 
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+
+                    {currentStep === 1 && (
+                        <View style={styles.signinContainer}>
+                            <Text style={styles.signinText}>Already have an account? </Text>
+                            {/* FIX: Push to login with PARAMS */}
+                            <TouchableOpacity onPress={() => router.push({ pathname: '/login', params: params })}>
+                                <Text style={styles.signinLinkText}>Signin</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
+
             </ScrollView>
           </KeyboardAvoidingView>
-
-          <View style={styles.footerContainer}>
-            {currentStep === 1 ? (
-                <TouchableOpacity 
-                    activeOpacity={0.8}
-                    onPress={validateAndSubmit}
-                    disabled={isLoading}
-                    style={[styles.button, { backgroundColor: isLoading ? DISABLED_RED : BRAND_RED }]}
-                >
-                    <Text style={styles.buttonText}>
-                        {isLoading ? 'Creating Account...' : 'Create Account'}
-                    </Text>
-                </TouchableOpacity>
-            ) : (
-                <TouchableOpacity 
-                    activeOpacity={0.8}
-                    disabled={!isFullCode || isLoading}
-                    onPress={handleVerifyOtp} 
-                    style={[
-                        styles.button, 
-                        { backgroundColor: isFullCode ? BRAND_RED : DISABLED_RED }
-                    ]}
-                >
-                    <Text style={styles.buttonText}>
-                        {isLoading ? 'Verifying...' : 'Continue'} 
-                    </Text>
-                </TouchableOpacity>
-            )}
-
-            {currentStep === 1 && (
-                <View style={styles.signinContainer}>
-                    <Text style={styles.signinText}>Already have an account? </Text>
-                    <Link href="/login">
-                        <Text style={styles.signinLinkText}>Signin</Text>
-                    </Link>
-                </View>
-            )}
-          </View>
 
         </View>
       </TouchableWithoutFeedback>

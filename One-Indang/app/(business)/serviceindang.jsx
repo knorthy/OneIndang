@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,7 +10,8 @@ import {
   Dimensions, 
   Linking, 
   Share, 
-  Alert 
+  Alert,
+  BackHandler // 1. Import BackHandler
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,10 +22,16 @@ const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
 const hp = (p) => (p * deviceHeight) / 100;
 const wp = (p) => (p * deviceWidth) / 100;
 
-// THEME COLORS
-const SERVICE_TEAL = '#008080'; 
-const LIGHT_TEAL_BG = '#E0F2F1';
-const HEART_ORANGE = '#FF8C00'; // UPDATED: Orange for Heart
+// --- THEME COLORS ---
+const COLORS = {
+  primary: '#003087', // Deep Blue
+  secondary: '#D32F2F', // Bright Red
+  background: '#ffffff',
+  text: '#003087',
+  textGray: '#666666',
+  lightRedBg: '#FFEBEE', 
+  lightBlueBg: '#E3F2FD', 
+};
 
 // --- DATA ---
 const BASE_DATA = [
@@ -64,6 +71,23 @@ export default function ServicesScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('About');
 
+  // --- FIX: HANDLE DEVICE BACK BUTTON ---
+  useEffect(() => {
+    const onBackPress = () => {
+      if (selectedItem) {
+        // If details are open, close them to go back to the list
+        setSelectedItem(null);
+        return true; // Prevent default behavior (exiting screen)
+      }
+      // If list is open, let default behavior happen (go back to previous screen)
+      return false; 
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => subscription.remove();
+  }, [selectedItem]);
+
   // --- ACTIONS ---
   const handleBook = () => {
     Alert.alert("Coming Soon", "This feature is not available coming soon...");
@@ -87,15 +111,15 @@ export default function ServicesScreen() {
     <View style={{ marginTop: hp(2) }}>
       <View style={styles.amenitiesRow}>
         <View style={styles.amenity}>
-          <Ionicons name="time-outline" size={22} color={SERVICE_TEAL} />
+          <Ionicons name="time-outline" size={22} color={COLORS.secondary} />
           <Text style={styles.amenityText}>{selectedItem?.time}</Text>
         </View>
         <View style={styles.amenity}>
-          <MaterialCommunityIcons name="shield-check-outline" size={22} color={SERVICE_TEAL} />
+          <MaterialCommunityIcons name="shield-check-outline" size={22} color={COLORS.secondary} />
           <Text style={styles.amenityText}>Verified</Text>
         </View>
         <View style={styles.amenity}>
-          <MaterialCommunityIcons name="account-group-outline" size={22} color={SERVICE_TEAL} />
+          <MaterialCommunityIcons name="account-group-outline" size={22} color={COLORS.secondary} />
           <Text style={styles.amenityText}>{selectedItem?.staff}</Text>
         </View>
       </View>
@@ -116,7 +140,7 @@ export default function ServicesScreen() {
         </View>
         <View style={styles.agentActions}>
           <TouchableOpacity style={styles.agentActionBtn} onPress={() => handleCall(selectedItem?.phone)}>
-            <Ionicons name="call-outline" size={20} color={SERVICE_TEAL} />
+            <Ionicons name="call-outline" size={20} color={COLORS.secondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,7 +163,7 @@ export default function ServicesScreen() {
         <View key={review.id} style={styles.reviewItem}>
           <View style={styles.reviewHeader}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-               <View style={styles.reviewAvatar}><Text style={{color: SERVICE_TEAL, fontWeight: 'bold'}}>{review.user[0]}</Text></View>
+               <View style={styles.reviewAvatar}><Text style={{color: COLORS.primary, fontWeight: 'bold'}}>{review.user[0]}</Text></View>
                <Text style={styles.reviewUser}>{review.user}</Text>
             </View>
             <Text style={styles.reviewDate}>{review.date}</Text>
@@ -167,15 +191,14 @@ export default function ServicesScreen() {
             <Image source={{ uri: selectedItem?.image }} style={styles.mainImage} />
             <SafeAreaView style={styles.headerOverlay} edges={['top']}>
               <TouchableOpacity style={styles.circleBtn} onPress={() => setSelectedItem(null)}>
-                <Ionicons name="arrow-back" size={20} color="#000" />
+                <Ionicons name="arrow-back" size={20} color={COLORS.text} />
               </TouchableOpacity>
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity style={[styles.circleBtn, { marginRight: 10 }]} onPress={() => handleShare(selectedItem)}>
-                  <Ionicons name="share-social-outline" size={20} color="#000" />
+                  <Ionicons name="share-social-outline" size={20} color={COLORS.text} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.circleBtn}>
-                  {/* UPDATED: Heart color to Orange */}
-                  <Ionicons name="heart-outline" size={20} color={HEART_ORANGE} />
+                  <Ionicons name="heart-outline" size={20} color={COLORS.secondary} />
                 </TouchableOpacity>
               </View>
             </SafeAreaView>
@@ -220,7 +243,7 @@ export default function ServicesScreen() {
             <Text style={styles.priceText}>₱{selectedItem?.price} <Text style={styles.perMonth}>/fee</Text></Text>
           </View>
           <TouchableOpacity 
-            style={[styles.bookBtn, {backgroundColor: SERVICE_TEAL}]}
+            style={[styles.bookBtn, {backgroundColor: COLORS.secondary}]}
             onPress={handleBook}
           >
             <Text style={styles.bookBtnText}>Book Service</Text>
@@ -255,7 +278,7 @@ export default function ServicesScreen() {
         {/* Index 0: Header (Scrolls Away) */}
         <View style={styles.headerBox}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color={SERVICE_TEAL} />
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Services</Text>
         </View>
@@ -271,7 +294,7 @@ export default function ServicesScreen() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
               />
-              <Ionicons name="search-outline" size={20} color={SERVICE_TEAL} />
+              <Ionicons name="search-outline" size={20} color={COLORS.text} />
             </View>
           </View>
 
@@ -298,7 +321,7 @@ export default function ServicesScreen() {
                 <Image source={{ uri: item.image }} style={styles.bizImage} />
                 {item.verified && (
                   <View style={styles.checkBadge}>
-                    <Ionicons name="shield-checkmark" size={14} color={SERVICE_TEAL} />
+                    <Ionicons name="shield-checkmark" size={14} color={COLORS.secondary} />
                   </View>
                 )}
               </View>
@@ -317,8 +340,7 @@ export default function ServicesScreen() {
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.ratingTextSmall}>{item.rating} ★  •  {item.distance}</Text>
-                  {/* UPDATED: Heart color to Orange */}
-                  <Ionicons name="heart-outline" size={22} color={HEART_ORANGE} />
+                  <Ionicons name="heart-outline" size={22} color={COLORS.secondary} />
                 </View>
               </View>
             </TouchableOpacity>
@@ -345,7 +367,7 @@ const styles = StyleSheet.create({
     paddingBottom: hp(1),
     backgroundColor: '#FFF'
   },
-  headerTitle: { fontSize: wp(6), fontWeight: 'bold', marginLeft: wp(2), color: SERVICE_TEAL },
+  headerTitle: { fontSize: wp(6), fontWeight: 'bold', marginLeft: wp(2), color: COLORS.text },
   backBtn: { padding: 4 },
 
   // STICKY CONTAINER
@@ -367,8 +389,8 @@ const styles = StyleSheet.create({
   filterRowContainer: { marginBottom: 5 },
   filterScroll: { paddingHorizontal: wp(4) },
   filterPill: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#DDD' },
-  activePill: { backgroundColor: SERVICE_TEAL, borderColor: SERVICE_TEAL },
-  filterText: { color: '#666', fontWeight: '600', fontSize: wp(3.5) },
+  activePill: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary },
+  filterText: { color: COLORS.textGray, fontWeight: '600', fontSize: wp(3.5) },
   activeFilterText: { color: '#FFF' },
 
   // LIST CONTENT
@@ -380,13 +402,13 @@ const styles = StyleSheet.create({
   infoWrapper: { flex: 1, marginLeft: wp(4), justifyContent: 'center' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   bizName: { fontSize: wp(4.1), fontWeight: 'bold', color: '#111', flex: 1, marginRight: 8 },
-  labelBadge: { backgroundColor: LIGHT_TEAL_BG, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  labelText: { color: SERVICE_TEAL, fontSize: wp(2.4), fontWeight: 'bold', textTransform: 'uppercase' },
-  bizSub: { fontSize: wp(3.3), color: '#777', marginTop: 2 },
+  labelBadge: { backgroundColor: COLORS.lightRedBg, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  labelText: { color: COLORS.secondary, fontSize: wp(2.4), fontWeight: 'bold', textTransform: 'uppercase' },
+  bizSub: { fontSize: wp(3.3), color: COLORS.textGray, marginTop: 2 },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  locationText: { fontSize: wp(3), color: '#888', marginLeft: 2 },
+  locationText: { fontSize: wp(3), color: COLORS.textGray, marginLeft: 2 },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
-  ratingTextSmall: { fontSize: wp(3.5), color: '#666', fontWeight: '600' },
+  ratingTextSmall: { fontSize: wp(3.5), color: COLORS.textGray, fontWeight: '600' },
 
   // DETAIL VIEW STYLES
   detailContainer: { flex: 1, backgroundColor: '#FFF' },
@@ -396,33 +418,33 @@ const styles = StyleSheet.create({
   circleBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
   contentPadding: { paddingHorizontal: wp(5), paddingTop: hp(2) },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  typeBadge: { backgroundColor: LIGHT_TEAL_BG, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
-  typeText: { color: SERVICE_TEAL, fontWeight: '600' },
+  typeBadge: { backgroundColor: COLORS.lightRedBg, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
+  typeText: { color: COLORS.secondary, fontWeight: '600' },
   ratingRow: { flexDirection: 'row', alignItems: 'center' },
-  ratingText: { color: '#888', fontSize: 13 },
+  ratingText: { color: COLORS.textGray, fontSize: 13 },
   title: { fontSize: 24, fontWeight: 'bold', marginTop: 10 },
-  address: { color: '#7D7F88' },
+  address: { color: COLORS.textGray },
   
   // TABS
   tabContainer: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', marginTop: hp(2) },
   tabItem: { paddingVertical: 12, marginRight: wp(8) },
-  activeTabItem: { borderBottomWidth: 3, borderBottomColor: SERVICE_TEAL },
-  tabText: { color: '#7D7F88', fontSize: 16, fontWeight: '600' },
-  activeTabText: { color: SERVICE_TEAL },
+  activeTabItem: { borderBottomWidth: 3, borderBottomColor: COLORS.secondary },
+  tabText: { color: COLORS.textGray, fontSize: 16, fontWeight: '600' },
+  activeTabText: { color: COLORS.secondary },
 
   // AMENITIES
   amenitiesRow: { flexDirection: 'row', marginTop: hp(2), justifyContent: 'space-between' },
   amenity: { flexDirection: 'row', alignItems: 'center' },
-  amenityText: { marginLeft: 6, fontWeight: '500' },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: hp(3) },
-  description: { color: '#7D7F88', lineHeight: 22 },
-  readMore: { color: SERVICE_TEAL, fontWeight: '600' },
+  amenityText: { marginLeft: 6, fontWeight: '500', color: COLORS.text },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: hp(3), color: COLORS.text },
+  description: { color: COLORS.textGray, lineHeight: 22 },
+  readMore: { color: COLORS.secondary, fontWeight: '600' },
   agentRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
   agentAvatar: { width: 50, height: 50, borderRadius: 25 },
-  agentName: { fontWeight: 'bold', fontSize: 16 },
-  agentTitle: { color: '#7D7F88' },
+  agentName: { fontWeight: 'bold', fontSize: 16, color: COLORS.text },
+  agentTitle: { color: COLORS.textGray },
   agentActions: { flexDirection: 'row' },
-  agentActionBtn: { width: 40, height: 40, borderRadius: 10, backgroundColor: LIGHT_TEAL_BG, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
+  agentActionBtn: { width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.lightRedBg, justifyContent: 'center', alignItems: 'center', marginLeft: 10 },
   
   // GALLERY
   galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: hp(2) },
@@ -431,7 +453,7 @@ const styles = StyleSheet.create({
   // REVIEWS
   reviewItem: { marginBottom: 20, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  reviewAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: LIGHT_TEAL_BG, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  reviewAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.lightBlueBg, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   reviewUser: { fontWeight: 'bold', fontSize: 15, color: '#333' },
   reviewDate: { color: '#999', fontSize: 12 },
   reviewComment: { color: '#555', lineHeight: 20, paddingLeft: 52 },
@@ -444,9 +466,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30, borderTopRightRadius: 30, elevation: 20,
     shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 10,
   },
-  footerLabel: { color: '#7D7F88' },
-  priceText: { fontSize: 20, fontWeight: 'bold', color: SERVICE_TEAL },
-  perMonth: { fontSize: 14, fontWeight: 'normal' },
+  footerLabel: { color: COLORS.textGray },
+  priceText: { fontSize: 20, fontWeight: 'bold', color: COLORS.secondary },
+  perMonth: { fontSize: 14, fontWeight: 'normal', color: COLORS.textGray },
   bookBtn: { paddingHorizontal: wp(10), paddingVertical: hp(2), borderRadius: 15 },
   bookBtnText: { color: '#FFF', fontWeight: 'bold' }
 });
