@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { styles as serviceStyles } from '../../styles/servicesStyles';
 import { auth } from '../../services/supabase';
 import { E_SERVICES, FEATURED_SERVICES, POPULAR_SERVICES, SERVICE_GUIDES, MAIN_SERVICES } from '../../constants/mainData';
 import { COLORS } from '../../constants/theme';
+import UserProfileSheet from '../../components/UserProfileSheet';
 
 // Icons
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -32,6 +33,38 @@ export default function HomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); 
 
+  // Bottom Sheet ref
+  const bottomSheetRef = useRef(null);
+
+  // Handle avatar press - open bottom sheet if logged in, otherwise go to login
+  const handleAvatarPress = useCallback(() => {
+    if (isLoggedIn) {
+      bottomSheetRef.current?.expand();
+    } else {
+      router.push('/login');
+    }
+  }, [isLoggedIn, router]);
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      setSession(null);
+      setIsLoggedIn(false);
+      bottomSheetRef.current?.close();
+      // Stay on main page as unregistered user
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
+  };
+
+  // Handle edit profile
+  const handleEditProfile = () => {
+    bottomSheetRef.current?.close();
+    // Navigate to edit profile screen
+    router.push('/profile');
+  };
+
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -42,6 +75,9 @@ export default function HomeScreen() {
         } else if (response?.session) {
           setSession(response.session);
           setIsLoggedIn(true);
+        } else {
+          setSession(null);
+          setIsLoggedIn(false);
         }
       } catch (e) {
         console.log("Session check error:", e);
@@ -49,6 +85,21 @@ export default function HomeScreen() {
     };
     checkUser();
     if (isUserLoggedIn === 'true') setIsLoggedIn(true);
+
+    // Listen for auth state changes (login/logout)
+    const { data: authListener } = auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setSession(session);
+        setIsLoggedIn(true);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setIsLoggedIn(false);
+      }
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, [isUserLoggedIn]);
 
   // --- FILTER LOGIC ---
@@ -83,7 +134,7 @@ export default function HomeScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
 
-      {/* --- FIXED HEADER (Search Bar) --- */}
+      {/* Hweader */}
       <View style={{
         paddingHorizontal: wp(5),
         paddingVertical: 15,
@@ -91,6 +142,10 @@ export default function HomeScreen() {
         zIndex: 10,
       }}>
         <View style={styles.searchBarContainer}>
+          <TouchableOpacity style={styles.avatarButton} onPress={handleAvatarPress}>
+            <Ionicons name="person-circle-outline" size={32} color="#003087" />
+          </TouchableOpacity>
+
           <View style={styles.searchInput}>
             <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
             <TextInput 
@@ -106,10 +161,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             )}
           </View>
-
-          <TouchableOpacity style={styles.notificationButton}>
-            <Ionicons name="notifications-outline" size={24} color="#003087" />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -146,7 +197,7 @@ export default function HomeScreen() {
                     { 
                         flexDirection: 'row', 
                         flexWrap: 'wrap', 
-                        justifyContent: 'space-between' // Ensures spacing handles itself
+                        justifyContent: 'space-between' 
                     }
                 ]}>
                     {MAIN_SERVICES.map((service, index) => (
@@ -155,9 +206,9 @@ export default function HomeScreen() {
                             style={[
                                 styles.serviceCard, 
                                 { 
-                                    // FIX: Using 30% width guarantees 3 items fit in one row (3x30=90%)
+                                   
                                     width: '30%', 
-                                    aspectRatio: 1, // Keep it square
+                                    aspectRatio: 1, 
                                     marginBottom: 15, 
                                     padding: 5,      
                                     justifyContent: 'center',
@@ -172,7 +223,7 @@ export default function HomeScreen() {
                                 style={[
                                     styles.serviceTitle, 
                                     { 
-                                        fontSize: hp(1.4), // Reduced font size slightly to fit 3 columns nicely
+                                        fontSize: hp(1.4), 
                                         marginTop: 6,
                                         textAlign: 'center'
                                     }
@@ -190,7 +241,7 @@ export default function HomeScreen() {
         {/* Divider */}
         <View style={{ height: 1, backgroundColor: '#E0E0E0', marginVertical: 20 }} />
 
-        {/* --- EMBEDDED SERVICES CONTENT (Filtered) --- */}
+        {/* EMBEDDED SERVICES CONTENT  */}
         
         {/* 1. Popular Services */}
         {filteredPopular.length > 0 && (
@@ -279,6 +330,15 @@ export default function HomeScreen() {
 
         <View style={{ height: hp(10) }} />
       </ScrollView>
+
+      {/* User Profile Bottom Sheet - Only render when logged in */}
+      {isLoggedIn && (
+        <UserProfileSheet
+          ref={bottomSheetRef}
+          onEditProfile={handleEditProfile}
+          onLogout={handleLogout}
+        />
+      )}
     </View>
   );
 }

@@ -173,7 +173,13 @@ export default function FoodScreen() {
   }, [searchQuery, activeIndex]);
 
   const handleGoToCart = () => router.push('/(business)/cart');
-  const handleViewOrders = () => router.push('/(business)/orders');
+  const handleViewOrders = () => {
+    if (!currentUser) {
+      setShowAuthModal(true);
+      return;
+    }
+    router.push('/(business)/orders');
+  };
 
   // --- VIEW 1: RESTAURANT DETAILS ---
   const renderDetails = () => {
@@ -434,7 +440,58 @@ export default function FoodScreen() {
     </SafeAreaView>
   );
 
-  return selectedItem ? renderDetails() : renderList();
+  return (
+    <>
+      {selectedItem ? renderDetails() : renderList()}
+      
+      {/* Auth Modal - rendered at top level so it works from both views */}
+      <Modal
+        visible={showAuthModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowAuthModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.modalClose} onPress={() => setShowAuthModal(false)}>
+              <Ionicons name="close" size={24} color="#666" />
+            </TouchableOpacity>
+            
+            <View style={styles.modalIconContainer}>
+              <Ionicons name="lock-closed" size={48} color={COLORS.secondary} />
+            </View>
+            
+            <Text style={styles.modalTitle}>Sign In Required</Text>
+            <Text style={styles.modalMessage}>
+              Please sign in or create an account to continue.
+            </Text>
+            
+            <TouchableOpacity 
+              style={styles.modalPrimaryBtn}
+              onPress={() => {
+                setShowAuthModal(false);
+                setSelectedItem(null);
+                router.push('/(tabs)/login');
+              }}
+            >
+              <Text style={styles.modalPrimaryBtnText}>Sign In</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.modalSecondaryBtn}
+              onPress={() => {
+                setShowAuthModal(false);
+                setSelectedItem(null);
+                router.push('/(tabs)/signup');
+              }}
+            >
+              <Text style={styles.modalSecondaryBtnText}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({

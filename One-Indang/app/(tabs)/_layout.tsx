@@ -45,6 +45,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="forgotpassword"
+        options={{
+          title: 'Forgot Password',
+        }}
+      />
+      <Tabs.Screen
         name="transpo"
         options={{
           title: 'Transpo',

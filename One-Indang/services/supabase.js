@@ -71,6 +71,11 @@ export const auth = {
     return { session, error };
   },
 
+  // Listen to auth state changes
+  onAuthStateChange: (callback) => {
+    return supabase.auth.onAuthStateChange(callback);
+  },
+
   // Reset password
   resetPassword: async (email) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
@@ -141,4 +146,4 @@ export const db = {
     const { error } = await query;
     return { error };
   }
-};
+};  

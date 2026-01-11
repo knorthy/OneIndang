@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,10 +16,13 @@ import {
   Image     //  for displaying recommendation images
 } from 'react-native';
 import LocationPickerModal from '../../components/LocationPickerModal';
+import UserProfileSheet from '../../components/UserProfileSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
+import { auth } from '../../services/supabase';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import axios from 'axios';
-import * as Location from 'expo-location'; // Added for GPS functionality
+import * as Location from 'expo-location'; 
 import { hp, wp } from "../../helpers/common";
 import { calculateFare, fetchRouteDetails, PLACES_API_KEY, getGoogleMapsUrl } from '../../services/transportService';
 import { recommendations } from '../../constants/recommendations';
@@ -39,9 +42,17 @@ const TransportIcon = ({ name, icon, onPress, isSelected }) => (
 );
 
 export default function App() {
+  const router = useRouter();
   const [userName, setUserName] = useState(null);
   const [timeGreeting, setTimeGreeting] = useState('');
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  
+  // User session state
+  const [session, setSession] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Bottom Sheet ref for profile
+  const profileSheetRef = useRef(null);
 
   // SEARCH STATE
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +101,78 @@ export default function App() {
       duration: 1000,
       useNativeDriver: true,
     }).start();
+
+    // Check for existing user session
+    const checkUser = async () => {
+      try {
+        const response = await auth.getSession();
+        if (response?.session) {
+          setSession(response.session);
+          setIsLoggedIn(true);
+          // Get user name from metadata or email
+          const user = response.session.user;
+          const name = user?.user_metadata?.full_name || 
+                       user?.user_metadata?.name || 
+                       user?.email?.split('@')[0] || 
+                       null;
+          setUserName(name);
+        }
+      } catch (e) {
+        console.log('Session check error:', e);
+      }
+    };
+    checkUser();
+
+    // Listen for auth state changes
+    const { data: authListener } = auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setSession(session);
+        setIsLoggedIn(true);
+        const user = session.user;
+        const name = user?.user_metadata?.full_name || 
+                     user?.user_metadata?.name || 
+                     user?.email?.split('@')[0] || 
+                     null;
+        setUserName(name);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setIsLoggedIn(false);
+        setUserName(null);
+      }
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
+
+  // Handle avatar press - open bottom sheet if logged in, otherwise go to login
+  const handleAvatarPress = useCallback(() => {
+    if (isLoggedIn) {
+      profileSheetRef.current?.expand();
+    } else {
+      router.push('/login');
+    }
+  }, [isLoggedIn, router]);
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      setSession(null);
+      setIsLoggedIn(false);
+      setUserName(null);
+      profileSheetRef.current?.close();
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
+  };
+
+  // Handle edit profile
+  const handleEditProfile = () => {
+    profileSheetRef.current?.close();
+    router.push('/profile');
+  };
 
   // SEARCH FILTERING EFFECT
   useEffect(() => {
@@ -101,7 +183,7 @@ export default function App() {
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.distance.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredRecommendations(filtered.slice(0, 10)); // Limit to 10 results for performance
+      setFilteredRecommendations(filtered.slice(0, 10));
     }
   }, [searchQuery]);
 
@@ -397,17 +479,17 @@ export default function App() {
       <View style={styles.fixedHeader}>
         <View style={styles.header}>
           {userName ? (
-            <View style={styles.profileSection}>
+            <TouchableOpacity style={styles.profileSection} onPress={handleAvatarPress} activeOpacity={0.7}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>{userName[0].toUpperCase()}</Text>
               </View>
               <View>
-                <Text style={styles.greeting}>Hi {userName}</Text>
+                <Text style={styles.greeting}>Welcome, {userName}!</Text>
                 <Text style={styles.timeGreeting}>{timeGreeting}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ) : (
-            <View style={styles.profileSection}>
+            <TouchableOpacity style={styles.profileSection} onPress={handleAvatarPress} activeOpacity={0.7}>
               <View style={styles.avatar}>
                 <Icon name="person" size={24} color="#D32F2F" />
               </View>
@@ -415,7 +497,7 @@ export default function App() {
                 <Text style={styles.greeting}>Welcome to One-Indang</Text>
                 <Text style={styles.timeGreeting}>{timeGreeting}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -645,6 +727,15 @@ export default function App() {
           )}
         </View>
       </ScrollView>
+
+      {/* User Profile Bottom Sheet */}
+      {isLoggedIn && (
+        <UserProfileSheet
+          ref={profileSheetRef}
+          onEditProfile={handleEditProfile}
+          onLogout={handleLogout}
+        />
+      )}
     </View>
   );
 }
