@@ -13,6 +13,7 @@ import { hp, wp } from "../../helpers/common";
 import styles from '../../styles/mainStyles';
 import { styles as serviceStyles } from '../../styles/servicesStyles';
 import { auth } from '../../services/supabase';
+import { E_SERVICES, FEATURED_SERVICES, POPULAR_SERVICES, SERVICE_GUIDES, MAIN_SERVICES } from '../../constants/mainData';
 
 // Icons
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -21,54 +22,16 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
-// --- THEME COLORS ---
+
 const COLORS = {
-  primary: '#003087', 
-  secondary: '#D32F2F', 
+  primary: '#003087',
+  secondary: '#D32F2F',
   background: '#ffffff',
   text: '#003087',
   textGray: '#666666',
-  lightRedBg: '#FFEBEE', 
-  lightBlueBg: '#E3F2FD', 
+  lightRedBg: '#FFEBEE',
+  lightBlueBg: '#E3F2FD',
 };
-
-// --- SERVICE DATA ---
-const E_SERVICES = [
-  { id: 1, title: 'Business Permit', icon: 'briefcase-outline', color: COLORS.secondary },
-  { id: 2, title: 'Real Property Tax', icon: 'home-city-outline', color: COLORS.primary },
-  { id: 3, title: 'Local Civil Registry', icon: 'file-document-outline', color: COLORS.secondary },
-];
-
-const FEATURED_SERVICES = [
-  { id: 'livelihood', title: 'Livelihood Training & Loan Assistance', icon: 'toolbox', library: 'MaterialCommunityIcons', color: COLORS.secondary },
-  { id: 'medical_cert', title: 'Medical Certificate', icon: 'stethoscope', library: 'MaterialCommunityIcons', color: COLORS.primary },
-  { id: 'solo_parent', title: 'Solo Parent ID', icon: 'card-account-details-outline', library: 'MaterialCommunityIcons', color: COLORS.secondary },
-  { id: 'hiking', title: 'River Resort & Eco-Tourism', icon: 'landscape', library: 'MaterialIcons', color: COLORS.primary }, 
-  { id: 'senior', title: 'Senior Citizen ID', icon: 'account-tie', library: 'MaterialCommunityIcons', color: COLORS.secondary },
-  { id: 'summer_job', title: 'Summer Employment', icon: 'school', library: 'MaterialCommunityIcons', color: COLORS.primary },
-];
-
-const POPULAR_SERVICES = [
-  { id: 'facilities', title: 'Use of Government Facilities', subtitle: 'Book venues for your programs.', icon: 'office-building', color: COLORS.primary },
-  { id: 'medical', title: 'Medical Assistance', subtitle: 'Get aid for medical expenses.', icon: 'heart-pulse', color: COLORS.secondary },
-  { id: 'transport', title: 'Transportation Assistance', subtitle: 'Request a ride for urgent needs.', icon: 'bus', color: COLORS.primary },
-  { id: 'training', title: 'Request for Training', subtitle: 'Request training from city experts.', icon: 'school', color: COLORS.secondary },
-  { id: 'grow', title: 'Negosyo Center / SME Support', subtitle: 'Get support for business growth and development.', icon: 'chart-line-variant', color: COLORS.primary },
-];
-
-const SERVICE_GUIDES = [
-  { id: 'health', title: 'Health and Nutrition' },
-  { id: 'social', title: 'Social Services' },
-  { id: 'housing', title: 'Housing and Urban Poor' },
-  { id: 'education', title: 'Education, Arts, Culture, and Sports' },
-  { id: 'legal', title: 'Legal Assistance' },
-  { id: 'livelihood', title: 'Livelihood, Employment, Agriculture' },
-  { id: 'transparency', title: 'Transparency, Accountability, Growth' },
-  { id: 'engineering', title: 'Engineering, General Services, Sound System' },
-  { id: 'environment', title: 'Cleanliness and Environmental Protection' },
-  { id: 'peace', title: 'Peace and Order, Public Safety, Transport' },
-  { id: 'it', title: 'Information Technology and Investment' },
-];
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -113,15 +76,14 @@ export default function HomeScreen() {
     return <MaterialCommunityIcons name={name} size={size || iconSize} color={color} />;
   };
 
-  // --- EXACT ORDER REQUESTED ---
-  const mainServices = [
-    { title: "Services", icon: <Ionicons name="apps" size={28} color="#D32F2F" />, route: "/services" },
-    { title: "Citizen Guide", icon: <MaterialIcons name="menu-book" size={28} color="#D32F2F" />, route: "/citizen" },
-    { title: "Students", icon: <MaterialCommunityIcons name="school" size={30} color="#D32F2F" />, route: "/studmain" },
-    { title: "Emergency", icon: <Ionicons name="warning" size={28} color="#D32F2F" />, route: "/emergency" },
-    { title: "Transport", icon: <MaterialIcons name="directions-bus" size={28} color="#D32F2F" />, route: "/transpo" },
-    { title: "Business", icon: <FontAwesome name="building" size={26} color="#D32F2F" />, route: "/business" },
-  ];
+  const renderMainIcon = (service) => {
+    const { icon, iconName, size, color } = service;
+    if (icon === 'Ionicons') return <Ionicons name={iconName} size={size} color={color} />;
+    if (icon === 'MaterialIcons') return <MaterialIcons name={iconName} size={size} color={color} />;
+    if (icon === 'MaterialCommunityIcons') return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+    if (icon === 'FontAwesome') return <FontAwesome name={iconName} size={size} color={color} />;
+    return null;
+  };
 
   const handleServicePress = (route) => {
     router.push(route);
@@ -197,7 +159,7 @@ export default function HomeScreen() {
                         justifyContent: 'space-between' // Ensures spacing handles itself
                     }
                 ]}>
-                    {mainServices.map((service, index) => (
+                    {MAIN_SERVICES.map((service, index) => (
                         <TouchableOpacity
                             key={index}
                             style={[
@@ -215,7 +177,7 @@ export default function HomeScreen() {
                             activeOpacity={0.8}
                             onPress={() => handleServicePress(service.route)}
                         >
-                            {service.icon}
+                            {renderMainIcon(service)}
                             <Text 
                                 style={[
                                     styles.serviceTitle, 
@@ -322,22 +284,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-        )}
-
-        {/* Bottom Banner */}
-        {!isLoggedIn && searchQuery === '' && (
-          <View style={styles.bottomBanner}>
-            <Text style={styles.bannerTitle}>Help us improve our city</Text>
-            <Text style={styles.bannerSubtitle}>
-              Create an account to report local issues directly to the city.
-            </Text>
-            <TouchableOpacity 
-                style={styles.signInButton}
-                onPress={() => router.push('/login')}
-            >
-              <Text style={styles.signInText}>Sign In</Text>
-            </TouchableOpacity>
           </View>
         )}
 

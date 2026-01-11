@@ -23,7 +23,7 @@ export default function LoginScreen() {
   const router = useRouter(); 
   const insets = useSafeAreaInsets();
   
-  // CAPTURE PARAMS (Redirect info)
+  // CAPTURE PARAMS 
   const params = useLocalSearchParams();
   const { redirect, name, image } = params;
 
