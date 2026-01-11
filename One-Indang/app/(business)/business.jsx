@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -9,7 +9,8 @@ import {
   Dimensions, 
   LayoutAnimation, 
   Platform, 
-  UIManager 
+  UIManager,
+  BackHandler // 1. IMPORT BACKHANDLER
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
@@ -32,9 +33,6 @@ const HEART_RED = '#EF4444';
 const SUCCESS_GREEN = '#22C55E';
 const TEXT_GRAY = '#6B7280';
 
-// --- DATA ---
-
-
 const BusinessListScreen = () => {
   const router = useRouter(); 
   const [favorites, setFavorites] = useState([]); 
@@ -42,6 +40,23 @@ const BusinessListScreen = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   const displayedBusinesses = showAll ? POPULAR_BUSINESSES : POPULAR_BUSINESSES.slice(0, 3);
+
+  // --- FIX: HANDLE DEVICE BACK BUTTON ---
+  useEffect(() => {
+    const onBackPress = () => {
+      // If a property is selected (Detail View is open), close it
+      if (selectedProperty) {
+        setSelectedProperty(null);
+        return true; // Stop the event here (don't exit screen)
+      }
+      // If nothing selected (List View), let default behavior happen (go back to Home)
+      return false; 
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => subscription.remove();
+  }, [selectedProperty]);
 
   const toggleFavorite = useCallback((item) => {
     setFavorites(prev => {

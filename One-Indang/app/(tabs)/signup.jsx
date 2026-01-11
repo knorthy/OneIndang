@@ -153,7 +153,7 @@ const AccountSetupScreen = () => {
           setCurrentStep(2);
         } else {
           showToast('Account created successfully!');
-          // Pass Params to Login
+          // Pass Params to Login so redirection logic persists
           router.replace({ pathname: '/login', params: params }); 
         }
       } else {
@@ -187,7 +187,7 @@ const AccountSetupScreen = () => {
       if (data.session) {
         showToast("Account Verified! Please log in.");
         await auth.signOut(); 
-        // Pass Params to Login
+        // Pass Params to Login so redirection logic persists
         router.replace({ pathname: '/login', params: params }); 
       }
     } catch (error) {
@@ -442,7 +442,7 @@ const AccountSetupScreen = () => {
                     {currentStep === 1 && (
                         <View style={styles.signinContainer}>
                             <Text style={styles.signinText}>Already have an account? </Text>
-                            {/* FIX: Push to login with PARAMS */}
+                            {/* FIX: Pass Params to Login so redirection logic persists */}
                             <TouchableOpacity onPress={() => router.push({ pathname: '/login', params: params })}>
                                 <Text style={styles.signinLinkText}>Signin</Text>
                             </TouchableOpacity>

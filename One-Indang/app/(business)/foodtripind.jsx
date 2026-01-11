@@ -13,7 +13,7 @@ import {
   StatusBar, 
   Animated, 
   Modal,
-  BackHandler // 1. Import BackHandler
+  BackHandler 
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,15 +21,13 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useCart } from '../../context/CartContext';
 import { auth } from '../../services/supabase'; 
 
-// RESPONSIVE DIMENSIONS
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get("window");
 const hp = (p) => (p * deviceHeight) / 100;
 const wp = (p) => (p * deviceWidth) / 100;
 
-// --- THEME COLORS ---
 const COLORS = {
-  primary: '#003087', // Deep Blue
-  secondary: '#D32F2F', // Bright Red
+  primary: '#003087', 
+  secondary: '#D32F2F', 
   background: '#ffffff',
   text: '#003087',
   textGray: '#666666',
@@ -140,7 +138,6 @@ export default function FoodScreen() {
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -153,24 +150,18 @@ export default function FoodScreen() {
     checkAuth();
   }, []);
 
-  // --- FIX: HANDLE DEVICE BACK BUTTON ---
   useEffect(() => {
     const onBackPress = () => {
-      // If Detail View is open, close it (go back to list)
       if (selectedItem) {
         setSelectedItem(null);
-        return true; // We handled the back press
+        return true; 
       }
-      // If List View is open, let the default behavior happen (pop screen)
       return false; 
     };
-
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
     return () => subscription.remove();
   }, [selectedItem]);
 
-  // Filter Logic
   const filteredData = useMemo(() => {
     const category = FILTERS[activeIndex];
     return FOOD_DATA.filter(item => {
@@ -184,7 +175,6 @@ export default function FoodScreen() {
   const handleGoToCart = () => router.push('/(business)/cart');
   const handleViewOrders = () => router.push('/(business)/orders');
 
-  // --- VIEW 1: RESTAURANT DETAILS ---
   const renderDetails = () => {
     if (!selectedItem) return null; 
 
@@ -196,7 +186,6 @@ export default function FoodScreen() {
 
     return (
       <View style={styles.detailContainer}>
-        {/* FIXED HEADER UI */}
         <View style={styles.fixedHeaderWrapper}>
             <Animated.View style={[styles.headerBackground, { opacity: headerBgOpacity }]} />
             <View style={styles.headerNav}>
@@ -288,7 +277,6 @@ export default function FoodScreen() {
           <TouchableOpacity 
             style={[styles.bookBtn, {backgroundColor: COLORS.secondary}]}
             onPress={() => {
-              // Check if user is authenticated
               if (!currentUser) {
                 setShowAuthModal(true);
                 return;
@@ -303,7 +291,7 @@ export default function FoodScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Auth Modal */}
+        {/* AUTH MODAL - UPDATED WITH REDIRECT LOGIC */}
         <Modal
           visible={showAuthModal}
           transparent={true}
@@ -330,7 +318,15 @@ export default function FoodScreen() {
                 onPress={() => {
                   setShowAuthModal(false);
                   setSelectedItem(null);
-                  router.push('/(tabs)/login');
+                  // PASS REDIRECT PARAMS TO LOGIN
+                  router.push({
+                    pathname: '/(tabs)/login',
+                    params: { 
+                        redirect: '/(business)/order',
+                        name: selectedItem.name,
+                        image: selectedItem.image // Note: passing image resource ID might warn, but works in Expo
+                    }
+                  });
                 }}
               >
                 <Text style={styles.modalPrimaryBtnText}>Sign In</Text>
@@ -341,7 +337,15 @@ export default function FoodScreen() {
                 onPress={() => {
                   setShowAuthModal(false);
                   setSelectedItem(null);
-                  router.push('/(tabs)/signup');
+                  // PASS REDIRECT PARAMS TO SIGNUP
+                  router.push({
+                    pathname: '/(tabs)/signup',
+                    params: { 
+                        redirect: '/(business)/order',
+                        name: selectedItem.name,
+                        image: selectedItem.image 
+                    }
+                  });
                 }}
               >
                 <Text style={styles.modalSecondaryBtnText}>Create Account</Text>
@@ -353,12 +357,10 @@ export default function FoodScreen() {
     );
   };
 
-  // --- VIEW 2: THE MAIN LIST ---
   const renderList = () => (
     <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
       
-      {/* Header */}
       <View style={[styles.header, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 15 : 20 }]}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} hitSlop={{top:10, bottom:10, left:10, right:10}}>
@@ -464,7 +466,7 @@ const styles = StyleSheet.create({
   filterRowContainer: { marginBottom: hp(1.5) },
   filterScroll: { paddingHorizontal: wp(4) },
   filterPill: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20, backgroundColor: '#FFF', marginRight: 10, borderWidth: 1, borderColor: '#DDD' },
-  activePill: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary }, // Using Red for active filter to match food theme
+  activePill: { backgroundColor: COLORS.secondary, borderColor: COLORS.secondary },
   filterText: { color: COLORS.textGray, fontWeight: '600', fontSize: wp(3.5) },
   activeFilterText: { color: '#FFF' },
   listContent: { paddingHorizontal: wp(4), paddingBottom: hp(10) }, 
@@ -516,8 +518,6 @@ const styles = StyleSheet.create({
   perMonth: { fontSize: 14, fontWeight: 'normal', color: COLORS.textGray },
   bookBtn: { paddingHorizontal: wp(10), paddingVertical: hp(2), borderRadius: 15 },
   bookBtnText: { color: '#FFF', fontWeight: 'bold' },
-
-  // Auth Modal Styles
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: 'white', borderRadius: 20, padding: 24, width: '100%', maxWidth: 340, alignItems: 'center' },
   modalClose: { position: 'absolute', top: 12, right: 12, padding: 4 },

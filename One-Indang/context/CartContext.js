@@ -6,22 +6,26 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
-  const [orders, setOrders] = useState([]); // Order history from database
+  const [orders, setOrders] = useState([]); 
   const [isLoading, setIsLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
+  // Sync user state with Supabase session
+  const updateUser = useCallback(async () => {
+    try {
+      const { user } = await auth.getCurrentUser();
+      setCurrentUser(user);
+      return user;
+    } catch (error) {
+      setCurrentUser(null);
+      return null;
+    }
+  }, []);
+
   // Get current user on mount
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { user } = await auth.getCurrentUser();
-        setCurrentUser(user);
-      } catch (error) {
-        console.log('No user logged in');
-      }
-    };
-    getUser();
-  }, []);
+    updateUser();
+  }, [updateUser]);
 
   // Fetch orders from database when user changes
   const fetchOrders = useCallback(async () => {
@@ -31,7 +35,6 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await ordersAPI.getByUser(currentUser.id);
       if (response.success) {
-        // Transform database orders to match local format
         const formattedOrders = response.data.map(order => ({
           id: order.id,
           date: new Date(order.order_date).toLocaleString(),
@@ -51,7 +54,6 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
-      // Keep local orders if fetch fails
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +63,6 @@ export const CartProvider = ({ children }) => {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Add Item to Cart
   const addToCart = (item, restaurantName) => {
     setCartItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
@@ -84,14 +85,21 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCartItems([]);
 
-  // Place Order - Now saves to database via Express API
+  // --- FIXED PLACE ORDER LOGIC ---
   const placeOrder = async (orderDetails) => {
     setIsLoading(true);
     
     try {
-      // Prepare order data for API
+      // 1. Force a fresh user check to avoid null user_id
+      const { user } = await auth.getCurrentUser();
+      
+      if (!user) {
+        throw new Error("User session not found. Please sign in again.");
+      }
+
+      // 2. Prepare order data using the guaranteed user ID
       const orderData = {
-        user_id: currentUser?.id || null,
+        user_id: user.id, // Direct from Supabase, not the state
         restaurant_name: orderDetails.restaurantName,
         total_amount: parseFloat(orderDetails.total),
         delivery_address: orderDetails.address,
@@ -105,11 +113,9 @@ export const CartProvider = ({ children }) => {
         }))
       };
 
-      // Send order to Express backend (saved to Supabase database)
       const response = await ordersAPI.create(orderData);
       
       if (response.success) {
-        // Add to local state with the database ID
         const newOrder = {
           id: response.data.id,
           date: new Date(response.data.order_date).toLocaleString(),
@@ -127,46 +133,20 @@ export const CartProvider = ({ children }) => {
         
         setOrders((prev) => [newOrder, ...prev]);
         clearCart();
-        
         return { success: true, order: newOrder };
       } else {
         throw new Error(response.error || 'Failed to place order');
       }
     } catch (error) {
-      console.error('Error placing order:', error);
-      
-      // Fallback: Save order locally if API fails
-      const fallbackOrder = {
-        id: Date.now().toString(),
-        date: new Date().toLocaleString(),
-        status: 'Preparing',
-        items: [...cartItems],
-        ...orderDetails,
-      };
-      
-      setOrders((prev) => [fallbackOrder, ...prev]);
-      clearCart();
-      
-      return { success: true, order: fallbackOrder, offline: true };
+      console.error('Final Error placing order:', error);
+      // Optional: Handle fallback or re-throw
+      throw error; 
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Refresh orders from database
-  const refreshOrders = () => {
-    fetchOrders();
-  };
-
-  // Update current user (call this after login/logout)
-  const updateUser = async () => {
-    try {
-      const { user } = await auth.getCurrentUser();
-      setCurrentUser(user);
-    } catch (error) {
-      setCurrentUser(null);
-    }
-  };
+  const refreshOrders = () => fetchOrders();
 
   const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);

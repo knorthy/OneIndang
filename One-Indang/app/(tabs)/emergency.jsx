@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from "react";
+import React, { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,6 +11,7 @@ import {
   Animated,
   PanResponder,
   Alert,
+  BackHandler // 1. Import BackHandler
 } from "react-native";
 import { Stack } from "expo-router";
 import { hp, wp } from "../../helpers/common";
@@ -35,8 +36,35 @@ export default function EmergencyScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [contentType, setContentType] = useState("hospitals");
   const bottomSheetRef = useRef(null);
+  
+  // Track if sheet is open to handle back press logic
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const snapPoints = useMemo(() => ["80%"], []);
+
+  // --- FIX: HANDLE DEVICE BACK BUTTON ---
+  useEffect(() => {
+    const onBackPress = () => {
+      if (isSheetOpen) {
+        // If bottom sheet is open, close it
+        bottomSheetRef.current?.close();
+        setIsSheetOpen(false);
+        return true; // We handled the event (don't exit screen)
+      }
+      // If sheet is closed, let default behavior happen (go back/exit)
+      return false; 
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => subscription.remove();
+  }, [isSheetOpen]);
+
+  // Handle Sheet Changes
+  const handleSheetChanges = useCallback((index) => {
+    // If index is -1, sheet is closed. If >= 0, it's open.
+    setIsSheetOpen(index >= 0);
+  }, []);
 
   const dialNumber = (number) => {
     const cleanNumber = number.replace(/[^0-9+]/g, "");
@@ -75,6 +103,12 @@ export default function EmergencyScreen() {
     ),
     []
   );
+
+  const openSheet = (type) => {
+    setContentType(type);
+    bottomSheetRef.current?.expand();
+    setIsSheetOpen(true); // Manually set open state
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -141,7 +175,7 @@ export default function EmergencyScreen() {
           <View style={styles.quickActionsRow}>
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("hospitals"); bottomSheetRef.current?.expand(); }}
+              onPress={() => openSheet("hospitals")}
             >
               <MaterialCommunityIcons name="hospital-building" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Hospitals</Text>
@@ -149,7 +183,7 @@ export default function EmergencyScreen() {
 
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("fire"); bottomSheetRef.current?.expand(); }}
+              onPress={() => openSheet("fire")}
             >
               <MaterialIcons name="local-fire-department" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Fire Protection</Text>
@@ -163,6 +197,7 @@ export default function EmergencyScreen() {
           snapPoints={snapPoints}
           enablePanDownToClose
           backdropComponent={renderBackdrop}
+          onChange={handleSheetChanges} // Listen for sheet state changes
           handleIndicatorStyle={{ backgroundColor: "#333", width: wp(12) }}
           backgroundStyle={{ borderRadius: wp(10) }}
         >

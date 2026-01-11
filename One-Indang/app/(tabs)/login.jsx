@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from '../../styles/loginStyles';
 import { auth } from '../../services/supabase';
 import { showToast } from '../../components/Toast';
-import { useRouter, useLocalSearchParams } from 'expo-router'; // Added useLocalSearchParams
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
 
 export default function LoginScreen() {
   const router = useRouter(); 

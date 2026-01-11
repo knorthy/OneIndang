@@ -21,7 +21,6 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
-// --- THEME COLORS ---
 const COLORS = {
   primary: '#003087', 
   secondary: '#D32F2F', 
@@ -32,7 +31,6 @@ const COLORS = {
   lightBlueBg: '#E3F2FD', 
 };
 
-// --- SERVICE DATA ---
 const E_SERVICES = [
   { id: 1, title: 'Business Permit', icon: 'briefcase-outline', color: COLORS.secondary },
   { id: 2, title: 'Real Property Tax', icon: 'home-city-outline', color: COLORS.primary },
@@ -75,30 +73,38 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   
   const { isUserLoggedIn } = useLocalSearchParams();
-  const [session, setSession] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); 
 
+  // --- LOGIC: AUTH STATE HANDLER ---
   useEffect(() => {
+    // 1. Check current session on mount
     const checkUser = async () => {
       try {
-        const response = await auth.getSession();
-        if (response?.data?.session) {
-          setSession(response.data.session);
-          setIsLoggedIn(true);
-        } else if (response?.session) {
-          setSession(response.session);
-          setIsLoggedIn(true);
-        }
+        const { session } = await auth.getSession();
+        setIsLoggedIn(!!session);
       } catch (e) {
         console.log("Session check error:", e);
       }
     };
     checkUser();
+
+    // 2. Setup real-time listener for login/logout events
+    // This will catch the login from foodtripind.jsx
+    const { data: authListener } = auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
     if (isUserLoggedIn === 'true') setIsLoggedIn(true);
+
+    return () => {
+      // 3. Clean up the listener
+      if (authListener?.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
   }, [isUserLoggedIn]);
 
-  // --- FILTER LOGIC ---
   const filteredPopular = POPULAR_SERVICES.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -113,7 +119,6 @@ export default function HomeScreen() {
     return <MaterialCommunityIcons name={name} size={size || iconSize} color={color} />;
   };
 
-  // --- EXACT ORDER REQUESTED ---
   const mainServices = [
     { title: "Services", icon: <Ionicons name="apps" size={28} color="#D32F2F" />, route: "/services" },
     { title: "Citizen Guide", icon: <MaterialIcons name="menu-book" size={28} color="#D32F2F" />, route: "/citizen" },
@@ -131,7 +136,6 @@ export default function HomeScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFF" />
 
-      {/* --- FIXED HEADER (Search Bar) --- */}
       <View style={{
         paddingHorizontal: wp(5),
         paddingVertical: 15,
@@ -161,17 +165,16 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* --- SCROLLABLE CONTENT --- */}
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={[styles.scrollContent, { paddingTop: 10, paddingHorizontal: wp(5), paddingBottom: 100 }]}
       >
         
-        {/* Title & Create Account Button */}
         {searchQuery === '' && (
             <View style={{ marginBottom: 25 }}>
                 <Text style={[styles.mainTitle, { marginTop: 0 }]}>One Indang ahuy</Text>
 
+                {/* --- LOGIC: HIDDEN IF LOGGED IN --- */}
                 {!isLoggedIn && (
                     <TouchableOpacity 
                     style={[styles.createAccountButton, { marginTop: 15 }]} 
@@ -184,7 +187,6 @@ export default function HomeScreen() {
             </View>
         )}
 
-        {/* --- MAIN GRID (3 COLUMNS) --- */}
         {searchQuery === '' && (
             <>
                 <Text style={styles.sectionTitle}>What would you like to do?</Text>
@@ -194,7 +196,7 @@ export default function HomeScreen() {
                     { 
                         flexDirection: 'row', 
                         flexWrap: 'wrap', 
-                        justifyContent: 'space-between' // Ensures spacing handles itself
+                        justifyContent: 'space-between'
                     }
                 ]}>
                     {mainServices.map((service, index) => (
@@ -203,11 +205,10 @@ export default function HomeScreen() {
                             style={[
                                 styles.serviceCard, 
                                 { 
-                                    // FIX: Using 30% width guarantees 3 items fit in one row (3x30=90%)
                                     width: '30%', 
-                                    aspectRatio: 1, // Keep it square
+                                    aspectRatio: 1, 
                                     marginBottom: 15, 
-                                    padding: 5,      
+                                    padding: 5,       
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }
@@ -220,7 +221,7 @@ export default function HomeScreen() {
                                 style={[
                                     styles.serviceTitle, 
                                     { 
-                                        fontSize: hp(1.4), // Reduced font size slightly to fit 3 columns nicely
+                                        fontSize: hp(1.4), 
                                         marginTop: 6,
                                         textAlign: 'center'
                                     }
@@ -235,11 +236,8 @@ export default function HomeScreen() {
             </>
         )}
 
-        {/* Divider */}
         <View style={{ height: 1, backgroundColor: '#E0E0E0', marginVertical: 20 }} />
 
-        {/* --- EMBEDDED SERVICES CONTENT (Filtered) --- */}
-        
         {/* 1. Popular Services */}
         {filteredPopular.length > 0 && (
           <View style={serviceStyles.section}>
@@ -277,7 +275,6 @@ export default function HomeScreen() {
                   <Text style={[serviceStyles.gridLabel, { color: COLORS.textGray }]}>{item.title}</Text>
                 </TouchableOpacity>
               ))}
-              {/* Spacers */}
               {filteredEServices.length === 1 && <View style={{width: '30%'}} />} 
               {filteredEServices.length === 1 && <View style={{width: '30%'}} />} 
             </View>
@@ -295,10 +292,10 @@ export default function HomeScreen() {
                   style={serviceStyles.featuredCard}
                   onPress={() => router.push({ pathname: '/(services)/detail', params: { id: item.id } })}
                 >
-                   <View style={serviceStyles.featuredIconContainer}>
+                    <View style={serviceStyles.featuredIconContainer}>
                       {renderIcon(item.library, item.icon, hp(3.5), item.color)}
-                   </View>
-                   <Text style={[serviceStyles.featuredTitle, { color: COLORS.textGray }]}>{item.title}</Text>
+                    </View>
+                    <Text style={[serviceStyles.featuredTitle, { color: COLORS.textGray }]}>{item.title}</Text>
                 </TouchableOpacity>
               ))}
               {filteredFeatured.length % 2 !== 0 && <View style={serviceStyles.featuredCardHidden} />}
@@ -325,7 +322,7 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Bottom Banner */}
+        {/* --- LOGIC: HIDDEN IF LOGGED IN --- */}
         {!isLoggedIn && searchQuery === '' && (
           <View style={styles.bottomBanner}>
             <Text style={styles.bannerTitle}>Help us improve our city</Text>
