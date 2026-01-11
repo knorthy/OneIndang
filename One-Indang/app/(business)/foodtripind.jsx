@@ -1,5 +1,20 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, TextInput, Dimensions, FlatList, Platform, StatusBar, Animated, Modal } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  Image, 
+  TouchableOpacity, 
+  TextInput, 
+  Dimensions, 
+  FlatList, 
+  Platform, 
+  StatusBar, 
+  Animated, 
+  Modal,
+  BackHandler // 1. Import BackHandler
+} from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -137,6 +152,23 @@ export default function FoodScreen() {
     };
     checkAuth();
   }, []);
+
+  // --- FIX: HANDLE DEVICE BACK BUTTON ---
+  useEffect(() => {
+    const onBackPress = () => {
+      // If Detail View is open, close it (go back to list)
+      if (selectedItem) {
+        setSelectedItem(null);
+        return true; // We handled the back press
+      }
+      // If List View is open, let the default behavior happen (pop screen)
+      return false; 
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => subscription.remove();
+  }, [selectedItem]);
 
   // Filter Logic
   const filteredData = useMemo(() => {

@@ -4,22 +4,29 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
-  SafeAreaView, 
   StatusBar,
   Platform,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  ScrollView
+  ScrollView,
+  Keyboard
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Using Expo icons
+import { Ionicons } from '@expo/vector-icons'; 
 import { hp, wp } from "../../helpers/common";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from '../../styles/loginStyles';
 import { auth } from '../../services/supabase';
 import { showToast } from '../../components/Toast';
+import { useRouter, useLocalSearchParams } from 'expo-router'; // Added useLocalSearchParams
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+  const router = useRouter(); 
   const insets = useSafeAreaInsets();
+  
+  // CAPTURE PARAMS (Redirect info)
+  const params = useLocalSearchParams();
+  const { redirect, name, image } = params;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,8 +34,12 @@ export default function LoginScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      showToast('Please fill in all fields');
+    if (!email.trim()) {
+      showToast('Please enter your email address.');
+      return;
+    }
+    if (!password) {
+      showToast('Please enter your password.');
       return;
     }
 
@@ -37,19 +48,37 @@ export default function LoginScreen({ navigation }) {
       const { data, error } = await auth.signIn(email, password);
 
       if (error) {
-        console.error('Login error:', error);
-        showToast(error.message || 'Login failed');
+        console.log('Login error:', error.message);
+        
+        if (error.message.toLowerCase().includes('invalid login credentials')) {
+            showToast('Incorrect email or password. Please try again.');
+        } else if (error.message.toLowerCase().includes('email not confirmed')) {
+            showToast('Your email is not verified. Please check your inbox.');
+        } else {
+            showToast(error.message || 'Login failed. Please try again.');
+        }
         return;
       }
 
-      if (data.user) {
+      if (data?.user || data?.session) {
         showToast('Login successful!');
-        // Navigate to main screen or handle successful login
-        // navigation.navigate('Main'); // Adjust based on your navigation setup
+        
+        // --- LOGIC: Redirect to Order Page OR Home ---
+        if (redirect) {
+            router.replace({ 
+                pathname: redirect, 
+                params: { name, image } 
+            });
+        } else {
+            router.replace({ 
+                pathname: '/main', 
+                params: { isUserLoggedIn: 'true' } 
+            });
+        }
       }
     } catch (error) {
-      console.error('Login error:', error);
-      showToast('An unexpected error occurred');
+      console.log('Unexpected Login error:', error);
+      showToast('Network error. Please check your internet connection.');
     } finally {
       setIsLoading(false);
     }
@@ -57,38 +86,40 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar style="dark" />
+      <StatusBar barStyle="dark-content" />
       
-      <TouchableWithoutFeedback onPress={() => {}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.mainWrapper}>
             
-          {/* Header / Back Button */}
+          {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation?.goBack()} style={styles.backButton}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <Ionicons name="chevron-back" size={hp(3.5)} color="black" />
             </TouchableOpacity>
-            
           </View>
 
-          {/* Title Section */}
+          {/* Title */}
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subtitle}>Enter  you account credentials to login.</Text>
+            <Text style={styles.subtitle}>Enter your account credentials to login.</Text>
           </View>
 
           <KeyboardAvoidingView 
-            behavior={Platform.OS === "ios" ? "padding" : "height"} 
-            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : undefined} 
+            style={{ flex: 1 }} 
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
           >
             <ScrollView 
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[
+                styles.scrollContent, 
+                { flexGrow: 1, paddingBottom: 50 } 
+              ]} 
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              {/* Form Section */}
               <View style={styles.formContainer}>
                 
-                {/* Email Input (Replaced Phone Number) */}
+                {/* Email Input */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>Enter your email</Text>
                   <View style={styles.inputWrapper}>
@@ -129,7 +160,7 @@ export default function LoginScreen({ navigation }) {
                   </View>
                 </View>
 
-                {/* Remember Me & Forgot Password Row */}
+                {/* Options Row */}
                 <View style={styles.optionsRow}>
                   <TouchableOpacity 
                     style={styles.checkboxContainer} 
@@ -146,21 +177,29 @@ export default function LoginScreen({ navigation }) {
                   </TouchableOpacity>
                 </View>
               </View>
+
+              <View style={[
+                  styles.footerContainer, 
+                  { 
+                    marginTop: 40,      
+                    marginBottom: 20,   
+                    position: 'relative', 
+                    bottom: 'auto'
+                  }
+              ]}>
+                <TouchableOpacity 
+                  style={[styles.continueButton, isLoading && { opacity: 0.6 }]} 
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.continueButtonText}>
+                    {isLoading ? 'Signing In...' : 'Continue'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
             </ScrollView>
           </KeyboardAvoidingView>
-
-          {/* Bottom Button */}
-          <View style={styles.footerContainer}>
-            <TouchableOpacity 
-              style={[styles.continueButton, isLoading && { opacity: 0.6 }]} 
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              <Text style={styles.continueButtonText}>
-                {isLoading ? 'Signing In...' : 'Continue'}
-              </Text>
-            </TouchableOpacity>
-          </View>
 
         </View>
       </TouchableWithoutFeedback>

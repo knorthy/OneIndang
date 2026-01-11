@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, 
-  StatusBar, Dimensions, Modal
+  StatusBar, Dimensions, Modal, BackHandler
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -20,7 +20,6 @@ export default function RestaurantDetailsScreen() {
   const [currentUser, setCurrentUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -33,17 +32,41 @@ export default function RestaurantDetailsScreen() {
     checkAuth();
   }, []);
 
+  // Handle Hardware Back Button to close Modal
+  useEffect(() => {
+    const onBackPress = () => {
+      if (showAuthModal) {
+        setShowAuthModal(false);
+        return true; 
+      }
+      return false; 
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [showAuthModal]);
+
   const handleOrderNow = () => {
-    // Check if user is authenticated
     if (!currentUser) {
       setShowAuthModal(true);
       return;
     }
     
-    // Navigate to the Menu/Ordering page
     router.push({
         pathname: '/(business)/order',
         params: { name, image } 
+    });
+  };
+
+  const handleAuthNavigation = (targetPath) => {
+    setShowAuthModal(false);
+    // PASS REDIRECT PARAMS HERE
+    router.push({
+        pathname: targetPath,
+        params: { 
+            redirect: '/(business)/order', // Where to go after login
+            name: name,                    // Data needed for order page
+            image: image 
+        }
     });
   };
 
@@ -51,13 +74,11 @@ export default function RestaurantDetailsScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" transparent translucent />
       
-      {/* Header Image */}
       <View style={styles.imageContainer}>
         <Image 
             source={{ uri: image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4' }} 
             style={styles.headerImage} 
         />
-        {/* Back Button */}
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
@@ -69,7 +90,6 @@ export default function RestaurantDetailsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Title Section */}
         <View style={styles.titleSection}>
             <View style={styles.badge}><Text style={styles.badgeText}>Fast Food</Text></View>
             <View style={styles.ratingRow}>
@@ -81,7 +101,6 @@ export default function RestaurantDetailsScreen() {
         <Text style={styles.restaurantName}>{name}</Text>
         <Text style={styles.locationText}>{location}</Text>
 
-        {/* Tabs */}
         <View style={styles.tabContainer}>
             {['About', 'Gallery', 'Review'].map((tab) => (
                 <TouchableOpacity 
@@ -94,7 +113,6 @@ export default function RestaurantDetailsScreen() {
             ))}
         </View>
 
-        {/* Info Icons */}
         <View style={styles.infoRow}>
             <View style={styles.infoItem}>
                 <Ionicons name="people-outline" size={20} color="#D32F2F" />
@@ -112,20 +130,15 @@ export default function RestaurantDetailsScreen() {
 
         <View style={styles.divider} />
 
-        {/* Description */}
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>
             Fast Food • Town Plaza. Serving the community of Indang with fresh ingredients and great flavors. Perfect for family gatherings or quick snacks. 
             <Text style={{color: '#D32F2F', fontWeight:'bold'}}> Read more</Text>
         </Text>
 
-        {/* Contact Person */}
         <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Contact Person</Text>
         <View style={styles.contactRow}>
-            <Image 
-                source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
-                style={styles.contactAvatar} 
-            />
+            <Image source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.contactAvatar} />
             <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.contactName}>Manager On Duty</Text>
                 <Text style={styles.contactRole}>Customer Relations</Text>
@@ -133,10 +146,8 @@ export default function RestaurantDetailsScreen() {
             <TouchableOpacity style={styles.contactBtn}><Ionicons name="chatbubble-ellipses-outline" size={22} color="#D32F2F" /></TouchableOpacity>
             <TouchableOpacity style={styles.contactBtn}><Ionicons name="call-outline" size={22} color="#D32F2F" /></TouchableOpacity>
         </View>
-
       </ScrollView>
 
-      {/* Bottom Bar */}
       <View style={styles.bottomBar}>
         <View>
             <Text style={styles.avgLabel}>Avg. Cost</Text>
@@ -171,20 +182,14 @@ export default function RestaurantDetailsScreen() {
             
             <TouchableOpacity 
               style={styles.modalPrimaryBtn}
-              onPress={() => {
-                setShowAuthModal(false);
-                router.push('/(tabs)/login');
-              }}
+              onPress={() => handleAuthNavigation('/(tabs)/login')}
             >
               <Text style={styles.modalPrimaryBtnText}>Sign In</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={styles.modalSecondaryBtn}
-              onPress={() => {
-                setShowAuthModal(false);
-                router.push('/(tabs)/signup');
-              }}
+              onPress={() => handleAuthNavigation('/(tabs)/signup')}
             >
               <Text style={styles.modalSecondaryBtnText}>Create Account</Text>
             </TouchableOpacity>

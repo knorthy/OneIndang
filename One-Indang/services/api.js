@@ -16,7 +16,7 @@ import axios from 'axios';
 // For development with Expo, use your computer's local IP address
 // Example: 'http://192.168.1.100:5000/api'
 // For production, replace with your deployed backend URL
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.31.117:5000/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.18.3:5000/api';
 
 // Create axios instance with default config
 const api = axios.create({
