@@ -176,7 +176,7 @@ export default function HomeScreen() {
 
   const renderIcon = (lib, name, size, color) => {
     const iconSize = hp(3.5);
-    if (lib === 'MaterialIcons') return <Ionicons name={name} size={size || iconSize} color={color} />;
+    if (lib === 'MaterialIcons') return <MaterialIcons name={name} size={size || iconSize} color={color} />;
     if (lib === 'FontAwesome5') return <FontAwesome5 name={name} size={size || iconSize} color={color} />;
     return <MaterialCommunityIcons name={name} size={size || iconSize} color={color} />;
   };
