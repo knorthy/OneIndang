@@ -13,7 +13,8 @@ import {
   Linking, //  for Google Maps
   Switch,   //  for Discount Toggle
   Modal,    //  for Receipt Modal
-  Image     //  for displaying recommendation images
+  Image,    //  for displaying recommendation images
+  StyleSheet, // for local styles
 } from 'react-native';
 import LocationPickerModal from '../../components/LocationPickerModal';
 import UserProfileSheet from '../../components/UserProfileSheet';
@@ -69,9 +70,6 @@ export default function App() {
   const [selectedTransport, setSelectedTransport] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const originRef = useRef();
-  const destRef = useRef();
-
   // TRICYCLE & DISCOUNT STATE 
   const [tricycleType, setTricycleType] = useState('Regular');
   const [passengerCount, setPassengerCount] = useState(1);
@@ -87,6 +85,10 @@ export default function App() {
   // LOCATION PICKER MODAL STATE
   const [showOriginPicker, setShowOriginPicker] = useState(false);
   const [showDestinationPicker, setShowDestinationPicker] = useState(false);
+
+  // PLACE SELECTION MODAL STATE
+  const [showPlaceModal, setShowPlaceModal] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
   useEffect(() => {
     const now = new Date();
@@ -243,9 +245,6 @@ export default function App() {
     const temp = origin;
     setOrigin(destination);
     setDestination(temp);
-    
-    originRef.current?.setAddressText(destination?.desc || '');
-    destRef.current?.setAddressText(origin?.desc || '');
   };
 
   // --- GET CURRENT LOCATION FUNCTION ---
@@ -273,8 +272,6 @@ export default function App() {
         lng: longitude,
         desc: addressString
       });
-
-      originRef.current?.setAddressText(addressString);
     } catch (error) {
       Alert.alert('Error', 'Unable to get current location. Please check your GPS settings.');
     }
@@ -286,41 +283,116 @@ export default function App() {
       dest => dest.name.toLowerCase() === item.title.toLowerCase()
     );
     
-    // Show place details with option to set as origin/destination
-    Alert.alert(
-      item.title,
-      item.distance,
-      [
-        { text: 'Set as Origin', onPress: () => {
-          if (matchedDestination?.coordinates) {
-            setOrigin({ 
-              lat: matchedDestination.coordinates.lat, 
-              lng: matchedDestination.coordinates.lng, 
-              desc: item.title 
-            });
-          } else {
-            // Open location picker to search for exact location
-            setShowOriginPicker(true);
-          }
-          originRef.current?.setAddressText(item.title);
-        }},
-        { text: 'Set as Destination', onPress: () => {
-          if (matchedDestination?.coordinates) {
-            setDestination({ 
-              lat: matchedDestination.coordinates.lat, 
-              lng: matchedDestination.coordinates.lng, 
-              desc: item.title 
-            });
-          } else {
-            // Open location picker to search for exact location
-            setShowDestinationPicker(true);
-          }
-          destRef.current?.setAddressText(item.title);
-        }},
-        { text: 'Cancel', style: 'cancel' }
-      ]
-    );
+    // Store selected place data and show custom modal
+    setSelectedPlace({ ...item, matchedDestination });
+    setShowPlaceModal(true);
   };
+
+  const handleSetAsOrigin = () => {
+    if (!selectedPlace) return;
+    
+    if (selectedPlace.matchedDestination?.coordinates) {
+      setOrigin({ 
+        lat: selectedPlace.matchedDestination.coordinates.lat, 
+        lng: selectedPlace.matchedDestination.coordinates.lng, 
+        desc: selectedPlace.title 
+      });
+    } else {
+      setShowOriginPicker(true);
+    }
+    setShowPlaceModal(false);
+    setSelectedPlace(null);
+  };
+
+  const handleSetAsDestination = () => {
+    if (!selectedPlace) return;
+    
+    if (selectedPlace.matchedDestination?.coordinates) {
+      setDestination({ 
+        lat: selectedPlace.matchedDestination.coordinates.lat, 
+        lng: selectedPlace.matchedDestination.coordinates.lng, 
+        desc: selectedPlace.title 
+      });
+    } else {
+      setShowDestinationPicker(true);
+    }
+    setShowPlaceModal(false);
+    setSelectedPlace(null);
+  };
+
+  // PLACE SELECTION MODAL COMPONENT
+  const PlaceSelectionModal = () => (
+    <Modal
+      visible={showPlaceModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowPlaceModal(false)}
+    >
+      <TouchableOpacity 
+        style={localStyles.placeModalOverlay} 
+        activeOpacity={1} 
+        onPress={() => setShowPlaceModal(false)}
+      >
+        <View style={localStyles.placeModalContainer}>
+          {/* Header with place info */}
+          <View style={localStyles.placeModalHeader}>
+            <View style={localStyles.placeIconCircle}>
+              <Icon name="place" size={28} color="#D32F2F" />
+            </View>
+            <Text style={localStyles.placeModalTitle}>{selectedPlace?.title}</Text>
+            <Text style={localStyles.placeModalSubtitle}>{selectedPlace?.distance}</Text>
+          </View>
+
+          {/* Divider */}
+          <View style={localStyles.placeModalDivider} />
+
+          {/* Action Buttons */}
+          <View style={localStyles.placeModalActions}>
+            {/* Set as Origin Button */}
+            <TouchableOpacity 
+              style={localStyles.placeActionButton} 
+              onPress={handleSetAsOrigin}
+              activeOpacity={0.7}
+            >
+              <View style={[localStyles.placeActionIconCircle, { backgroundColor: '#E8F5E9' }]}>
+                <Icon name="trip-origin" size={22} color="#4CAF50" />
+              </View>
+              <View style={localStyles.placeActionTextContainer}>
+                <Text style={localStyles.placeActionTitle}>Set as Origin</Text>
+                <Text style={localStyles.placeActionSubtitle}>Start your trip from here</Text>
+              </View>
+              <Icon name="chevron-right" size={24} color="#CCC" />
+            </TouchableOpacity>
+
+            {/* Set as Destination Button */}
+            <TouchableOpacity 
+              style={localStyles.placeActionButton} 
+              onPress={handleSetAsDestination}
+              activeOpacity={0.7}
+            >
+              <View style={[localStyles.placeActionIconCircle, { backgroundColor: '#FFEBEE' }]}>
+                <Icon name="flag" size={22} color="#D32F2F" />
+              </View>
+              <View style={localStyles.placeActionTextContainer}>
+                <Text style={localStyles.placeActionTitle}>Set as Destination</Text>
+                <Text style={localStyles.placeActionSubtitle}>End your trip here</Text>
+              </View>
+              <Icon name="chevron-right" size={24} color="#CCC" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Cancel Button */}
+          <TouchableOpacity 
+            style={localStyles.placeCancelButton} 
+            onPress={() => setShowPlaceModal(false)}
+            activeOpacity={0.7}
+          >
+            <Text style={localStyles.placeCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
 
   // RECEIPT MODAL COMPONENT
   const ReceiptModal = () => (
@@ -455,13 +527,15 @@ export default function App() {
       {/* Receipt Modal */}
       <ReceiptModal />
 
+      {/* Place Selection Modal */}
+      <PlaceSelectionModal />
+
       {/* Location Picker Modals */}
       <LocationPickerModal
         visible={showOriginPicker}
         onClose={() => setShowOriginPicker(false)}
         onSelectLocation={(location) => {
           setOrigin(location);
-          originRef.current?.setAddressText(location.desc);
         }}
         type="origin"
       />
@@ -470,7 +544,6 @@ export default function App() {
         onClose={() => setShowDestinationPicker(false)}
         onSelectLocation={(location) => {
           setDestination(location);
-          destRef.current?.setAddressText(location.desc);
         }}
         type="destination"
       />
@@ -739,3 +812,108 @@ export default function App() {
     </View>
   );
 }
+
+// Local styles for Place Selection Modal
+const localStyles = StyleSheet.create({
+  placeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  placeModalContainer: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: hp(2),
+    paddingBottom: hp(4),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  placeModalHeader: {
+    alignItems: 'center',
+    paddingHorizontal: wp(5),
+    paddingVertical: hp(2),
+  },
+  placeIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFF5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: hp(1.5),
+    borderWidth: 2,
+    borderColor: '#FFEBEE',
+  },
+  placeModalTitle: {
+    fontSize: hp(2.4),
+    fontWeight: 'bold',
+    color: '#003087',
+    textAlign: 'center',
+    marginBottom: hp(0.5),
+  },
+  placeModalSubtitle: {
+    fontSize: hp(1.6),
+    color: '#666',
+    textAlign: 'center',
+  },
+  placeModalDivider: {
+    height: 1,
+    backgroundColor: '#F0F0F0',
+    marginHorizontal: wp(5),
+    marginVertical: hp(1),
+  },
+  placeModalActions: {
+    paddingHorizontal: wp(5),
+  },
+  placeActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFF',
+    paddingVertical: hp(2),
+    paddingHorizontal: wp(4),
+    borderRadius: 16,
+    marginBottom: hp(1.5),
+    borderWidth: 1,
+    borderColor: '#E8EEF8',
+  },
+  placeActionIconCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: wp(3),
+  },
+  placeActionTextContainer: {
+    flex: 1,
+  },
+  placeActionTitle: {
+    fontSize: hp(1.9),
+    fontWeight: '600',
+    color: '#003087',
+    marginBottom: 2,
+  },
+  placeActionSubtitle: {
+    fontSize: hp(1.4),
+    color: '#888',
+  },
+  placeCancelButton: {
+    marginTop: hp(1),
+    marginHorizontal: wp(5),
+    paddingVertical: hp(1.8),
+    borderRadius: 14,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  placeCancelText: {
+    fontSize: hp(1.8),
+    fontWeight: '600',
+    color: '#666',
+  },
+});

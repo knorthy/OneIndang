@@ -38,6 +38,15 @@ export default function EmergencyScreen() {
 
   const snapPoints = useMemo(() => ["80%"], []);
 
+  // Handle opening sheet - more reliable than expand()
+  const handleOpenSheet = useCallback((type) => {
+    setContentType(type);
+    // Small delay ensures state is set before sheet opens
+    setTimeout(() => {
+      bottomSheetRef.current?.snapToIndex(0);
+    }, 50);
+  }, []);
+
   const dialNumber = (number) => {
     const cleanNumber = number.replace(/[^0-9+]/g, "");
     let phoneNumber =
@@ -141,7 +150,7 @@ export default function EmergencyScreen() {
           <View style={styles.quickActionsRow}>
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("hospitals"); bottomSheetRef.current?.expand(); }}
+              onPress={() => handleOpenSheet("hospitals")}
             >
               <MaterialCommunityIcons name="hospital-building" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Hospitals</Text>
@@ -149,7 +158,7 @@ export default function EmergencyScreen() {
 
             <TouchableOpacity 
               style={styles.actionBox} 
-              onPress={() => { setContentType("fire"); bottomSheetRef.current?.expand(); }}
+              onPress={() => handleOpenSheet("fire")}
             >
               <MaterialIcons name="local-fire-department" size={wp(8)} color="#00C2A0" />
               <Text style={styles.actionBoxText}>Fire Protection</Text>
