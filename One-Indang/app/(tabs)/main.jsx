@@ -30,9 +30,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
-// Import the header background image
-// MAKE SURE THIS PATH IS CORRECT FOR YOUR PROJECT
-const headerBg = require('../../assets/images/bg.png');
+const headerBg = require('../../assets/images/mainbg.png');
 
 export default function HomeScreen() {
   const router = useRouter();

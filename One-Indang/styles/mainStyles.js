@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#003087",
     marginLeft: wp(5),
-    marginTop: hp(4),
+    marginTop: hp(2.5),
     letterSpacing: 0.5,
   },
   createAccountButton: {
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: wp(5),
     marginTop: hp(2),
+    marginBottom: hp(1.5),
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 30,
@@ -149,6 +150,17 @@ const styles = StyleSheet.create({
     color: "#D32F2F",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  headerBackground: {
+    width: '100%',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    overflow: 'hidden',
+  },
+  headerContainer: {
+    paddingHorizontal: wp(5),
+    paddingTop: hp(1),
+    paddingBottom: hp(2),
   },
 });
 
