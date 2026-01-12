@@ -24,6 +24,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm i @gorhom/bottom-sheet
 
    npm install @supabase/supabase-js
+
+   npx expo install expo-image-picker
    ```
 
 2. Start the app

@@ -43,7 +43,10 @@ export default function ForgotPasswordScreen() {
 
     setIsLoading(true);
     try {
-      const { error } = await auth.resetPassword(email);
+      // UPDATE THIS LINE:
+      const { error } = await auth.resetPassword(email, {
+        redirectTo: 'exp://192.168.18.3:8081/--/reset-password' 
+      });
 
       if (error) {
         console.log('Password reset error:', error.message);
